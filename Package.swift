@@ -20,7 +20,7 @@ let package = Package(
         .binaryTarget(
             name: "IotCoreIOS",
             url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.2-test/IotCoreIOS-0.0.2-test.xcframework.zip",
-            checksum: "1802ea36e33955361e2e4c62caf161a7c0b7bbd0a74e5c6a11be663a69b65161"
+            checksum: "0e8bb6b72a66d8e919d8cf6a382c297aa7b39aff799712529851830fdc64902b"
         )
     ]
 )
