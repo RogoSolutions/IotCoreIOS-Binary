@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'IotCoreIOS'
-  s.version          = '0.0.2-test'
+  s.version          = '0.0.1-e2e-test'
   s.summary          = 'iOS SDK for IoT device management'
   s.description      = <<-DESC
     IotCoreIOS provides BLE discovery, WiFi provisioning, and multi-transport
