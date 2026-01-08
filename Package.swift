@@ -19,8 +19,8 @@ let package = Package(
         // Per closed-source policy, this SDK is distributed as pre-compiled XCFramework
         .binaryTarget(
             name: "IotCoreIOS",
-            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.1-e2e-test/IotCoreIOS-0.0.1-e2e-test.xcframework.zip",
-            checksum: "9075a6179950aad997b8afb951b74e36f4c1ec7a83cb845ede66c2f44b1a0dd8"
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.3-test/IotCoreIOS-0.0.3-test.xcframework.zip",
+            checksum: "e939735525a4d8f943951ce1dc201c8a1f14edb0cac5605c8b3adc9040d5ad77"
         )
     ]
 )
