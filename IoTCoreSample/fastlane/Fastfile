@@ -44,6 +44,18 @@ platform :ios do
       xcodeproj: "IoTCoreSample.xcodeproj"
     )
 
+    # Auto-fetch or create distribution certificate
+    get_certificates(
+      development: false,
+      team_id: ENV["TEAM_ID"]
+    )
+
+    # Auto-fetch or create provisioning profile
+    get_provisioning_profile(
+      app_identifier: "rogo.iot.core",
+      team_id: ENV["TEAM_ID"]
+    )
+
     # Enable automatic code signing
     update_code_signing_settings(
       use_automatic_signing: true,
