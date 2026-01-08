@@ -54,6 +54,11 @@ jobs:
       LC_ALL: en_US.UTF-8
       # Build settings
       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+      # Apple credentials
+      FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+      FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+      APPLE_ID: ${{ secrets.FASTLANE_USER }}
+      TEAM_ID: H6B975ZR6W
 
     steps:
       - name: Checkout
