@@ -14,11 +14,9 @@
 #     - XcodeGen
 #     - Distribution certificate in Keychain
 #     - Provisioning profile installed
-#   - GitHub Secrets:
-#     - APPLE_ID, TEAM_ID (required for TestFlight)
-#     - APP_STORE_CONNECT_API_KEY_ID (optional, recommended)
-#     - APP_STORE_CONNECT_API_ISSUER_ID (optional, recommended)
-#     - APP_STORE_CONNECT_API_KEY (optional, recommended)
+#   - Credentials stored on runner:
+#     - APPLE_ID, TEAM_ID in ~/.config/fastlane/env
+#     - Apple ID password in Keychain (via fastlane-credentials)
 #
 # NOTE: IOTCORE_APP_KEY and IOTCORE_APP_SECRET are NOT needed.
 #       Users configure their own credentials in the app's Settings.
@@ -50,14 +48,9 @@ jobs:
     timeout-minutes: 60
 
     env:
-      # Apple credentials for TestFlight upload
-      APPLE_ID: ${{ secrets.APPLE_ID }}
-      TEAM_ID: ${{ secrets.TEAM_ID }}
-      # App Store Connect API (optional but recommended)
-      APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-      APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+      # Apple credentials loaded from runner's ~/.config/fastlane/env
+      # APPLE_ID and TEAM_ID are set via runner's shell profile
       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
-      # NOTE: IOTCORE_APP_KEY/SECRET not needed - users configure in app Settings
 
     steps:
       - name: Checkout
@@ -89,18 +82,8 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
-          # Determine release notes
-          if [ -n "${{ github.event.inputs.release_notes }}" ]; then
-            NOTES="${{ github.event.inputs.release_notes }}"
-          elif [ -n "${{ github.event.release.body }}" ]; then
-            NOTES="${{ github.event.release.body }}"
-          else
-            NOTES="New build"
-          fi
-          # Escape for environment variable
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "$NOTES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          # Set simple release notes (avoid complex markdown from release body)
+          echo "RELEASE_NOTES=IotCoreIOS SDK v$VERSION" >> $GITHUB_ENV
 
       - name: Generate Xcode Project
         working-directory: IoTCoreSample
@@ -133,13 +116,6 @@ jobs:
 
           echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
 
-      - name: Setup App Store Connect API Key
-        if: env.APP_STORE_CONNECT_API_KEY_ID != ''
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
-          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
-
       - name: Resolve Swift Packages
         working-directory: IoTCoreSample
         run: |
@@ -153,11 +129,6 @@ jobs:
         working-directory: IoTCoreSample
         run: |
           fastlane release_testflight
-
-      - name: Cleanup API Key
-        if: always() && env.APP_STORE_CONNECT_API_KEY_ID != ''
-        run: |
-          rm -f ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
 
       - name: Create Summary
         if: always()
