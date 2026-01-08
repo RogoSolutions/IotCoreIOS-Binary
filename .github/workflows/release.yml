@@ -1,0 +1,182 @@
+# TestFlight Release Workflow for IoTCoreSample
+#
+# This workflow builds a signed IPA and uploads to TestFlight when a new
+# GitHub release is published.
+#
+# Triggers:
+#   - GitHub release published
+#   - Manual workflow dispatch
+#
+# Requirements:
+#   - Self-hosted macOS runner with:
+#     - Xcode 15.0+
+#     - Fastlane
+#     - XcodeGen
+#     - Distribution certificate in Keychain
+#     - Provisioning profile installed
+#   - GitHub Secrets:
+#     - APPLE_ID, TEAM_ID (required for TestFlight)
+#     - APP_STORE_CONNECT_API_KEY_ID (optional, recommended)
+#     - APP_STORE_CONNECT_API_ISSUER_ID (optional, recommended)
+#     - APP_STORE_CONNECT_API_KEY (optional, recommended)
+#
+# NOTE: IOTCORE_APP_KEY and IOTCORE_APP_SECRET are NOT needed.
+#       Users configure their own credentials in the app's Settings.
+#
+
+name: Release to TestFlight
+
+on:
+  release:
+    types: [published]
+
+  # Manual trigger option
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: false
+        type: string
+      release_notes:
+        description: 'Release notes for TestFlight'
+        required: false
+        type: string
+        default: 'New build'
+
+jobs:
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 60
+
+    env:
+      # Apple credentials for TestFlight upload
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      TEAM_ID: ${{ secrets.TEAM_ID }}
+      # App Store Connect API (optional but recommended)
+      APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+      APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+      FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+      # NOTE: IOTCORE_APP_KEY/SECRET not needed - users configure in app Settings
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        run: |
+          echo "::group::Environment Info"
+          echo "Runner: $(hostname)"
+          echo "macOS: $(sw_vers -productVersion)"
+          xcodebuild -version
+          fastlane --version
+          echo "::endgroup::"
+
+      - name: Extract Version
+        id: version
+        run: |
+          # Determine version from input, release tag, or default
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [ -n "${{ github.event.release.tag_name }}" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            # Remove 'v' prefix if present
+            VERSION="${VERSION#v}"
+          else
+            VERSION="1.0.0"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+          # Determine release notes
+          if [ -n "${{ github.event.inputs.release_notes }}" ]; then
+            NOTES="${{ github.event.inputs.release_notes }}"
+          elif [ -n "${{ github.event.release.body }}" ]; then
+            NOTES="${{ github.event.release.body }}"
+          else
+            NOTES="New build"
+          fi
+          # Escape for environment variable
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Generate Xcode Project
+        working-directory: IoTCoreSample
+        run: |
+          echo "::group::Generate Xcode Project"
+          if command -v xcodegen &> /dev/null; then
+            xcodegen generate
+            echo "Project generated with XcodeGen"
+          elif [ -d "IoTCoreSample.xcodeproj" ]; then
+            echo "Using existing Xcode project"
+          else
+            echo "::error::No Xcode project found"
+            exit 1
+          fi
+          echo "::endgroup::"
+
+      - name: Update Version Numbers
+        working-directory: IoTCoreSample
+        run: |
+          # Use timestamp as build number for uniqueness
+          BUILD_NUMBER=$(date +%Y%m%d%H%M)
+          VERSION="${{ steps.version.outputs.version }}"
+
+          echo "Version: $VERSION"
+          echo "Build Number: $BUILD_NUMBER"
+
+          # Update Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" IoTCoreSample/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" IoTCoreSample/Info.plist
+
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Setup App Store Connect API Key
+        if: env.APP_STORE_CONNECT_API_KEY_ID != ''
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+
+      - name: Resolve Swift Packages
+        working-directory: IoTCoreSample
+        run: |
+          echo "::group::Resolving SPM Dependencies"
+          xcodebuild -resolvePackageDependencies \
+            -project IoTCoreSample.xcodeproj \
+            -scheme IoTCoreSample
+          echo "::endgroup::"
+
+      - name: Build and Upload to TestFlight
+        working-directory: IoTCoreSample
+        run: |
+          fastlane release_testflight
+
+      - name: Cleanup API Key
+        if: always() && env.APP_STORE_CONNECT_API_KEY_ID != ''
+        run: |
+          rm -f ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+
+      - name: Create Summary
+        if: always()
+        run: |
+          echo "## TestFlight Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Trigger** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Build uploaded to TestFlight successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The build will be available in App Store Connect shortly." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          echo "::error::TestFlight deployment failed. Check the logs for details."

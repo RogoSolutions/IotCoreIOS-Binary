@@ -1,0 +1,109 @@
+# XcodeGen Project Specification for IoTCoreSample
+# This file generates a standalone Xcode project for the binary distribution repo
+#
+# Usage:
+#   cd IoTCoreSample
+#   xcodegen generate
+#
+# Requirements:
+#   brew install xcodegen
+#
+
+name: IoTCoreSample
+options:
+  bundleIdPrefix: rogo.iot
+  deploymentTarget:
+    iOS: "13.0"
+  xcodeVersion: "15.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Manual
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    IPHONEOS_DEPLOYMENT_TARGET: "13.0"
+
+packages:
+  IotCoreIOS:
+    path: ".."
+
+targets:
+  IoTCoreSample:
+    type: application
+    platform: iOS
+    sources:
+      - path: IoTCoreSample
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: rogo.iot.core
+        INFOPLIST_FILE: IoTCoreSample/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: ""
+        ENABLE_PREVIEWS: true
+      configs:
+        Debug:
+          CODE_SIGNING_ALLOWED: "NO"
+          CODE_SIGN_IDENTITY: ""
+        Release:
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: ""
+    dependencies:
+      - package: IotCoreIOS
+    info:
+      path: IoTCoreSample/Info.plist
+      properties:
+        CFBundleDevelopmentRegion: "$(DEVELOPMENT_LANGUAGE)"
+        CFBundleExecutable: "$(EXECUTABLE_NAME)"
+        CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: "$(PRODUCT_NAME)"
+        CFBundlePackageType: "$(PRODUCT_BUNDLE_PACKAGE_TYPE)"
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSRequiresIPhoneOS: true
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: "Default Configuration"
+                UISceneDelegateClassName: "$(PRODUCT_MODULE_NAME).SceneDelegate"
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiredDeviceCapabilities:
+          - armv7
+        NSBluetoothAlwaysUsageDescription: "This app uses Bluetooth to discover and connect to IoT devices."
+        NSBluetoothPeripheralUsageDescription: "This app uses Bluetooth to discover and connect to IoT devices."
+        NSLocalNetworkUsageDescription: "This app uses the local network to discover and control IoT devices."
+        NSLocationWhenInUseUsageDescription: "Location is required for Bluetooth device scanning."
+
+schemes:
+  IoTCoreSample:
+    build:
+      targets:
+        IoTCoreSample: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

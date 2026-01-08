@@ -1,0 +1,96 @@
+# IotCoreIOS-Binary .gitignore
+
+# =============================================================================
+# macOS
+# =============================================================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# =============================================================================
+# Xcode
+# =============================================================================
+# Build artifacts
+build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# User-specific settings
+*.xcuserstate
+*.xcscmblueprint
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Package.resolved
+
+# =============================================================================
+# Fastlane
+# =============================================================================
+# Build outputs
+IoTCoreSample/fastlane/report.xml
+IoTCoreSample/fastlane/Preview.html
+IoTCoreSample/fastlane/screenshots/
+IoTCoreSample/fastlane/test_output/
+IoTCoreSample/fastlane/logs/
+
+# Environment files with secrets - NEVER commit these!
+IoTCoreSample/fastlane/.env
+IoTCoreSample/fastlane/.env.local
+IoTCoreSample/fastlane/.env.secret
+.env
+.env.local
+.env.secret
+
+# Build artifacts
+*.ipa
+*.dSYM.zip
+*.dSYM/
+*.app.zip
+
+# Gym (build)
+IoTCoreSample/build/
+
+# =============================================================================
+# Code Signing
+# =============================================================================
+# Certificate and provisioning files - NEVER commit these!
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+
+# =============================================================================
+# IDE / Editors
+# =============================================================================
+# VSCode
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# =============================================================================
+# Temporary Files
+# =============================================================================
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+
+# =============================================================================
+# Archives (keep release archives in releases, not repo)
+# =============================================================================
+# Note: XCFramework zips for releases are kept for distribution
+# *.xcframework.zip  # Uncomment if you don't want these in repo

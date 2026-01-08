@@ -1,0 +1,114 @@
+# CI Workflow for IoTCoreSample
+#
+# This workflow builds the Sample App on every push and pull request to validate
+# that the SDK integration works correctly.
+#
+# Triggers:
+#   - Push to main branch
+#   - Pull requests to main branch
+#
+# Requirements:
+#   - Self-hosted macOS runner with Xcode installed
+#   - XcodeGen (for project generation)
+#
+# NOTE: IOTCORE_APP_KEY/SECRET are NOT needed - users configure in app Settings.
+#
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-sample-app:
+    name: Build Sample App
+    runs-on: [self-hosted, macOS]
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        id: setup
+        run: |
+          echo "::group::Environment Info"
+          echo "Runner: $(hostname)"
+          echo "macOS: $(sw_vers -productVersion)"
+          xcodebuild -version
+          fastlane --version || echo "Fastlane not installed (optional for CI build)"
+          echo "::endgroup::"
+
+          # Auto-detect available iOS simulator
+          echo "::group::Detecting Simulator"
+          SIMULATOR_NAME=$(xcrun simctl list devices available | grep -E "^\s+iPhone.*Pro\s" | head -1 | sed 's/^[[:space:]]*//' | sed 's/ (.*$//')
+          if [ -z "$SIMULATOR_NAME" ]; then
+            SIMULATOR_NAME=$(xcrun simctl list devices available | grep -E "^\s+iPhone" | head -1 | sed 's/^[[:space:]]*//' | sed 's/ (.*$//')
+          fi
+          if [ -z "$SIMULATOR_NAME" ]; then
+            echo "::error::No iPhone simulator found"
+            exit 1
+          fi
+          echo "Selected simulator: $SIMULATOR_NAME"
+          echo "simulator_name=$SIMULATOR_NAME" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+
+      - name: Generate Xcode Project
+        working-directory: IoTCoreSample
+        run: |
+          echo "::group::Generate Xcode Project"
+          if command -v xcodegen &> /dev/null; then
+            xcodegen generate
+            echo "Project generated with XcodeGen"
+          elif [ -d "IoTCoreSample.xcodeproj" ]; then
+            echo "Using existing Xcode project"
+          else
+            echo "::error::No Xcode project found and XcodeGen not available"
+            exit 1
+          fi
+          echo "::endgroup::"
+
+      - name: Resolve Swift Packages
+        working-directory: IoTCoreSample
+        run: |
+          echo "::group::Resolving SPM Dependencies"
+          xcodebuild -resolvePackageDependencies \
+            -project IoTCoreSample.xcodeproj \
+            -scheme IoTCoreSample
+          echo "::endgroup::"
+
+      - name: Build Sample App
+        working-directory: IoTCoreSample
+        run: |
+          echo "::group::Building Sample App"
+          set -o pipefail
+          xcodebuild build \
+            -project IoTCoreSample.xcodeproj \
+            -scheme IoTCoreSample \
+            -destination "platform=iOS Simulator,name=${{ steps.setup.outputs.simulator_name }}" \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty --color || tail -100
+          echo "::endgroup::"
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Simulator** | ${{ steps.setup.outputs.simulator_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
