@@ -1,0 +1,552 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0ABE693045C6C8CCAC9E21ED /* DebugLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2BA32EDBE75459E461D06C /* DebugLogView.swift */; };
+		16D315C578605A7893E5C2EF /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */; };
+		1F4F563B91D4BAFB4BC71113 /* DeviceCommandTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */; };
+		31A82C3A5A0B572840A585A6 /* DeviceControlDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1227DA2FCADE3BE176103CC1 /* DeviceControlDetailView.swift */; };
+		354108AFA5F775FEFAFB3D9B /* OperationTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */; };
+		3CB7810C6E9867F2DBA09F0F /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638D0F941424D5588904ED3E /* Location.swift */; };
+		4026883B59F0ECAA3F626699 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */; };
+		48E2B5C70FB52A8BA1050BC8 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */; };
+		4D77DB8B8CD3687D8FB9B151 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3EA90838CB678CD1EF4695 /* SettingsViewModel.swift */; };
+		514FF485910A2C2352A964F3 /* DiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003AE29675897EF2D6CDFEF /* DiscoveryViewModel.swift */; };
+		52C122A492501251BFE4DEA3 /* OperationDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */; };
+		60B861F8E02A9BF6EA5ACC45 /* IoTCoreSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59DD058E81CD63235D8359DB /* IoTCoreSampleApp.swift */; };
+		6378B6AAA55380D401F5B0AE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03D1788202A3571AB3B7AFB /* ContentView.swift */; };
+		64CF01692F1226A54FD177BE /* DiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */; };
+		6AA778672BC87AC06D55CB9F /* ConfigWifiDeviceTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */; };
+		6FBC4C9BE2D7D19F0321034F /* GroupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28C710A559089B7D6AE8C45 /* GroupViewModel.swift */; };
+		7A19714004599DFA029FBF5D /* OnboardingTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE637063A52D4098A7C7E4E6 /* OnboardingTabView.swift */; };
+		7B3816218D936F5A26A5270F /* DeviceControlViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C27BA0860A273EBC430C28 /* DeviceControlViewModel.swift */; };
+		7EE2416286FFDACCC872F7BD /* OperationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */; };
+		8302203271D372AC876C8C6B /* CertificateTransferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C5B107D7576CD17D79E506 /* CertificateTransferView.swift */; };
+		843DB7218F8E5516ACBEA6C9 /* LocationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */; };
+		84D595A9A0063F6530FBBC15 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455DFE4D8B6645B71C97E01E /* Group.swift */; };
+		8D0E80238714B5A486A72F70 /* DeviceCommandTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */; };
+		951BC9EE862221C4AD3675B6 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D59A8D83AEBB78F52F34E3C /* AuthView.swift */; };
+		962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */; };
+		9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */; };
+		A16E6D27200576EA328D3F94 /* LocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */; };
+		A459845E2C45F15BE9356C7A /* RestfulAPITestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D15D7C7D2F4DCFD135B2B8 /* RestfulAPITestViewModel.swift */; };
+		A65AA6D2B34A6231A2B2F362 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0B27DE0E695B2217F694769 /* Assets.xcassets */; };
+		A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */; };
+		B2A25A6F4D2EF7A8DC155F5E /* IotCoreIOS in Frameworks */ = {isa = PBXBuildFile; productRef = 327727AD949A93E6384B9F46 /* IotCoreIOS */; };
+		C9CA0E02AFE56205761A754C /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */; };
+		CC34ABD3911A9E8FD34D52FD /* ConfigWifiDeviceTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */; };
+		CE194FD1F173190034D50EA3 /* GroupControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB02124565D01E4799297828 /* GroupControlView.swift */; };
+		DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */; };
+		E4FCF353730FAE6B273E6108 /* DeviceControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */; };
+		FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */; };
+		FD7DFDA0521F1784AAA9EBFA /* OperatorsTestingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD19BAE94D535D0151E6ACB /* OperatorsTestingView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0D59A8D83AEBB78F52F34E3C /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		1227DA2FCADE3BE176103CC1 /* DeviceControlDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlDetailView.swift; sourceTree = "<group>"; };
+		14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCommandTestView.swift; sourceTree = "<group>"; };
+		155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelectionView.swift; sourceTree = "<group>"; };
+		245D7E23E868E8D02FCF0291 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlTabView.swift; sourceTree = "<group>"; };
+		2A3EA90838CB678CD1EF4695 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		2FD19BAE94D535D0151E6ACB /* OperatorsTestingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorsTestingView.swift; sourceTree = "<group>"; };
+		32C5B107D7576CD17D79E506 /* CertificateTransferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateTransferView.swift; sourceTree = "<group>"; };
+		341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWifiDeviceTestView.swift; sourceTree = "<group>"; };
+		38C27BA0860A273EBC430C28 /* DeviceControlViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlViewModel.swift; sourceTree = "<group>"; };
+		3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCallbackDemoViewModel.swift; sourceTree = "<group>"; };
+		3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryView.swift; sourceTree = "<group>"; };
+		42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
+		455DFE4D8B6645B71C97E01E /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		5003AE29675897EF2D6CDFEF /* DiscoveryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryViewModel.swift; sourceTree = "<group>"; };
+		56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorsTestingViewModel.swift; sourceTree = "<group>"; };
+		59DD058E81CD63235D8359DB /* IoTCoreSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IoTCoreSampleApp.swift; sourceTree = "<group>"; };
+		5A941DE23C8FC514F4A1BC7B /* IotCoreIOS-Binary */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "IotCoreIOS-Binary"; path = ..; sourceTree = SOURCE_ROOT; };
+		638D0F941424D5588904ED3E /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
+		77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConfigurationManager.swift; sourceTree = "<group>"; };
+		89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
+		8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestViewModel.swift; sourceTree = "<group>"; };
+		99A127832DFCA628F7473ACC /* IoTCoreSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IoTCoreSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWifiDeviceTestViewModel.swift; sourceTree = "<group>"; };
+		B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		C03D1788202A3571AB3B7AFB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C0B27DE0E695B2217F694769 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C28C710A559089B7D6AE8C45 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
+		C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCallbackDemoView.swift; sourceTree = "<group>"; };
+		CF2BA32EDBE75459E461D06C /* DebugLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogView.swift; sourceTree = "<group>"; };
+		D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDefinition.swift; sourceTree = "<group>"; };
+		E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestView.swift; sourceTree = "<group>"; };
+		EB02124565D01E4799297828 /* GroupControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupControlView.swift; sourceTree = "<group>"; };
+		EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCommandTestViewModel.swift; sourceTree = "<group>"; };
+		F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		F5D15D7C7D2F4DCFD135B2B8 /* RestfulAPITestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestViewModel.swift; sourceTree = "<group>"; };
+		F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestView.swift; sourceTree = "<group>"; };
+		FE637063A52D4098A7C7E4E6 /* OnboardingTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		98DA385CFA7437D327B4EDDD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2A25A6F4D2EF7A8DC155F5E /* IotCoreIOS in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0245455B9C36CF48F84E69C9 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				455DFE4D8B6645B71C97E01E /* Group.swift */,
+				638D0F941424D5588904ED3E /* Location.swift */,
+				D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1CF425A1A9E609BAD627C512 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				5A941DE23C8FC514F4A1BC7B /* IotCoreIOS-Binary */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		4FB127F1A2529C2AC4097A69 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B7563C110252A2EF0AB39629 /* DeviceControlTab */,
+				6966F2E1B2D4C00BDDDC4322 /* OnboardingTab */,
+				DAF035BC07AF9B9BDC8E6343 /* SettingsTab */,
+				0D59A8D83AEBB78F52F34E3C /* AuthView.swift */,
+				341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */,
+				14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */,
+				3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */,
+				155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */,
+				E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */,
+				F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		565E16DCBBFC03A08B992B25 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		66FEDB6F62EBED3E55C02964 = {
+			isa = PBXGroup;
+			children = (
+				E835B1B4C7422DFACF2738CA /* IoTCoreSample */,
+				1CF425A1A9E609BAD627C512 /* Packages */,
+				7BEC50AE87E93E30AAB9A7DF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6966F2E1B2D4C00BDDDC4322 /* OnboardingTab */ = {
+			isa = PBXGroup;
+			children = (
+				FE637063A52D4098A7C7E4E6 /* OnboardingTabView.swift */,
+			);
+			path = OnboardingTab;
+			sourceTree = "<group>";
+		};
+		7BEC50AE87E93E30AAB9A7DF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				99A127832DFCA628F7473ACC /* IoTCoreSample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A120C1BA945E7730C74888F6 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */,
+				A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */,
+				EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */,
+				38C27BA0860A273EBC430C28 /* DeviceControlViewModel.swift */,
+				5003AE29675897EF2D6CDFEF /* DiscoveryViewModel.swift */,
+				C28C710A559089B7D6AE8C45 /* GroupViewModel.swift */,
+				6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */,
+				F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */,
+				8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */,
+				56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */,
+				F5D15D7C7D2F4DCFD135B2B8 /* RestfulAPITestViewModel.swift */,
+				3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */,
+				2A3EA90838CB678CD1EF4695 /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		B7563C110252A2EF0AB39629 /* DeviceControlTab */ = {
+			isa = PBXGroup;
+			children = (
+				1227DA2FCADE3BE176103CC1 /* DeviceControlDetailView.swift */,
+				2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */,
+				EB02124565D01E4799297828 /* GroupControlView.swift */,
+				2FD19BAE94D535D0151E6ACB /* OperatorsTestingView.swift */,
+			);
+			path = DeviceControlTab;
+			sourceTree = "<group>";
+		};
+		DAF035BC07AF9B9BDC8E6343 /* SettingsTab */ = {
+			isa = PBXGroup;
+			children = (
+				32C5B107D7576CD17D79E506 /* CertificateTransferView.swift */,
+				CF2BA32EDBE75459E461D06C /* DebugLogView.swift */,
+				C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */,
+				89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */,
+			);
+			path = SettingsTab;
+			sourceTree = "<group>";
+		};
+		E835B1B4C7422DFACF2738CA /* IoTCoreSample */ = {
+			isa = PBXGroup;
+			children = (
+				565E16DCBBFC03A08B992B25 /* Extensions */,
+				0245455B9C36CF48F84E69C9 /* Models */,
+				A120C1BA945E7730C74888F6 /* ViewModels */,
+				4FB127F1A2529C2AC4097A69 /* Views */,
+				C0B27DE0E695B2217F694769 /* Assets.xcassets */,
+				C03D1788202A3571AB3B7AFB /* ContentView.swift */,
+				245D7E23E868E8D02FCF0291 /* Info.plist */,
+				59DD058E81CD63235D8359DB /* IoTCoreSampleApp.swift */,
+				77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */,
+			);
+			path = IoTCoreSample;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CDAA67F50C66F33C85362BE1 /* IoTCoreSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B581A0101E3D1B3FFDF04C09 /* Build configuration list for PBXNativeTarget "IoTCoreSample" */;
+			buildPhases = (
+				4420AB9114C3E0337BB23CFA /* Sources */,
+				38714DCBE54D85CAF5DB34BD /* Resources */,
+				98DA385CFA7437D327B4EDDD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IoTCoreSample;
+			packageProductDependencies = (
+				327727AD949A93E6384B9F46 /* IotCoreIOS */,
+			);
+			productName = IoTCoreSample;
+			productReference = 99A127832DFCA628F7473ACC /* IoTCoreSample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		91AF5E02CEFD355E18D70B86 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = DBC53D6C93A5418D54730A4B /* Build configuration list for PBXProject "IoTCoreSample" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 66FEDB6F62EBED3E55C02964;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4AF2C311303C2E0CB4D38CFF /* XCLocalSwiftPackageReference ".." */,
+			);
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CDAA67F50C66F33C85362BE1 /* IoTCoreSample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		38714DCBE54D85CAF5DB34BD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A65AA6D2B34A6231A2B2F362 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4420AB9114C3E0337BB23CFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				951BC9EE862221C4AD3675B6 /* AuthView.swift in Sources */,
+				16D315C578605A7893E5C2EF /* AuthViewModel.swift in Sources */,
+				8302203271D372AC876C8C6B /* CertificateTransferView.swift in Sources */,
+				CC34ABD3911A9E8FD34D52FD /* ConfigWifiDeviceTestView.swift in Sources */,
+				6AA778672BC87AC06D55CB9F /* ConfigWifiDeviceTestViewModel.swift in Sources */,
+				6378B6AAA55380D401F5B0AE /* ContentView.swift in Sources */,
+				0ABE693045C6C8CCAC9E21ED /* DebugLogView.swift in Sources */,
+				8D0E80238714B5A486A72F70 /* DeviceCommandTestView.swift in Sources */,
+				1F4F563B91D4BAFB4BC71113 /* DeviceCommandTestViewModel.swift in Sources */,
+				31A82C3A5A0B572840A585A6 /* DeviceControlDetailView.swift in Sources */,
+				E4FCF353730FAE6B273E6108 /* DeviceControlTabView.swift in Sources */,
+				7B3816218D936F5A26A5270F /* DeviceControlViewModel.swift in Sources */,
+				64CF01692F1226A54FD177BE /* DiscoveryView.swift in Sources */,
+				514FF485910A2C2352A964F3 /* DiscoveryViewModel.swift in Sources */,
+				84D595A9A0063F6530FBBC15 /* Group.swift in Sources */,
+				CE194FD1F173190034D50EA3 /* GroupControlView.swift in Sources */,
+				6FBC4C9BE2D7D19F0321034F /* GroupViewModel.swift in Sources */,
+				60B861F8E02A9BF6EA5ACC45 /* IoTCoreSampleApp.swift in Sources */,
+				3CB7810C6E9867F2DBA09F0F /* Location.swift in Sources */,
+				843DB7218F8E5516ACBEA6C9 /* LocationSelectionView.swift in Sources */,
+				A16E6D27200576EA328D3F94 /* LocationViewModel.swift in Sources */,
+				7A19714004599DFA029FBF5D /* OnboardingTabView.swift in Sources */,
+				48E2B5C70FB52A8BA1050BC8 /* OnboardingViewModel.swift in Sources */,
+				52C122A492501251BFE4DEA3 /* OperationDefinition.swift in Sources */,
+				7EE2416286FFDACCC872F7BD /* OperationTestView.swift in Sources */,
+				354108AFA5F775FEFAFB3D9B /* OperationTestViewModel.swift in Sources */,
+				FD7DFDA0521F1784AAA9EBFA /* OperatorsTestingView.swift in Sources */,
+				A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */,
+				962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */,
+				A459845E2C45F15BE9356C7A /* RestfulAPITestViewModel.swift in Sources */,
+				DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */,
+				FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */,
+				9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */,
+				C9CA0E02AFE56205761A754C /* SettingsTabView.swift in Sources */,
+				4D77DB8B8CD3687D8FB9B151 /* SettingsViewModel.swift in Sources */,
+				4026883B59F0ECAA3F626699 /* ViewExtensions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7A3D8D1CB2D2E6B0E98B71C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = H6B975ZR6W;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = IoTCoreSample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = rogo.iot.core;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		91D494883A5E97C87AC02036 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		96520E33D3AEDE7F08E888CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = H6B975ZR6W;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = IoTCoreSample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = rogo.iot.core;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BA758ABC9B4DA5E2EF81E2A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B581A0101E3D1B3FFDF04C09 /* Build configuration list for PBXNativeTarget "IoTCoreSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A3D8D1CB2D2E6B0E98B71C1 /* Debug */,
+				96520E33D3AEDE7F08E888CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DBC53D6C93A5418D54730A4B /* Build configuration list for PBXProject "IoTCoreSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				91D494883A5E97C87AC02036 /* Debug */,
+				BA758ABC9B4DA5E2EF81E2A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		4AF2C311303C2E0CB4D38CFF /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		327727AD949A93E6384B9F46 /* IotCoreIOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = IotCoreIOS;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 91AF5E02CEFD355E18D70B86 /* Project object */;
+}
