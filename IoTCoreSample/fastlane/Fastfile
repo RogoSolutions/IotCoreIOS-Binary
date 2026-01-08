@@ -50,7 +50,8 @@ platform :ios do
       configuration: "Release",
       export_method: "app-store",
       output_directory: "./build",
-      output_name: "IoTCoreSample.ipa"
+      output_name: "IoTCoreSample.ipa",
+      xcargs: "-allowProvisioningUpdates"
     )
   end
 
