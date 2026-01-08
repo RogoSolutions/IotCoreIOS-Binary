@@ -44,24 +44,13 @@ platform :ios do
       xcodeproj: "IoTCoreSample.xcodeproj"
     )
 
-    # Enable automatic code signing (certificate must be pre-installed on runner)
-    update_code_signing_settings(
-      use_automatic_signing: true,
-      path: "IoTCoreSample.xcodeproj",
-      team_id: ENV["TEAM_ID"]
-    )
-
     build_app(
       project: "IoTCoreSample.xcodeproj",
       scheme: "IoTCoreSample",
       configuration: "Release",
       export_method: "app-store",
       output_directory: "./build",
-      output_name: "IoTCoreSample.ipa",
-      export_options: {
-        signingStyle: "automatic",
-        teamID: ENV["TEAM_ID"]
-      }
+      output_name: "IoTCoreSample.ipa"
     )
   end
 
