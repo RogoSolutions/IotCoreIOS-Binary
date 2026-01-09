@@ -13,7 +13,7 @@ name: IoTCoreSample
 options:
   bundleIdPrefix: rogo.iot
   deploymentTarget:
-    iOS: "13.0"
+    iOS: "14.0"
   xcodeVersion: "15.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
@@ -27,7 +27,7 @@ settings:
     CODE_SIGN_STYLE: Automatic
     SWIFT_VERSION: "5.0"
     TARGETED_DEVICE_FAMILY: "1,2"
-    IPHONEOS_DEPLOYMENT_TARGET: "13.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "14.0"
 
 packages:
   IotCoreIOS:
