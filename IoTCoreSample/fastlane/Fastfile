@@ -37,10 +37,8 @@ platform :ios do
 
   desc "Build signed IPA for App Store / TestFlight"
   lane :build_sample do
-    # Increment build number using timestamp for uniqueness
-    build_number = Time.now.strftime("%Y%m%d%H%M")
+    # Increment build number (auto-increment from current value)
     increment_build_number(
-      build_number: build_number,
       xcodeproj: "IoTCoreSample.xcodeproj"
     )
 
@@ -90,10 +88,16 @@ platform :ios do
 
   desc "Run tests"
   lane :test do
+    # Dynamically detect available iPhone simulator
+    available_sims = sh("xcrun simctl list devices available | grep iPhone | head -1 | sed 's/(.*//' | xargs", log: false).strip
+    simulator = available_sims.empty? ? "iPhone 15 Pro" : available_sims
+
+    UI.message("Using simulator: #{simulator}")
+
     scan(
       project: "IoTCoreSample.xcodeproj",
       scheme: "IoTCoreSample",
-      devices: ["iPhone 15 Pro"],
+      devices: [simulator],
       clean: true
     )
   end

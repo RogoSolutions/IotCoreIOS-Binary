@@ -1,133 +1,64 @@
-# Fastlane Configuration for IoTCoreSample
+fastlane documentation
+----
 
-This directory contains Fastlane configuration for automated builds and TestFlight deployment.
+# Installation
 
-## Prerequisites
+Make sure you have the latest version of the Xcode command line tools installed:
 
-- **Fastlane**: Install with `brew install fastlane`
-- **Xcode**: 15.0 or later
-- **Apple Developer Account**: Required for TestFlight deployment
-- **Code Signing**: Distribution certificate and provisioning profile
-
-## Quick Start
-
-### 1. Setup Environment
-
-```bash
-# Copy the template
-cp fastlane/.env.default fastlane/.env
-
-# Edit with your credentials
-nano fastlane/.env
+```sh
+xcode-select --install
 ```
 
-### 2. Available Lanes
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
 
-| Lane | Description | Code Signing |
-|------|-------------|--------------|
-| `build_test` | Build for simulator | No |
-| `build_sample` | Build signed IPA | Yes |
-| `release_testflight` | Build and upload to TestFlight | Yes |
-| `test` | Run unit tests | No |
-| `bump_version` | Increment version number | No |
+# Available Actions
 
-### 3. Running Lanes
+## iOS
 
-```bash
-cd IoTCoreSample
+### ios build_test
 
-# Build for simulator (no signing required)
-fastlane build_test
-
-# Build signed IPA (requires certificates)
-fastlane build_sample
-
-# Upload to TestFlight
-fastlane release_testflight
+```sh
+[bundle exec] fastlane ios build_test
 ```
 
-## Environment Variables
+Build Sample App for simulator (no code signing)
 
-### Required for TestFlight
+### ios build_sample
 
-| Variable | Description |
-|----------|-------------|
-| `APPLE_ID` | Apple Developer Account email |
-| `TEAM_ID` | Apple Developer Team ID |
-
-### Optional (Recommended for CI)
-
-| Variable | Description |
-|----------|-------------|
-| `APP_STORE_CONNECT_API_KEY_ID` | API Key ID |
-| `APP_STORE_CONNECT_API_ISSUER_ID` | API Issuer ID |
-| `APP_STORE_CONNECT_API_KEY_PATH` | Path to .p8 key file |
-
-## CI/CD Integration
-
-For GitHub Actions, set these secrets in your repository:
-
-1. Go to Settings > Secrets and variables > Actions
-2. Add the following secrets:
-   - `APPLE_ID` - Apple Developer Account email
-   - `TEAM_ID` - Apple Developer Team ID
-   - `APP_STORE_CONNECT_API_KEY_ID` (optional, recommended for CI)
-   - `APP_STORE_CONNECT_API_ISSUER_ID` (optional, recommended for CI)
-   - `APP_STORE_CONNECT_API_KEY` (optional - .p8 file content)
-
-> **Note:** `IOTCORE_APP_KEY` and `IOTCORE_APP_SECRET` are NOT needed for CI builds.
-> Users configure their own SDK credentials in the app's Settings screen.
-
-## Code Signing
-
-### Manual Signing (Single Machine)
-
-1. Export distribution certificate from Keychain Access
-2. Import on build machine:
-   ```bash
-   security import certificate.p12 -k ~/Library/Keychains/login.keychain-db
-   ```
-3. Download provisioning profile from Apple Developer Portal
-4. Copy to: `~/Library/MobileDevice/Provisioning Profiles/`
-
-### Automatic with Match (Recommended for Teams)
-
-```bash
-# Setup (one-time)
-fastlane match init
-fastlane match appstore
-
-# Sync on CI
-fastlane match appstore --readonly
+```sh
+[bundle exec] fastlane ios build_sample
 ```
 
-## Troubleshooting
+Build signed IPA for App Store / TestFlight
 
-### "Code signing is required"
-- Ensure distribution certificate is installed
-- Verify provisioning profile is in place
-- Check `TEAM_ID` environment variable
+### ios release_testflight
 
-### "Authentication failed"
-- Verify `APPLE_ID` is correct
-- For 2FA accounts, use App-Specific Password or API Key
-- Check App Store Connect access permissions
+```sh
+[bundle exec] fastlane ios release_testflight
+```
 
-### "Build number already exists"
-- Our lanes use timestamp-based build numbers
-- If manually uploading, increment build number first
+Build and upload to TestFlight
 
-## Files
+### ios test
 
-| File | Purpose |
-|------|---------|
-| `Fastfile` | Lane definitions |
-| `Appfile` | App configuration (bundle ID, team) |
-| `.env.default` | Environment variable template |
-| `.env` | Your local configuration (gitignored) |
+```sh
+[bundle exec] fastlane ios test
+```
 
-## More Information
+Run tests
 
-- [Fastlane Documentation](https://docs.fastlane.tools/)
-- [Code Signing Guide](https://docs.fastlane.tools/codesigning/getting-started/)
-- [App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi)
+### ios bump_version
+
+```sh
+[bundle exec] fastlane ios bump_version
+```
+
+Increment version number
+
+----
+
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
+
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
+
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).

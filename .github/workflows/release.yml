@@ -113,21 +113,14 @@ jobs:
           fi
           echo "::endgroup::"
 
-      - name: Update Version Numbers
+      - name: Update Marketing Version
         working-directory: IoTCoreSample
         run: |
-          # Use timestamp as build number for uniqueness
-          BUILD_NUMBER=$(date +%Y%m%d%H%M)
           VERSION="${{ steps.version.outputs.version }}"
+          echo "Marketing Version: $VERSION"
 
-          echo "Version: $VERSION"
-          echo "Build Number: $BUILD_NUMBER"
-
-          # Update Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" IoTCoreSample/Info.plist
+          # Update marketing version in Info.plist (build number is auto-incremented by fastlane)
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" IoTCoreSample/Info.plist
-
-          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Resolve Swift Packages
         working-directory: IoTCoreSample
