@@ -74,6 +74,11 @@ jobs:
           fastlane --version
           echo "::endgroup::"
 
+      - name: Unlock Keychain
+        run: |
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/login.keychain-db
+          security set-keychain-settings -lut 7200 ~/Library/Keychains/login.keychain-db
+
       - name: Extract Version
         id: version
         run: |
