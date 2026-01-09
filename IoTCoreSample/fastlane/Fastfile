@@ -64,16 +64,21 @@ platform :ios do
     # Build the app
     build_sample
 
-    # Get release notes from environment or use default
-    changelog = ENV["RELEASE_NOTES"] || "New build from CI"
+    # Upload to TestFlight using altool (workaround for fastlane Ruby 4.0 bug)
+    ipa_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
 
-    # Upload to TestFlight
-    upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-      skip_submission: true,
-      changelog: changelog,
-      distribute_external: false
+    UI.message("Uploading #{ipa_path} to TestFlight via altool...")
+
+    sh(
+      "xcrun", "altool", "--upload-app",
+      "-f", ipa_path,
+      "-t", "ios",
+      "-u", ENV["APPLE_ID"],
+      "-p", ENV["FASTLANE_PASSWORD"],
+      "--verbose"
     )
+
+    UI.success("Successfully uploaded to TestFlight!")
 
     # Clean up build artifacts
     clean_build_artifacts
