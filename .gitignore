@@ -90,7 +90,10 @@ IoTCoreSample/build/
 *~
 
 # =============================================================================
-# Archives (keep release archives in releases, not repo)
+# XCFramework Binaries - Distributed via GitHub Releases ONLY
 # =============================================================================
-# Note: XCFramework zips for releases are kept for distribution
-# *.xcframework.zip  # Uncomment if you don't want these in repo
+# XCFramework binaries are uploaded to GitHub Releases as assets.
+# They should NOT be committed to the repository (causes bloat).
+# Consumers download from: https://github.com/.../releases/download/VERSION/...
+*.xcframework.zip
+*.xcframework.zip.sha256
