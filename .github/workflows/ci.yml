@@ -78,6 +78,14 @@ jobs:
           fi
           echo "::endgroup::"
 
+      - name: Clear SPM Cache
+        run: |
+          echo "Clearing SPM cache to avoid checksum conflicts..."
+          rm -rf ~/Library/Caches/org.swift.swiftpm
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*/SourcePackages
+          rm -rf IoTCoreSample/.swiftpm
+          rm -f IoTCoreSample/IoTCoreSample.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
       - name: Resolve Swift Packages
         working-directory: IoTCoreSample
         run: |
