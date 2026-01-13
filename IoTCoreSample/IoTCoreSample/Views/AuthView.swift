@@ -108,11 +108,12 @@ struct AuthView: View {
 
     private var logoutSection: some View {
         Section {
-            Button(role: .destructive, action: viewModel.logout) {
+            Button(action: viewModel.logout) {
                 HStack {
                     Spacer()
                     Text("Logout")
                         .fontWeight(.semibold)
+                        .foregroundColor(.red)
                     Spacer()
                 }
             }

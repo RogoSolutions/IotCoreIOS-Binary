@@ -211,23 +211,25 @@ struct DeviceCommandTestView: View {
 
     private var dangerousCommandsSection: some View {
         Section {
-            Button(role: .destructive) {
+            Button {
                 viewModel.rebootDevice(devId: deviceId)
             } label: {
                 HStack {
                     Image(systemName: "arrow.clockwise")
                     Text("Reboot Device")
                 }
+                .foregroundColor(.red)
             }
             .disabled(deviceId.isEmpty)
 
-            Button(role: .destructive) {
+            Button {
                 viewModel.resetDevice(devId: deviceId)
             } label: {
                 HStack {
                     Image(systemName: "trash")
                     Text("Reset Device (Factory Reset)")
                 }
+                .foregroundColor(.red)
             }
             .disabled(deviceId.isEmpty)
         } header: {

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GroupControlView: View {
     @ObservedObject var viewModel: DeviceControlViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     @State private var groupAddress: String = "49153"
     @State private var attrValue: String = "1,255,255,255"
@@ -43,7 +43,7 @@ struct GroupControlView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") {
-                        dismiss()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
 

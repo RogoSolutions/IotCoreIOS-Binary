@@ -1167,7 +1167,7 @@ struct OnboardingTabView: View {
 struct GroupSelectionSheet: View {
     @ObservedObject var groupViewModel: GroupViewModel
     let locationId: String?
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var filteredGroups: [DeviceGroup] {
         groupViewModel.groups(forLocationId: locationId)
@@ -1179,7 +1179,7 @@ struct GroupSelectionSheet: View {
                 // No group option
                 Button {
                     groupViewModel.clearSelection()
-                    dismiss()
+                    presentationMode.wrappedValue.dismiss()
                 } label: {
                     HStack {
                         Image(systemName: "minus.circle")
@@ -1229,7 +1229,7 @@ struct GroupSelectionSheet: View {
                     ForEach(filteredGroups) { group in
                         Button {
                             groupViewModel.selectGroup(group)
-                            dismiss()
+                            presentationMode.wrappedValue.dismiss()
                         } label: {
                             HStack {
                                 Image(systemName: group.isRoom ? "door.left.hand.open" : "folder.fill")
@@ -1287,7 +1287,7 @@ struct GroupSelectionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        dismiss()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
 

@@ -10,7 +10,7 @@ import IotCoreIOS
 
 struct LocationSelectionView: View {
     @ObservedObject var viewModel: LocationViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         NavigationView {
@@ -28,7 +28,7 @@ struct LocationSelectionView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        dismiss()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -232,7 +232,7 @@ struct LocationSelectionView: View {
 
     private func selectLocation(_ location: Location) {
         viewModel.setActiveLocation(location)
-        dismiss()
+        presentationMode.wrappedValue.dismiss()
     }
 }
 

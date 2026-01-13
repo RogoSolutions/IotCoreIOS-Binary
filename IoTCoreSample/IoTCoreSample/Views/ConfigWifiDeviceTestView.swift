@@ -175,7 +175,7 @@ struct ConfigWifiDeviceTestView: View {
                     Spacer()
                 }
 
-                Button(role: .destructive) {
+                Button {
                     viewModel.disconnect()
                     selectedPeripheral = nil
                 } label: {
@@ -183,6 +183,7 @@ struct ConfigWifiDeviceTestView: View {
                         Image(systemName: "xmark.circle")
                         Text("Disconnect")
                     }
+                    .foregroundColor(.red)
                 }
             } else {
                 Button {

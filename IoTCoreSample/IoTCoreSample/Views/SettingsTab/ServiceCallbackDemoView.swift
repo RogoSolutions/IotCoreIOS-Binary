@@ -38,10 +38,11 @@ struct ServiceCallbackDemoView: View {
                         Label("Simulate Event", systemImage: "plus.circle")
                     }
 
-                    Button(role: .destructive) {
+                    Button {
                         viewModel.clearEvents()
                     } label: {
                         Label("Clear Events", systemImage: "trash")
+                            .foregroundColor(.red)
                     }
                     .disabled(!viewModel.hasEvents)
                 } label: {
@@ -282,7 +283,6 @@ struct ServiceCallbackDemoView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
     }
 
     // MARK: - Simulate Sheet
@@ -322,7 +322,6 @@ struct ServiceCallbackDemoView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
     }
 
     // MARK: - Helpers

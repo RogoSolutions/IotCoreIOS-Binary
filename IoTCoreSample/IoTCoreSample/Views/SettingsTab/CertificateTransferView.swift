@@ -106,7 +106,7 @@ struct CertificateTransferView: View {
                     Spacer()
                 }
 
-                Button(role: .destructive) {
+                Button {
                     viewModel.disconnect()
                     selectedPeripheral = nil
                 } label: {
@@ -114,6 +114,7 @@ struct CertificateTransferView: View {
                         Image(systemName: "xmark.circle")
                         Text("Disconnect")
                     }
+                    .foregroundColor(.red)
                 }
             } else {
                 Button {

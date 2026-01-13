@@ -97,13 +97,14 @@ struct SettingsTabView: View {
 
             // Login/Logout Actions
             if viewModel.isAuthenticated {
-                Button(role: .destructive) {
+                Button {
                     viewModel.showingLogoutAlert = true
                 } label: {
                     HStack {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
                         Text("Logout")
                     }
+                    .foregroundColor(.red)
                 }
             } else {
                 NavigationLink(destination: AuthView()) {
@@ -336,7 +337,7 @@ struct SettingsTabView: View {
             NavigationLink(destination: ServiceCallbackDemoView()) {
                 HStack {
                     Image(systemName: "antenna.radiowaves.left.and.right")
-                        .foregroundColor(.indigo)
+                        .foregroundColor(Color(red: 0.29, green: 0.33, blue: 0.73))
                         .frame(width: 24)
                     Text("Service Callbacks")
                 }

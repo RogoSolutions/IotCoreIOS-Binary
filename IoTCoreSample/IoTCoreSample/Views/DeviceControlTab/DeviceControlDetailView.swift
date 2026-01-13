@@ -10,7 +10,7 @@ import SwiftUI
 struct DeviceControlDetailView: View {
     let device: IoTDevice
     @ObservedObject var viewModel: DeviceControlViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
     @State private var showingRebootConfirm = false
     @State private var showingResetConfirm = false
     @State private var showingDeleteConfirm = false
@@ -75,7 +75,7 @@ struct DeviceControlDetailView: View {
             Button("Delete", role: .destructive) {
                 viewModel.deleteDevice { success in
                     if success {
-                        dismiss()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }

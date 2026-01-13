@@ -344,7 +344,7 @@ struct DeviceRow: View {
 struct DeviceDetailView: View {
     let device: DiscoveredDevice
     let onAddDevice: () -> Void
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         NavigationView {
@@ -395,7 +395,7 @@ struct DeviceDetailView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        dismiss()
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }

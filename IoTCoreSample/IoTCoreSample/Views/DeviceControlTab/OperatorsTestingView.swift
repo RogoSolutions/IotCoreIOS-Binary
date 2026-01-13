@@ -11,7 +11,7 @@ import IotCoreIOS
 
 struct OperatorsTestingView: View {
     @StateObject private var viewModel: OperatorsTestingViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     private let device: IoTDevice
 
