@@ -12,10 +12,21 @@ struct ContentView: View {
     @State private var sdkInitialized = false
     @State private var initializationError: String?
     @State private var selectedTab = 0
+    @State private var needsCredentialsSetup = false
+    @State private var isCheckingCredentials = true
 
     var body: some View {
         Group {
-            if sdkInitialized {
+            if isCheckingCredentials {
+                // Brief loading while checking credentials
+                ProgressView()
+            } else if needsCredentialsSetup {
+                // Show setup view if credentials are not configured
+                CredentialsSetupView {
+                    needsCredentialsSetup = false
+                    initializeSDK()
+                }
+            } else if sdkInitialized {
                 mainTabView
             } else if let error = initializationError {
                 errorView(error)
@@ -24,7 +35,21 @@ struct ContentView: View {
             }
         }
         .task {
+            checkCredentialsAndInitialize()
+        }
+    }
+
+    // MARK: - Credentials Check
+
+    private func checkCredentialsAndInitialize() {
+        let config = SDKConfigurationManager.shared.loadConfiguration()
+
+        if config.hasValidCredentials {
+            isCheckingCredentials = false
             initializeSDK()
+        } else {
+            isCheckingCredentials = false
+            needsCredentialsSetup = true
         }
     }
 
@@ -90,11 +115,19 @@ struct ContentView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            Button("Retry") {
-                initializationError = nil
-                initializeSDK()
+            HStack(spacing: 16) {
+                Button("Configure") {
+                    initializationError = nil
+                    needsCredentialsSetup = true
+                }
+                .buttonStyle(.bordered)
+
+                Button("Retry") {
+                    initializationError = nil
+                    initializeSDK()
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding()
     }
