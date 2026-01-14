@@ -218,7 +218,7 @@ struct LocationSelectionView: View {
             if isActive {
                 Image(systemName: "checkmark")
                     .foregroundColor(.green)
-                    .fontWeight(.semibold)
+                    .font(.body.weight(.semibold))
             } else {
                 Image(systemName: "chevron.right")
                     .foregroundColor(.secondary)

@@ -38,8 +38,8 @@ struct SDKConfiguration {
         appSecret: ProcessInfo.processInfo.environment["IOTCORE_APP_SECRET"] ?? ""
     )
 
-    /// Check if credentials are configured
-    var isConfigured: Bool {
+    /// Check if credentials are configured (either via env vars or UserDefaults)
+    var hasValidCredentials: Bool {
         return !appKey.isEmpty && !appSecret.isEmpty
     }
 }
