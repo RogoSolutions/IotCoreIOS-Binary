@@ -10,10 +10,16 @@ import SwiftUI
 struct DeviceControlTabView: View {
     @StateObject private var viewModel = DeviceControlViewModel()
     @State private var showingGroupControl = false
+    @State private var expandedGroupIds: Set<String> = []
 
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
+                // Location Tabs
+                if !viewModel.locations.isEmpty {
+                    locationTabsView
+                }
+
                 if viewModel.isLoading {
                     loadingView
                 } else if let error = viewModel.errorMessage {
@@ -30,6 +36,8 @@ struct DeviceControlTabView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         viewModel.fetchDevices()
+                        viewModel.fetchLocations()
+                        viewModel.fetchGroups()
                     } label: {
                         Image(systemName: "arrow.clockwise")
                     }
@@ -43,8 +51,57 @@ struct DeviceControlTabView: View {
                 if viewModel.devices.isEmpty {
                     viewModel.fetchDevices()
                 }
+                if viewModel.locations.isEmpty {
+                    viewModel.fetchLocations()
+                }
+                if viewModel.groups.isEmpty {
+                    viewModel.fetchGroups()
+                }
             }
         }
+    }
+
+    // MARK: - Location Tabs View
+
+    private var locationTabsView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                // "All" tab
+                locationTab(title: "All", locationId: nil)
+
+                // Location tabs
+                ForEach(viewModel.locations) { location in
+                    locationTab(title: location.displayName, locationId: location.uuid)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
+        .background(Color(.systemGroupedBackground))
+    }
+
+    private func locationTab(title: String, locationId: String?) -> some View {
+        let isSelected = viewModel.selectedLocationId == locationId
+        let count = viewModel.deviceCount(forLocationId: locationId)
+
+        return Button {
+            viewModel.selectLocation(locationId)
+        } label: {
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(isSelected ? .semibold : .regular)
+                Text("\(count)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(isSelected ? Color.blue.opacity(0.15) : Color(.secondarySystemGroupedBackground))
+            .foregroundColor(isSelected ? .blue : .primary)
+            .cornerRadius(8)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Loading View
@@ -120,17 +177,50 @@ struct DeviceControlTabView: View {
     private var deviceListView: some View {
         VStack(spacing: 0) {
             List {
-                // Devices Section
-                Section {
-                    ForEach(viewModel.devices) { device in
-                        NavigationLink {
-                            DeviceControlDetailView(device: device, viewModel: viewModel)
+                // Devices grouped by Group/Room
+                ForEach(viewModel.devicesByGroup, id: \.groupId) { groupData in
+                    Section {
+                        DisclosureGroup(
+                            isExpanded: Binding(
+                                get: { expandedGroupIds.contains(groupData.groupId ?? "ungrouped") },
+                                set: { isExpanded in
+                                    let key = groupData.groupId ?? "ungrouped"
+                                    if isExpanded {
+                                        expandedGroupIds.insert(key)
+                                    } else {
+                                        expandedGroupIds.remove(key)
+                                    }
+                                }
+                            )
+                        ) {
+                            ForEach(groupData.devices) { device in
+                                NavigationLink {
+                                    DeviceControlDetailView(device: device, viewModel: viewModel)
+                                } label: {
+                                    DeviceRowView(device: device)
+                                }
+                            }
                         } label: {
-                            DeviceRowView(device: device)
+                            HStack {
+                                Image(systemName: groupData.groupId == nil ? "questionmark.folder" : "folder.fill")
+                                    .foregroundColor(groupData.groupId == nil ? .secondary : .blue)
+                                    .frame(width: 24)
+
+                                Text(groupData.groupName)
+                                    .fontWeight(.medium)
+
+                                Spacer()
+
+                                Text("\(groupData.devices.count)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(Color(.systemGray5))
+                                    .cornerRadius(10)
+                            }
                         }
                     }
-                } header: {
-                    Text("\(viewModel.devices.count) Device\(viewModel.devices.count == 1 ? "" : "s")")
                 }
 
                 // Group Control Section
@@ -160,6 +250,7 @@ struct DeviceControlTabView: View {
             .listStyle(InsetGroupedListStyle())
             .refreshable {
                 viewModel.fetchDevices()
+                viewModel.fetchGroups()
             }
         }
     }

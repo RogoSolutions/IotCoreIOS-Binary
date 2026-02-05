@@ -342,6 +342,15 @@ struct SettingsTabView: View {
                     Text("Service Callbacks")
                 }
             }
+
+            NavigationLink(destination: MQTTStatusView()) {
+                HStack {
+                    Image(systemName: "network")
+                        .foregroundColor(.green)
+                        .frame(width: 24)
+                    Text("MQTT Status")
+                }
+            }
         } header: {
             Text("Developer Tools")
         } footer: {

@@ -9,6 +9,9 @@ import Foundation
 import IotCoreIOS
 import Combine
 
+// Note: TransportOption and ConnectionStatus are defined in TransportSelectorView.swift
+// Note: CommandExecution is defined in DeviceCmdTestViewModel.swift
+
 // MARK: - Device Models (from PO specification)
 
 /// Element info for device elements
@@ -139,12 +142,63 @@ enum JSONValue: Codable {
 @MainActor
 class DeviceControlViewModel: ObservableObject {
 
+    // MARK: - Constants
+
+    private let selectedLocationKey = "DeviceControl_SelectedLocationId"
+
     // MARK: - Published Properties
 
     @Published var devices: [IoTDevice] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var selectedDevice: IoTDevice?
+
+    // Location filtering
+    @Published var locations: [Location] = []
+    @Published var selectedLocationId: String? = nil
+
+    // Group filtering
+    @Published var groups: [DeviceGroup] = []
+
+    // MARK: - Computed Properties
+
+    /// Devices filtered by selected location
+    var filteredDevices: [IoTDevice] {
+        guard let locationId = selectedLocationId else {
+            return devices // "All" - show all devices
+        }
+        return devices.filter { $0.locationId == locationId
+        }
+    }
+
+    /// Devices grouped by groupId for the current filtered list
+    /// Returns tuples of (groupId, groupName, devices) sorted with named groups first, ungrouped last
+    var devicesByGroup: [(groupId: String?, groupName: String, devices: [IoTDevice])] {
+        // Group devices by groupId
+        let grouped = Dictionary(grouping: filteredDevices) { $0.groupId }
+
+        var groupedData: [(groupId: String?, groupName: String, devices: [IoTDevice])] = []
+
+        // Create tuples with group names
+        for (groupId, groupDevices) in grouped {
+            let groupName: String
+            if let gid = groupId, let group = groups.first(where: { $0.uuid == gid }) {
+                groupName = group.label
+            } else if groupId == nil {
+                groupName = "Ungrouped"
+            } else {
+                groupName = "Unknown Group"
+            }
+            groupedData.append((groupId: groupId, groupName: groupName, devices: groupDevices))
+        }
+
+        // Sort: named groups first (alphabetically), then ungrouped at the end
+        return groupedData.sorted { item1, item2 in
+            if item1.groupId == nil { return false }
+            if item2.groupId == nil { return true }
+            return item1.groupName.localizedCaseInsensitiveCompare(item2.groupName) == .orderedAscending
+        }
+    }
 
     // Detail view state
     @Published var isLoadingState = false
@@ -158,6 +212,14 @@ class DeviceControlViewModel: ObservableObject {
     // Operation result
     @Published var lastOperationResult: String?
     @Published var lastOperationError: String?
+
+    // Transport selection (global)
+    @Published var selectedTransport: TransportOption = .auto
+    @Published var bleStatus: ConnectionStatus = .disconnected
+    @Published var mqttStatus: ConnectionStatus = .disconnected
+
+    // Execution history (for all operations)
+    @Published var executionHistory: [CommandExecution] = []
 
     // MARK: - Device List Operations
 
@@ -202,6 +264,107 @@ class DeviceControlViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Location Operations
+
+    /// Fetch locations from API for filtering
+    func fetchLocations() {
+        guard let sdk = IoTAppCore.current else {
+            print("[DeviceControlViewModel] SDK not initialized - cannot fetch locations")
+            return
+        }
+
+        sdk.callApiGet("location/get", params: nil, headers: nil) { [weak self] result in
+            Task { @MainActor in
+                guard let self = self else { return }
+
+                switch result {
+                case .success(let data):
+                    if let parsedLocations = Location.parseFromAPIResponse(data) {
+                        self.locations = parsedLocations
+                        self.loadSavedLocation()
+                        print("[DeviceControlViewModel] Loaded \(parsedLocations.count) locations")
+                    } else {
+                        print("[DeviceControlViewModel] Failed to parse locations response")
+                    }
+
+                case .failure(let error):
+                    print("[DeviceControlViewModel] Failed to fetch locations: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    /// Select a location for filtering devices
+    /// - Parameter locationId: Location UUID or nil for "All"
+    func selectLocation(_ locationId: String?) {
+        selectedLocationId = locationId
+        saveSelectedLocation()
+    }
+
+    /// Save the selected location to UserDefaults for persistence across app launches
+    private func saveSelectedLocation() {
+        if let locationId = selectedLocationId {
+            UserDefaults.standard.set(locationId, forKey: selectedLocationKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: selectedLocationKey)
+        }
+    }
+
+    /// Load the saved location from UserDefaults and validate it still exists
+    private func loadSavedLocation() {
+        let savedId = UserDefaults.standard.string(forKey: selectedLocationKey)
+
+        // Validate the saved location still exists
+        if let savedId = savedId {
+            if locations.contains(where: { $0.uuid == savedId }) {
+                selectedLocationId = savedId
+            } else {
+                // Saved location no longer exists, reset to "All"
+                selectedLocationId = nil
+                saveSelectedLocation()
+            }
+        }
+    }
+
+    // MARK: - Group Operations
+
+    /// Fetch groups (rooms) from API for grouping devices
+    func fetchGroups() {
+        guard let sdk = IoTAppCore.current else {
+            print("[DeviceControlViewModel] SDK not initialized - cannot fetch groups")
+            return
+        }
+
+        sdk.callApiGet("group/get", params: nil, headers: nil) { [weak self] result in
+            Task { @MainActor in
+                guard let self = self else { return }
+
+                switch result {
+                case .success(let data):
+                    if let parsedGroups = DeviceGroup.parseFromAPIResponse(data) {
+                        self.groups = parsedGroups
+                        print("[DeviceControlViewModel] Loaded \(parsedGroups.count) groups")
+                    } else {
+                        print("[DeviceControlViewModel] Failed to parse groups response")
+                    }
+
+                case .failure(let error):
+                    print("[DeviceControlViewModel] Failed to fetch groups: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    /// Get device count for a specific location
+    /// - Parameter locationId: Location UUID or nil for "All"
+    /// - Returns: Number of devices in the location
+    func deviceCount(forLocationId locationId: String?) -> Int {
+        guard let locationId = locationId else {
+            return devices.count
+        }
+        return devices.filter { $0.locationId == locationId }.count
+    }
+
     // MARK: - Device Selection
 
     func selectDevice(_ device: IoTDevice) {
@@ -231,6 +394,8 @@ class DeviceControlViewModel: ObservableObject {
         lastOperationError = nil
         lastOperationResult = nil
 
+        let parameters = ["devId": device.id]
+
         sdk.deviceCmdHandler.getDeviceState(devId: device.id) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -240,10 +405,29 @@ class DeviceControlViewModel: ObservableObject {
                 case .success(let state):
                     self.deviceState = state
                     self.stateDescription = "State retrieved successfully"
-                    self.lastOperationResult = "Device state retrieved"
+                    let resultText = "Device state retrieved via \(self.selectedTransport.displayName)"
+                    self.lastOperationResult = resultText
+                    // Extract state data for history display using String(describing:)
+                    // Note: RGBDeviceState has internal properties, so we capture the description
+                    let stateDescription = String(describing: state)
+                    let responseData = CommandResponseData.deviceStateDescription(stateDescription)
+                    self.addToHistory(
+                        command: DeviceCommand.getDeviceState.rawValue,
+                        parameters: parameters,
+                        result: resultText,
+                        isSuccess: true,
+                        responseData: responseData
+                    )
 
                 case .failure(let error):
-                    self.lastOperationError = "Failed to get state: \(error.localizedDescription)"
+                    let errorText = "Failed to get state: \(error.localizedDescription)"
+                    self.lastOperationError = errorText
+                    self.addToHistory(
+                        command: DeviceCommand.getDeviceState.rawValue,
+                        parameters: parameters,
+                        result: errorText,
+                        isSuccess: false
+                    )
                 }
             }
         }
@@ -274,6 +458,12 @@ class DeviceControlViewModel: ObservableObject {
         lastOperationError = nil
         lastOperationResult = nil
 
+        let parameters = [
+            "devId": device.id,
+            "elements": controlElements,
+            "attrValue": controlAttrValue
+        ]
+
         sdk.deviceCmdHandler.controlDevice(
             devId: device.id,
             elements: elements,
@@ -285,10 +475,25 @@ class DeviceControlViewModel: ObservableObject {
 
                 switch result {
                 case .success(let ackCode):
-                    self.lastOperationResult = "Control sent successfully (ACK: \(ackCode))"
+                    let resultText = "Control sent via \(self.selectedTransport.displayName) (ACK: \(ackCode))"
+                    self.lastOperationResult = resultText
+                    self.addToHistory(
+                        command: DeviceCommand.controlDevice.rawValue,
+                        parameters: parameters,
+                        result: resultText,
+                        isSuccess: true,
+                        responseData: .ackCode(ackCode)
+                    )
 
                 case .failure(let error):
-                    self.lastOperationError = "Control failed: \(error.localizedDescription)"
+                    let errorText = "Control failed: \(error.localizedDescription)"
+                    self.lastOperationError = errorText
+                    self.addToHistory(
+                        command: DeviceCommand.controlDevice.rawValue,
+                        parameters: parameters,
+                        result: errorText,
+                        isSuccess: false
+                    )
                 }
             }
         }
@@ -305,6 +510,8 @@ class DeviceControlViewModel: ObservableObject {
         lastOperationError = nil
         lastOperationResult = nil
 
+        let parameters = ["devId": device.id]
+
         sdk.deviceCmdHandler.rebootDevice(devId: device.id) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -312,10 +519,24 @@ class DeviceControlViewModel: ObservableObject {
 
                 switch result {
                 case .success:
-                    self.lastOperationResult = "Device reboot initiated"
+                    let resultText = "Device reboot initiated via \(self.selectedTransport.displayName)"
+                    self.lastOperationResult = resultText
+                    self.addToHistory(
+                        command: DeviceCommand.rebootDevice.rawValue,
+                        parameters: parameters,
+                        result: resultText,
+                        isSuccess: true
+                    )
 
                 case .failure(let error):
-                    self.lastOperationError = "Reboot failed: \(error.localizedDescription)"
+                    let errorText = "Reboot failed: \(error.localizedDescription)"
+                    self.lastOperationError = errorText
+                    self.addToHistory(
+                        command: DeviceCommand.rebootDevice.rawValue,
+                        parameters: parameters,
+                        result: errorText,
+                        isSuccess: false
+                    )
                 }
             }
         }
@@ -332,6 +553,8 @@ class DeviceControlViewModel: ObservableObject {
         lastOperationError = nil
         lastOperationResult = nil
 
+        let parameters = ["devId": device.id]
+
         sdk.deviceCmdHandler.resetDevice(devId: device.id) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -339,10 +562,24 @@ class DeviceControlViewModel: ObservableObject {
 
                 switch result {
                 case .success:
-                    self.lastOperationResult = "Device reset to factory defaults"
+                    let resultText = "Device reset to factory defaults via \(self.selectedTransport.displayName)"
+                    self.lastOperationResult = resultText
+                    self.addToHistory(
+                        command: DeviceCommand.resetDevice.rawValue,
+                        parameters: parameters,
+                        result: resultText,
+                        isSuccess: true
+                    )
 
                 case .failure(let error):
-                    self.lastOperationError = "Reset failed: \(error.localizedDescription)"
+                    let errorText = "Reset failed: \(error.localizedDescription)"
+                    self.lastOperationError = errorText
+                    self.addToHistory(
+                        command: DeviceCommand.resetDevice.rawValue,
+                        parameters: parameters,
+                        result: errorText,
+                        isSuccess: false
+                    )
                 }
             }
         }
@@ -361,6 +598,8 @@ class DeviceControlViewModel: ObservableObject {
         lastOperationError = nil
         lastOperationResult = nil
 
+        let parameters = ["devId": device.id]
+
         sdk.deviceCmdHandler.getDeviceConnectivity(devId: device.id) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -368,11 +607,11 @@ class DeviceControlViewModel: ObservableObject {
 
                 switch result {
                 case .success(let connectivity):
-                    var resultText = "Connectivity Info:\n"
+                    var resultText = "Connectivity Info via \(self.selectedTransport.displayName):\n"
                     for (index, conn) in connectivity.enumerated() {
                         resultText += "\nInterface \(index):\n"
-                        resultText += "  WiFi: \(conn.isWiFiConnected ?? false ? "Connected" : "Disconnected")\n"
-                        resultText += "  Cloud: \(conn.isCloudConnected ?? false ? "Connected" : "Disconnected")\n"
+                        resultText += "  WiFi: \(conn.isWiFiConnected ? "Connected" : "Disconnected")\n"
+                        resultText += "  Cloud: \(conn.isCloudConnected ? "Connected" : "Disconnected")\n"
                         if let ssid = conn.wifiSSID {
                             resultText += "  SSID: \(ssid)\n"
                         }
@@ -381,9 +620,33 @@ class DeviceControlViewModel: ObservableObject {
                         }
                     }
                     self.lastOperationResult = resultText
+                    // Extract connectivity data for history display
+                    let connectivityInfos = connectivity.map { conn in
+                        ConnectivityInfo(
+                            isWiFiConnected: conn.isWiFiConnected,
+                            isCloudConnected: conn.isCloudConnected,
+                            wifiSSID: conn.wifiSSID,
+                            wifiSignalStrength: conn.wifiSignalStrength
+                        )
+                    }
+                    // Note: getConnectivity uses getDeviceState as closest DeviceCommand match for history
+                    self.addToHistory(
+                        command: "getConnectivity",
+                        parameters: parameters,
+                        result: "Connectivity retrieved successfully",
+                        isSuccess: true,
+                        responseData: .connectivity(connectivityInfos)
+                    )
 
                 case .failure(let error):
-                    self.lastOperationError = "Failed to get connectivity: \(error.localizedDescription)"
+                    let errorText = "Failed to get connectivity: \(error.localizedDescription)"
+                    self.lastOperationError = errorText
+                    self.addToHistory(
+                        command: "getConnectivity",
+                        parameters: parameters,
+                        result: errorText,
+                        isSuccess: false
+                    )
                 }
             }
         }
@@ -480,11 +743,107 @@ class DeviceControlViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Transport Status
+
+    /// Update transport status from SDK
+    /// Call this on appear to refresh BLE and MQTT connection status
+    func updateTransportStatus() {
+        guard let core = IoTAppCore.current, let device = selectedDevice else {
+            bleStatus = .unavailable
+            mqttStatus = .disconnected
+            return
+        }
+
+        // Check MQTT connection status
+        mqttStatus = core.isMQTTConnected() ? .connected : .disconnected
+
+        // Check BLE availability for this device
+        bleStatus = core.isBLEAvailable(for: device.id) ? .connected : .disconnected
+    }
+
+    /// Start BLE scan to discover nearby devices
+    /// This refreshes BLE availability status after scanning
+    func startBLEScan() {
+        // For now, just refresh status
+        // In a full implementation, this would trigger a BLE scan
+        updateTransportStatus()
+    }
+
+    /// Reconnect MQTT service
+    /// Initiates MQTT connection and updates status on completion
+    func reconnectMQTT() {
+        guard let core = IoTAppCore.current else {
+            lastOperationError = "SDK not initialized"
+            return
+        }
+
+        mqttStatus = .connecting
+
+        core.connectService { [weak self] result in
+            Task { @MainActor in
+                self?.updateTransportStatus()
+                switch result {
+                case .success:
+                    self?.lastOperationResult = "MQTT connection initiated"
+                case .failure(let error):
+                    self?.lastOperationError = "MQTT connect failed: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
+
     // MARK: - Helpers
 
     func clearResults() {
         lastOperationResult = nil
         lastOperationError = nil
+    }
+
+    // MARK: - History Management
+
+    /// Add a command execution to history
+    /// - Parameters:
+    ///   - command: The command that was executed (e.g., "getDeviceState", "controlDevice")
+    ///   - parameters: Dictionary of parameters used
+    ///   - result: The result message
+    ///   - isSuccess: Whether the execution was successful
+    ///   - responseData: Optional response data from the command
+    func addToHistory(
+        command: String,
+        parameters: [String: String],
+        result: String,
+        isSuccess: Bool,
+        responseData: CommandResponseData = .none
+    ) {
+        // Map string command to DeviceCommand enum (use .getDeviceState as fallback)
+        let deviceCommand = DeviceCommand.allCases.first { $0.rawValue == command } ?? .getDeviceState
+
+        let executionResult: ExecutionResult = isSuccess
+            ? .success(result)
+            : .failure(result)
+
+        let execution = CommandExecution(
+            command: deviceCommand,
+            parameters: parameters,
+            transport: selectedTransport,
+            result: executionResult,
+            responseData: responseData
+        )
+
+        // Insert at beginning (newest first)
+        executionHistory.insert(execution, at: 0)
+    }
+
+    /// Toggle expanded state for a history item
+    func toggleHistoryExpanded(_ executionId: UUID) {
+        if let index = executionHistory.firstIndex(where: { $0.id == executionId }) {
+            executionHistory[index].isExpanded.toggle()
+        }
+    }
+
+    /// Clear all execution history
+    func clearHistory() {
+        executionHistory.removeAll()
     }
 
     private func parseIntArray(_ string: String) -> [Int]? {

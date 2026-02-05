@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'IotCoreIOS'
-  s.version          = '0.0.7'
+  s.version          = '0.9.1-test'
   s.summary          = 'iOS SDK for IoT device management'
   s.description      = <<-DESC
     IotCoreIOS provides BLE discovery, WiFi provisioning, and multi-transport
@@ -30,6 +30,11 @@ Pod::Spec.new do |s|
 
   # System frameworks required by the SDK
   s.frameworks       = 'Foundation', 'CoreBluetooth'
+
+  # Per ADR-012: CocoaMQTT is a transitive dependency
+  # Automatically installed with `pod install`
+  # This prevents duplicate symbols if app also uses CocoaMQTT
+  s.dependency 'CocoaMQTT', '~> 2.1'
 
   # Build settings for compatibility
   s.pod_target_xcconfig = {
