@@ -28,7 +28,7 @@ let package = Package(
         .binaryTarget(
             name: "IotCoreIOSBinary",
             url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.9.1-test/IotCoreIOS-0.9.1-test.xcframework.zip",
-            checksum: "36362cd5cee023e9da76ab72ec8421d5fd931d02e80753f8b3d2d260d4e26815"
+            checksum: "ba69bd8332f0edd93de2d4c7adcbad10291c4f6e71e1c7fa0249a119f381b9fc"
         ),
         // Wrapper target links binary with CocoaMQTT dependency
         // When apps add IotCoreIOS, SPM automatically resolves CocoaMQTT
