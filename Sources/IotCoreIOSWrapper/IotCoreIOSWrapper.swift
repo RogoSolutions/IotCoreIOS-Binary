@@ -7,4 +7,4 @@
 //
 // Apps using this SDK will get CocoaMQTT automatically via SPM.
 
-@_exported import IotCoreIOSBinary
+@_exported import IotCoreIOS
