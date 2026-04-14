@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import IotCoreIOS
 
 struct DeviceCommandTestView: View {
     @StateObject private var viewModel = DeviceCommandTestViewModel()
@@ -15,26 +16,33 @@ struct DeviceCommandTestView: View {
     @State private var elements = "[0]"
     @State private var attrValue = "[1, 255, 255, 255]"
     @State private var targetDevType = "1"
+    @State private var isServiceConnected = false
+    @State private var isConnectingService = false
 
     var body: some View {
-        List {
-            // Device Info Section
-            deviceInfoSection
+        VStack(spacing: 0) {
+            // Connect Service toggle
+            connectServiceBanner
 
-            // Basic Commands
-            basicCommandsSection
+            List {
+                // Device Info Section
+                deviceInfoSection
 
-            // Control Commands
-            controlCommandsSection
+                // Basic Commands
+                basicCommandsSection
 
-            // WiFi Commands
-            wifiCommandsSection
+                // Control Commands
+                controlCommandsSection
 
-            // Dangerous Commands
-            dangerousCommandsSection
+                // WiFi Commands
+                wifiCommandsSection
 
-            // Results Section
-            resultsSection
+                // Dangerous Commands
+                dangerousCommandsSection
+
+                // Results Section
+                resultsSection
+            }
         }
         .navigationTitle("Device Commands")
         .navigationBarTitleDisplayMode(.inline)
@@ -46,6 +54,53 @@ struct DeviceCommandTestView: View {
                     .background(Color.black.opacity(0.2))
             }
         }
+        .onAppear {
+            isServiceConnected = IoTAppCore.current?.isMQTTConnected() ?? false
+        }
+    }
+
+    // MARK: - Connect Service Banner
+
+    private var connectServiceBanner: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("connectService()")
+                    .font(.system(.subheadline, design: .monospaced))
+                    .fontWeight(.medium)
+                Text("Required for MQTT operations")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            if isConnectingService {
+                ProgressView()
+                    .frame(width: 30)
+            }
+
+            Toggle("", isOn: Binding(
+                get: { isServiceConnected },
+                set: { newValue in
+                    if newValue && !isServiceConnected {
+                        isConnectingService = true
+                        IoTAppCore.current?.connectService { result in
+                            Task { @MainActor in
+                                isConnectingService = false
+                                if case .success = result {
+                                    isServiceConnected = true
+                                }
+                            }
+                        }
+                    }
+                }
+            ))
+            .labelsHidden()
+            .disabled(isServiceConnected || isConnectingService)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(isServiceConnected ? Color.green.opacity(0.1) : Color.orange.opacity(0.1))
     }
 
     // MARK: - Device Info Section

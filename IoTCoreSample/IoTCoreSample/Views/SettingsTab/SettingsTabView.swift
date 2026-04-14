@@ -334,6 +334,15 @@ struct SettingsTabView: View {
                 }
             }
 
+            NavigationLink(destination: SmartTestView()) {
+                HStack {
+                    Image(systemName: "bolt.heart")
+                        .foregroundColor(.cyan)
+                        .frame(width: 24)
+                    Text("Smart Automation")
+                }
+            }
+
             NavigationLink(destination: ServiceCallbackDemoView()) {
                 HStack {
                     Image(systemName: "antenna.radiowaves.left.and.right")

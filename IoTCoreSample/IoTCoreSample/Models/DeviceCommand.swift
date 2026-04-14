@@ -325,7 +325,7 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     name: "values",
                     displayName: "Values",
                     type: .intArray,
-                    defaultValue: "255,0,0",
+                    defaultValue: "",
                     placeholder: "255,0,0 (R,G,B)",
                     helpText: "Values for the attribute"
                 )
@@ -352,7 +352,7 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     name: "values",
                     displayName: "Values",
                     type: .intArray,
-                    defaultValue: "255,0,0",
+                    defaultValue: "",
                     placeholder: "255,0,0"
                 ),
                 CommandParameter(
@@ -379,7 +379,7 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     name: "values",
                     displayName: "Values",
                     type: .intArray,
-                    defaultValue: "255,0,0",
+                    defaultValue: "",
                     placeholder: "255,0,0"
                 ),
                 CommandParameter(

@@ -13,9 +13,22 @@ import Combine
 enum AuthMode: String, CaseIterable, Identifiable {
     case login = "Login"
     case signUp = "Sign Up"
-    case forgotPassword = "Forgot Password"
+    case verifyEmail = "Verify"
+    case forgotPassword = "Forgot"
 
     var id: String { rawValue }
+}
+
+/// Step in the forgot password flow
+enum ForgotPasswordStep {
+    case enterEmail
+    case enterCode
+}
+
+/// Step in the sign up flow
+enum SignUpStep {
+    case fillForm
+    case verifyEmail
 }
 
 /// Login type for switching between Email, Username, and Token login
@@ -51,9 +64,18 @@ class AuthViewModel: ObservableObject {
     @Published var signUpPhone: String = ""
     @Published var signUpPassword: String = ""
     @Published var signUpConfirmPassword: String = ""
+    @Published var signUpStep: SignUpStep = .fillForm
+    @Published var signUpVerifyCode: String = ""
+
+    // Verify Email fields
+    @Published var verifyEmailCode: String = ""
 
     // Forgot Password fields
     @Published var forgotEmail: String = ""
+    @Published var forgotPasswordStep: ForgotPasswordStep = .enterEmail
+    @Published var verifyCode: String = ""
+    @Published var newPassword: String = ""
+    @Published var confirmNewPassword: String = ""
 
     // MARK: - Computed Properties
 
@@ -173,8 +195,33 @@ class AuthViewModel: ObservableObject {
                 self?.isLoading = false
                 switch result {
                 case .success:
-                    self?.successMessage = "Sign up successful! Please login."
+                    self?.successMessage = "Sign up successful! Check your email for verification code."
+                    self?.signUpStep = .verifyEmail
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    func verifySignUpEmail() {
+        guard !signUpVerifyCode.isEmpty else {
+            errorMessage = "Please enter verification code"
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        successMessage = nil
+
+        IoTAppCore.current?.updatePasswordOrVerifyAccount(otp: signUpVerifyCode, pwd: nil) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success:
+                    self?.successMessage = "Email verified! You can now login."
                     self?.authMode = .login
+                    self?.signUpStep = .fillForm
                     self?.clearSignUpFields()
                 case .failure(let error):
                     self?.errorMessage = error.localizedDescription
@@ -189,6 +236,32 @@ class AuthViewModel: ObservableObject {
         signUpPhone = ""
         signUpPassword = ""
         signUpConfirmPassword = ""
+        signUpVerifyCode = ""
+    }
+
+    func verifyEmail() {
+        guard !verifyEmailCode.isEmpty else {
+            errorMessage = "Please enter verification code"
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        successMessage = nil
+
+        IoTAppCore.current?.updatePasswordOrVerifyAccount(otp: verifyEmailCode, pwd: nil) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success:
+                    self?.successMessage = "Email verified! You can now login."
+                    self?.authMode = .login
+                    self?.verifyEmailCode = ""
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            }
+        }
     }
 
     func clearMessages() {
@@ -197,7 +270,66 @@ class AuthViewModel: ObservableObject {
     }
 
     func requestPasswordReset() {
-        // SDK API not yet implemented - show message
-        errorMessage = "Password reset is not yet available. SDK API is under development."
+        guard !forgotEmail.isEmpty else {
+            errorMessage = "Please enter your email"
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        successMessage = nil
+
+        IoTAppCore.current?.forgotPassword(email: forgotEmail) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success:
+                    self?.successMessage = "Verification code sent to your email."
+                    self?.forgotPasswordStep = .enterCode
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    func resetPassword() {
+        guard !verifyCode.isEmpty else {
+            errorMessage = "Please enter verification code"
+            return
+        }
+        guard !newPassword.isEmpty else {
+            errorMessage = "Please enter new password"
+            return
+        }
+        guard newPassword == confirmNewPassword else {
+            errorMessage = "Passwords do not match"
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        successMessage = nil
+
+        IoTAppCore.current?.updatePasswordOrVerifyAccount(otp: verifyCode, pwd: newPassword) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success:
+                    self?.successMessage = "Password reset successful! Please login with your new password."
+                    self?.authMode = .login
+                    self?.forgotPasswordStep = .enterEmail
+                    self?.clearForgotPasswordFields()
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    func clearForgotPasswordFields() {
+        forgotEmail = ""
+        verifyCode = ""
+        newPassword = ""
+        confirmNewPassword = ""
     }
 }

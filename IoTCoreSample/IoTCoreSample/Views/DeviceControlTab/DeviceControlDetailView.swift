@@ -62,6 +62,10 @@ struct DeviceControlDetailView: View {
         .onAppear {
             viewModel.selectDevice(device)
             viewModel.updateTransportStatus()
+            // Auto-connect MQTT when entering device detail
+            if viewModel.mqttStatus != .connected {
+                viewModel.reconnectMQTT()
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -217,7 +221,7 @@ struct DeviceControlDetailView: View {
                     HStack(spacing: 12) {
                         // ON Button
                         Button {
-                            executeQuickAction(attrValue: "1,255,255,255")
+                            executeQuickAction(attrValue: "1,1")
                         } label: {
                             VStack(spacing: 4) {
                                 Image(systemName: "power")
@@ -235,7 +239,7 @@ struct DeviceControlDetailView: View {
 
                         // OFF Button
                         Button {
-                            executeQuickAction(attrValue: "0,0,0,0")
+                            executeQuickAction(attrValue: "1,0")
                         } label: {
                             VStack(spacing: 4) {
                                 Image(systemName: "power")
@@ -692,6 +696,9 @@ struct DeviceControlDetailView: View {
         for param in command.parameters {
             if param.name == "devId" {
                 parameterValues[param.name] = device.id
+            } else if param.name == "elements", let elementIds = device.elementIds, !elementIds.isEmpty {
+                // Auto-fill with all device elements
+                parameterValues[param.name] = elementIds.map { String($0) }.joined(separator: ",")
             } else if !param.defaultValue.isEmpty {
                 parameterValues[param.name] = param.defaultValue
             }
@@ -700,7 +707,12 @@ struct DeviceControlDetailView: View {
 
     private func executeQuickAction(attrValue: String) {
         viewModel.controlAttrValue = attrValue
-        viewModel.controlElements = "0"
+        // Send to all device elements
+        if let elementIds = device.elementIds, !elementIds.isEmpty {
+            viewModel.controlElements = elementIds.map { String($0) }.joined(separator: ",")
+        } else {
+            viewModel.controlElements = "0"
+        }
         viewModel.sendControl()
     }
 
@@ -1043,13 +1055,15 @@ struct DeviceControlDetailView: View {
         let elm = Int(parameterValues["elm"] ?? "0") ?? 0
         let attrValue = parseIntArray(parameterValues["attrValue"] ?? "")
         let delay: Int? = parameterValues["delay"].flatMap { Int($0) }
+        let reversing: Int? = parameterValues["reversing"].flatMap { Int($0) }
         return try await withCheckedThrowingContinuation { continuation in
             handler.bindDeviceSmartCmd(
                 smid: smid,
                 devId: devId,
                 elm: elm,
                 attrValue: attrValue,
-                delay: delay
+                delay: delay,
+                reversing: reversing
             ) { result in
                 switch result {
                 case .success(let ack):

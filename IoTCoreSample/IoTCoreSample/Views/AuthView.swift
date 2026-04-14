@@ -28,6 +28,8 @@ struct AuthView: View {
                         loginSection
                     case .signUp:
                         signUpSection
+                    case .verifyEmail:
+                        verifyEmailSection
                     case .forgotPassword:
                         forgotPasswordSection
                     }
@@ -174,46 +176,117 @@ struct AuthView: View {
 
     private var signUpSection: some View {
         Section {
-            TextField("Email *", text: $viewModel.signUpEmail)
-                .textContentType(.emailAddress)
+            switch viewModel.signUpStep {
+            case .fillForm:
+                TextField("Email *", text: $viewModel.signUpEmail)
+                    .textContentType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .disabled(viewModel.isLoading)
+
+                TextField("Username (optional)", text: $viewModel.signUpUsername)
+                    .textInputAutocapitalization(.never)
+                    .disabled(viewModel.isLoading)
+
+                TextField("Phone (optional)", text: $viewModel.signUpPhone)
+                    .keyboardType(.phonePad)
+                    .disabled(viewModel.isLoading)
+
+                SecureField("Password *", text: $viewModel.signUpPassword)
+                    .textContentType(.newPassword)
+                    .disabled(viewModel.isLoading)
+
+                SecureField("Confirm Password *", text: $viewModel.signUpConfirmPassword)
+                    .textContentType(.newPassword)
+                    .disabled(viewModel.isLoading)
+
+                Button(action: viewModel.signUp) {
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                            Text("Signing up...")
+                        } else {
+                            Text("Create Account")
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .disabled(!viewModel.canSignUp)
+
+            case .verifyEmail:
+                TextField("Verification Code", text: $viewModel.signUpVerifyCode)
+                    .textInputAutocapitalization(.never)
+                    .disabled(viewModel.isLoading)
+
+                Button(action: viewModel.verifySignUpEmail) {
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                            Text("Verifying...")
+                        } else {
+                            Text("Verify Email")
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .disabled(viewModel.signUpVerifyCode.isEmpty || viewModel.isLoading)
+
+                Button(action: {
+                    viewModel.signUpStep = .fillForm
+                    viewModel.errorMessage = nil
+                    viewModel.successMessage = nil
+                }) {
+                    Text("Back")
+                        .frame(maxWidth: .infinity)
+                }
+                .disabled(viewModel.isLoading)
+            }
+        } header: {
+            Text("Sign Up")
+        } footer: {
+            Group {
+                switch viewModel.signUpStep {
+                case .fillForm:
+                    Text("* Required fields. Username and phone are optional.")
+                case .verifyEmail:
+                    Text("Enter the verification code sent to \(viewModel.signUpEmail).")
+                }
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
+        }
+    }
+
+    // MARK: - Verify Email Section
+
+    private var verifyEmailSection: some View {
+        Section {
+            TextField("Verification Code", text: $viewModel.verifyEmailCode)
                 .textInputAutocapitalization(.never)
-                .keyboardType(.emailAddress)
                 .disabled(viewModel.isLoading)
 
-            TextField("Username (optional)", text: $viewModel.signUpUsername)
-                .textInputAutocapitalization(.never)
-                .disabled(viewModel.isLoading)
-
-            TextField("Phone (optional)", text: $viewModel.signUpPhone)
-                .keyboardType(.phonePad)
-                .disabled(viewModel.isLoading)
-
-            SecureField("Password *", text: $viewModel.signUpPassword)
-                .textContentType(.newPassword)
-                .disabled(viewModel.isLoading)
-
-            SecureField("Confirm Password *", text: $viewModel.signUpConfirmPassword)
-                .textContentType(.newPassword)
-                .disabled(viewModel.isLoading)
-
-            Button(action: viewModel.signUp) {
+            Button(action: viewModel.verifyEmail) {
                 HStack {
                     if viewModel.isLoading {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
-                        Text("Signing up...")
+                        Text("Verifying...")
                     } else {
-                        Text("Create Account")
+                        Text("Verify Email")
                             .fontWeight(.semibold)
                     }
                 }
                 .frame(maxWidth: .infinity)
             }
-            .disabled(!viewModel.canSignUp)
+            .disabled(viewModel.verifyEmailCode.isEmpty || viewModel.isLoading)
         } header: {
-            Text("Sign Up")
+            Text("Verify Email")
         } footer: {
-            Text("* Required fields. Username and phone are optional.")
+            Text("Enter the verification code sent to your email after sign up.")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
@@ -223,31 +296,80 @@ struct AuthView: View {
 
     private var forgotPasswordSection: some View {
         Section {
-            // SDK Status Banner
-            HStack {
-                Image(systemName: "info.circle.fill")
-                    .foregroundColor(.orange)
-                Text("SDK APIs for password reset are not yet implemented")
-                    .font(.caption)
-            }
-            .padding(.vertical, 4)
+            switch viewModel.forgotPasswordStep {
+            case .enterEmail:
+                TextField("Email", text: $viewModel.forgotEmail)
+                    .textContentType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .disabled(viewModel.isLoading)
 
-            TextField("Email", text: $viewModel.forgotEmail)
-                .textContentType(.emailAddress)
-                .textInputAutocapitalization(.never)
-                .keyboardType(.emailAddress)
-
-            Button(action: viewModel.requestPasswordReset) {
-                Text("Send Reset Link")
-                    .fontWeight(.semibold)
+                Button(action: viewModel.requestPasswordReset) {
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                            Text("Sending...")
+                        } else {
+                            Text("Send Verification Code")
+                                .fontWeight(.semibold)
+                        }
+                    }
                     .frame(maxWidth: .infinity)
+                }
+                .disabled(viewModel.forgotEmail.isEmpty || viewModel.isLoading)
+
+            case .enterCode:
+                TextField("Verification Code", text: $viewModel.verifyCode)
+                    .textInputAutocapitalization(.never)
+                    .disabled(viewModel.isLoading)
+
+                SecureField("New Password", text: $viewModel.newPassword)
+                    .textContentType(.newPassword)
+                    .disabled(viewModel.isLoading)
+
+                SecureField("Confirm New Password", text: $viewModel.confirmNewPassword)
+                    .textContentType(.newPassword)
+                    .disabled(viewModel.isLoading)
+
+                Button(action: viewModel.resetPassword) {
+                    HStack {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                            Text("Resetting...")
+                        } else {
+                            Text("Reset Password")
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .disabled(viewModel.verifyCode.isEmpty || viewModel.newPassword.isEmpty || viewModel.isLoading)
+
+                Button(action: {
+                    viewModel.forgotPasswordStep = .enterEmail
+                    viewModel.errorMessage = nil
+                    viewModel.successMessage = nil
+                }) {
+                    Text("Back")
+                        .frame(maxWidth: .infinity)
+                }
+                .disabled(viewModel.isLoading)
             }
         } header: {
             Text("Forgot Password")
         } footer: {
-            Text("Enter your email to receive a password reset link. This feature will be available once the SDK API is implemented.")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            Group {
+                switch viewModel.forgotPasswordStep {
+                case .enterEmail:
+                    Text("Enter your email to receive a verification code.")
+                case .enterCode:
+                    Text("Enter the verification code sent to your email and set a new password.")
+                }
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
         }
     }
 
