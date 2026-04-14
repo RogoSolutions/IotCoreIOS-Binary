@@ -999,6 +999,7 @@ struct DeviceControlDetailView: View {
 
     private func executeBindDeviceSmartTrigger(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let smid = Int(parameterValues["smid"] ?? "0") ?? 0
+        let smartSubType = Int(parameterValues["smartSubType"] ?? "66") ?? 66
         let devId = parameterValues["devId"] ?? device.id
         let typeTrigger = Int(parameterValues["typeTrigger"] ?? "0") ?? 0
         let elm = Int(parameterValues["elm"] ?? "0") ?? 0
@@ -1009,10 +1010,12 @@ struct DeviceControlDetailView: View {
         let attrValueConditionExt: [Int]? = parameterValues["attrValueConditionExt"].map { parseIntArray($0) }
         let timeCfg: [Int]? = parameterValues["timeCfg"].map { parseIntArray($0) }
         let timeJob: [Int]? = parameterValues["timeJob"].map { parseIntArray($0) }
+        let cfm = Int(parameterValues["cfm"] ?? "1") ?? 1
 
         return try await withCheckedThrowingContinuation { continuation in
             handler.bindDeviceSmartTrigger(
                 smid: smid,
+                smartSubType: smartSubType,
                 devId: devId,
                 typeTrigger: typeTrigger,
                 elm: elm,
@@ -1022,7 +1025,8 @@ struct DeviceControlDetailView: View {
                 conditionExt: conditionExt,
                 attrValueConditionExt: attrValueConditionExt,
                 timeCfg: timeCfg,
-                timeJob: timeJob
+                timeJob: timeJob,
+                cfm: cfm
             ) { result in
                 switch result {
                 case .success(let ack):
@@ -1055,15 +1059,13 @@ struct DeviceControlDetailView: View {
         let elm = Int(parameterValues["elm"] ?? "0") ?? 0
         let attrValue = parseIntArray(parameterValues["attrValue"] ?? "")
         let delay: Int? = parameterValues["delay"].flatMap { Int($0) }
-        let reversing: Int? = parameterValues["reversing"].flatMap { Int($0) }
         return try await withCheckedThrowingContinuation { continuation in
             handler.bindDeviceSmartCmd(
                 smid: smid,
                 devId: devId,
                 elm: elm,
                 attrValue: attrValue,
-                delay: delay,
-                reversing: reversing
+                delay: delay
             ) { result in
                 switch result {
                 case .success(let ack):

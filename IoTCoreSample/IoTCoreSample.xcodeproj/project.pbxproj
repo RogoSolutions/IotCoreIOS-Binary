@@ -8,11 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		0ABE693045C6C8CCAC9E21ED /* DebugLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2BA32EDBE75459E461D06C /* DebugLogView.swift */; };
+		0B3CA1CA1FB4CDB503FBEF51 /* SmartListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7FA8E1EA018C82335D1466 /* SmartListViewModel.swift */; };
 		0B74D20A2D7B0D85AC832530 /* CommandParameterFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4714BAB606B4B132B7EB58 /* CommandParameterFormView.swift */; };
 		16D315C578605A7893E5C2EF /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */; };
 		1F4F563B91D4BAFB4BC71113 /* DeviceCommandTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */; };
+		279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C603850BCEC52F2B28B6B6FE /* RestfulAPITestViewModel.swift */; };
 		31A82C3A5A0B572840A585A6 /* DeviceControlDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1227DA2FCADE3BE176103CC1 /* DeviceControlDetailView.swift */; };
 		354108AFA5F775FEFAFB3D9B /* OperationTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */; };
+		3A5F24A475C8B8E90FB32845 /* SmartDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */; };
 		3CB7810C6E9867F2DBA09F0F /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638D0F941424D5588904ED3E /* Location.swift */; };
 		4026883B59F0ECAA3F626699 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */; };
 		48E2B5C70FB52A8BA1050BC8 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */; };
@@ -21,6 +24,7 @@
 		52C122A492501251BFE4DEA3 /* OperationDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */; };
 		5A31710C983663C4C6144B9C /* CredentialsSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6245809A878DF90EB338B0AD /* CredentialsSetupView.swift */; };
 		60B861F8E02A9BF6EA5ACC45 /* IoTCoreSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59DD058E81CD63235D8359DB /* IoTCoreSampleApp.swift */; };
+		60F9EEACE33E98D4ABBD2DC4 /* SmartTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA5B7CA18CE384C447AC4562 /* SmartTestView.swift */; };
 		6378B6AAA55380D401F5B0AE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03D1788202A3571AB3B7AFB /* ContentView.swift */; };
 		64CF01692F1226A54FD177BE /* DiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */; };
 		68A332708F79F072723A2B07 /* CommandExecution.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67E54ADD2A98C05A4337E6 /* CommandExecution.swift */; };
@@ -34,20 +38,23 @@
 		843DB7218F8E5516ACBEA6C9 /* LocationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */; };
 		84D595A9A0063F6530FBBC15 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455DFE4D8B6645B71C97E01E /* Group.swift */; };
 		8D0E80238714B5A486A72F70 /* DeviceCommandTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */; };
+		9472C541675F284841476D1E /* SmartDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75109671C3AC968C1215A4F8 /* SmartDetailView.swift */; };
 		951BC9EE862221C4AD3675B6 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D59A8D83AEBB78F52F34E3C /* AuthView.swift */; };
 		962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */; };
 		9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */; };
 		A16E6D27200576EA328D3F94 /* LocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */; };
-		A459845E2C45F15BE9356C7A /* RestfulAPITestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D15D7C7D2F4DCFD135B2B8 /* RestfulAPITestViewModel.swift */; };
 		A65AA6D2B34A6231A2B2F362 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0B27DE0E695B2217F694769 /* Assets.xcassets */; };
 		A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */; };
 		B2A25A6F4D2EF7A8DC155F5E /* IotCoreIOS in Frameworks */ = {isa = PBXBuildFile; productRef = 327727AD949A93E6384B9F46 /* IotCoreIOS */; };
+		B6573FCC85404D6200080850 /* SmartTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233883E95F128A5E9D05DC82 /* SmartTestViewModel.swift */; };
 		BE2F4383CDC112AC104F2485 /* MQTTStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC64620FFC8AE3FD1D68E3D /* MQTTStatusViewModel.swift */; };
 		C5D5910AED1B25343356A3BF /* DeviceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C90E1317F3D4D93EE7FF72 /* DeviceCommand.swift */; };
 		C9CA0E02AFE56205761A754C /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */; };
 		CC34ABD3911A9E8FD34D52FD /* ConfigWifiDeviceTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */; };
 		CE194FD1F173190034D50EA3 /* GroupControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB02124565D01E4799297828 /* GroupControlView.swift */; };
+		D45B7BBAF667277F1175A70C /* SmartListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE727BE473CB66BB965FFB5 /* SmartListView.swift */; };
 		DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */; };
+		E4B27534E31D967E48DFF2D5 /* SmartItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE01921590D32EAA4A920FE /* SmartItem.swift */; };
 		E4FCF353730FAE6B273E6108 /* DeviceControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */; };
 		FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */; };
 		FC00E013A531F5DCC8CD94D5 /* MQTTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CD0A877C230F54D17171E4 /* MQTTStatusView.swift */; };
@@ -59,6 +66,7 @@
 		1227DA2FCADE3BE176103CC1 /* DeviceControlDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlDetailView.swift; sourceTree = "<group>"; };
 		14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCommandTestView.swift; sourceTree = "<group>"; };
 		155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelectionView.swift; sourceTree = "<group>"; };
+		233883E95F128A5E9D05DC82 /* SmartTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTestViewModel.swift; sourceTree = "<group>"; };
 		245D7E23E868E8D02FCF0291 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		24C90E1317F3D4D93EE7FF72 /* DeviceCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCommand.swift; sourceTree = "<group>"; };
 		2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlTabView.swift; sourceTree = "<group>"; };
@@ -71,23 +79,30 @@
 		38C27BA0860A273EBC430C28 /* DeviceControlViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceControlViewModel.swift; sourceTree = "<group>"; };
 		3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCallbackDemoViewModel.swift; sourceTree = "<group>"; };
 		3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryView.swift; sourceTree = "<group>"; };
+		3C7FA8E1EA018C82335D1466 /* SmartListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartListViewModel.swift; sourceTree = "<group>"; };
 		42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		455DFE4D8B6645B71C97E01E /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
 		5003AE29675897EF2D6CDFEF /* DiscoveryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryViewModel.swift; sourceTree = "<group>"; };
 		56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorsTestingViewModel.swift; sourceTree = "<group>"; };
 		59DD058E81CD63235D8359DB /* IoTCoreSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IoTCoreSampleApp.swift; sourceTree = "<group>"; };
+		5A941DE23C8FC514F4A1BC7B /* IotCoreIOS-Binary */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "IotCoreIOS-Binary"; path = ..; sourceTree = SOURCE_ROOT; };
 		6245809A878DF90EB338B0AD /* CredentialsSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsSetupView.swift; sourceTree = "<group>"; };
 		638D0F941424D5588904ED3E /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
+		75109671C3AC968C1215A4F8 /* SmartDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartDetailView.swift; sourceTree = "<group>"; };
 		77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConfigurationManager.swift; sourceTree = "<group>"; };
+		84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartDetailViewModel.swift; sourceTree = "<group>"; };
 		89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
 		8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestViewModel.swift; sourceTree = "<group>"; };
+		8AE727BE473CB66BB965FFB5 /* SmartListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartListView.swift; sourceTree = "<group>"; };
 		99A127832DFCA628F7473ACC /* IoTCoreSample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IoTCoreSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWifiDeviceTestViewModel.swift; sourceTree = "<group>"; };
+		AEE01921590D32EAA4A920FE /* SmartItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartItem.swift; sourceTree = "<group>"; };
 		B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		C03D1788202A3571AB3B7AFB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C0B27DE0E695B2217F694769 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C28C710A559089B7D6AE8C45 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
+		C603850BCEC52F2B28B6B6FE /* RestfulAPITestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestViewModel.swift; sourceTree = "<group>"; };
 		C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCallbackDemoView.swift; sourceTree = "<group>"; };
 		CA4714BAB606B4B132B7EB58 /* CommandParameterFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandParameterFormView.swift; sourceTree = "<group>"; };
 		CBC64620FFC8AE3FD1D68E3D /* MQTTStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTStatusViewModel.swift; sourceTree = "<group>"; };
@@ -97,10 +112,9 @@
 		E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestView.swift; sourceTree = "<group>"; };
 		EB02124565D01E4799297828 /* GroupControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupControlView.swift; sourceTree = "<group>"; };
 		EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCommandTestViewModel.swift; sourceTree = "<group>"; };
-		F2A42EE0CF175B35B7B419D8 /* binary-repo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "binary-repo"; path = ..; sourceTree = SOURCE_ROOT; };
 		F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
-		F5D15D7C7D2F4DCFD135B2B8 /* RestfulAPITestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestViewModel.swift; sourceTree = "<group>"; };
 		F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestView.swift; sourceTree = "<group>"; };
+		FA5B7CA18CE384C447AC4562 /* SmartTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartTestView.swift; sourceTree = "<group>"; };
 		FE637063A52D4098A7C7E4E6 /* OnboardingTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -124,6 +138,8 @@
 				455DFE4D8B6645B71C97E01E /* Group.swift */,
 				638D0F941424D5588904ED3E /* Location.swift */,
 				D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */,
+				C603850BCEC52F2B28B6B6FE /* RestfulAPITestViewModel.swift */,
+				AEE01921590D32EAA4A920FE /* SmartItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -131,7 +147,7 @@
 		1CF425A1A9E609BAD627C512 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				F2A42EE0CF175B35B7B419D8 /* binary-repo */,
+				5A941DE23C8FC514F4A1BC7B /* IotCoreIOS-Binary */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -149,6 +165,9 @@
 				155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */,
 				E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */,
 				F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */,
+				75109671C3AC968C1215A4F8 /* SmartDetailView.swift */,
+				8AE727BE473CB66BB965FFB5 /* SmartListView.swift */,
+				FA5B7CA18CE384C447AC4562 /* SmartTestView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -200,9 +219,11 @@
 				F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */,
 				8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */,
 				56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */,
-				F5D15D7C7D2F4DCFD135B2B8 /* RestfulAPITestViewModel.swift */,
 				3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */,
 				2A3EA90838CB678CD1EF4695 /* SettingsViewModel.swift */,
+				84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */,
+				3C7FA8E1EA018C82335D1466 /* SmartListViewModel.swift */,
+				233883E95F128A5E9D05DC82 /* SmartTestViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -282,13 +303,12 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					CDAA67F50C66F33C85362BE1 = {
-						DevelopmentTeam = H6B975ZR6W;
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
 			buildConfigurationList = DBC53D6C93A5418D54730A4B /* Build configuration list for PBXProject "IoTCoreSample" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -301,6 +321,7 @@
 				4AF2C311303C2E0CB4D38CFF /* XCLocalSwiftPackageReference ".." */,
 			);
 			preferredProjectObjectVersion = 77;
+			productRefGroup = 7BEC50AE87E93E30AAB9A7DF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -360,12 +381,19 @@
 				FD7DFDA0521F1784AAA9EBFA /* OperatorsTestingView.swift in Sources */,
 				A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */,
 				962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */,
-				A459845E2C45F15BE9356C7A /* RestfulAPITestViewModel.swift in Sources */,
+				279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */,
 				DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */,
 				FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */,
 				9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */,
 				C9CA0E02AFE56205761A754C /* SettingsTabView.swift in Sources */,
 				4D77DB8B8CD3687D8FB9B151 /* SettingsViewModel.swift in Sources */,
+				9472C541675F284841476D1E /* SmartDetailView.swift in Sources */,
+				3A5F24A475C8B8E90FB32845 /* SmartDetailViewModel.swift in Sources */,
+				E4B27534E31D967E48DFF2D5 /* SmartItem.swift in Sources */,
+				D45B7BBAF667277F1175A70C /* SmartListView.swift in Sources */,
+				0B3CA1CA1FB4CDB503FBEF51 /* SmartListViewModel.swift in Sources */,
+				60F9EEACE33E98D4ABBD2DC4 /* SmartTestView.swift in Sources */,
+				B6573FCC85404D6200080850 /* SmartTestViewModel.swift in Sources */,
 				6F89573D8463CF0EEC0DD197 /* TransportSelectorView.swift in Sources */,
 				4026883B59F0ECAA3F626699 /* ViewExtensions.swift in Sources */,
 			);
@@ -426,11 +454,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = H6B975ZR6W;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -447,7 +475,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -465,9 +493,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = IoTCoreSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -475,6 +502,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = rogo.iot.core;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -513,11 +541,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = H6B975ZR6W;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -528,7 +556,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

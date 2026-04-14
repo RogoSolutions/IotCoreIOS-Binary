@@ -18,15 +18,48 @@ struct SmartTestView: View {
     @State private var selectedElementId: Int = 0
     @State private var cmdAction = 0  // 0=OFF, 1=ON
     @State private var cmdDelay = "3"
-    @State private var cmdReversing = "2"
 
     // Manual MQTT params
     @State private var smid = ""
     @State private var smartUuid = ""
 
     @State private var selectedTab = 0
+
+    // Automation flow params
+    @State private var autoLabel = "Test Automation"
+    @State private var autoSmartSubType: Int = 0
+    @State private var autoTriggerDeviceIndex: Int? = nil
+    @State private var autoTriggerElm: Int = 0
+    @State private var autoCondition: Int = 2       // EQUAL
+    @State private var autoTriggerAttrVal = "8,1"   // EVT_MOTION=ON
+    @State private var autoTypeTrigger: Int = 0     // OWNER
+    @State private var autoTimeCfg = ""
+    @State private var autoTimeJob = ""
+    @State private var autoCmdDeviceIndex: Int? = nil
+    @State private var autoCmdElm: Int = 0
+    @State private var autoCmdAction: Int = 1       // ON
+    @State private var autoCmdAttrVal = ""          // custom attr value (overrides ON/OFF)
+    @State private var autoCmdDelay = "0"
     @State private var isServiceConnected = false
     @State private var isConnectingService = false
+
+    // Schedule flow params
+    @State private var scheduleLabel = "Test Schedule"
+    @State private var scheduleDeviceIndex: Int? = nil
+    @State private var scheduleElementId: Int = 0
+    @State private var scheduleOnOff: Int = 1  // 0=OFF, 1=ON
+    @State private var scheduleTime: Date = {
+        var c = DateComponents(); c.hour = 8; c.minute = 0
+        return Calendar.current.date(from: c) ?? Date()
+    }()
+    // 0=Sun..6=Sat
+    @State private var scheduleWeekdays: Set<Int> = [1, 2, 3, 4, 5]
+    // Legacy RGBSchedule fields. SDK does not currently expose public accessors;
+    // PO can paste these manually for testing parity with the legacy app.
+    @State private var scheduleEndpoint: String = ""
+    @State private var schedulePartner: String = ""
+    @State private var scheduleEndpointFromSDK: Bool = false
+    @State private var schedulePartnerFromSDK: Bool = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,8 +68,10 @@ struct SmartTestView: View {
 
             // Tab picker
             Picker("Mode", selection: $selectedTab) {
-                Text("Scenario Flow").tag(0)
-                Text("MQTT Primitives").tag(1)
+                Text("Scenario").tag(0)
+                Text("Schedule").tag(1)
+                Text("Automation").tag(3)
+                Text("MQTT").tag(2)
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
@@ -44,6 +79,10 @@ struct SmartTestView: View {
 
             if selectedTab == 0 {
                 scenarioFlowView
+            } else if selectedTab == 1 {
+                scheduleFlowView
+            } else if selectedTab == 3 {
+                automationFlowView
             } else {
                 mqttPrimitivesView
             }
@@ -66,6 +105,15 @@ struct SmartTestView: View {
                 viewModel.fetchDevices()
             }
             isServiceConnected = IoTAppCore.current?.isMQTTConnected() ?? false
+            // Auto-populate Schedule endpoint/partner from SDK public APIs
+            if scheduleEndpoint.isEmpty, let ep = IoTAppCore.current?.mqttEndpoint {
+                scheduleEndpoint = ep
+                scheduleEndpointFromSDK = true
+            }
+            if schedulePartner.isEmpty, let pid = IoTAppCore.current?.partnerId {
+                schedulePartner = pid
+                schedulePartnerFromSDK = true
+            }
         }
     }
 
@@ -221,11 +269,6 @@ struct SmartTestView: View {
                     .keyboardType(.numberPad)
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 80)
-                Text("Reversing")
-                TextField("seconds", text: $cmdReversing)
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 80)
             }
         } header: {
             HStack {
@@ -239,7 +282,7 @@ struct SmartTestView: View {
                 }
             }
         } footer: {
-            Text("Delay=wait before exec. Reversing=auto-reverse after N sec (0=no reverse).")
+            Text("Delay=wait before execution (seconds).")
         }
     }
 
@@ -251,15 +294,13 @@ struct SmartTestView: View {
                       let deviceUuid = device.uuid else { return }
                 let cmd = [1, cmdAction]  // [ACT_ONOFF, value]
                 let delay = Int(cmdDelay) ?? 0
-                let rev = Int(cmdReversing) ?? 0
                 viewModel.createScenario(
                     label: scenarioLabel,
                     locationId: locationId,
                     targetDeviceId: deviceUuid,
                     elementId: selectedElementId,
                     cmd: cmd,
-                    delay: delay,
-                    reversing: rev
+                    delay: delay
                 )
             } label: {
                 HStack {
@@ -380,6 +421,446 @@ struct SmartTestView: View {
             }
         } header: {
             Text("Flow Log")
+        }
+    }
+
+    // MARK: - Schedule Flow View
+
+    private static let weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+    private var scheduleSelectedDevice: IoTDevice? {
+        guard let idx = scheduleDeviceIndex, idx < viewModel.devices.count else { return nil }
+        return viewModel.devices[idx]
+    }
+
+    private var scheduleAvailableElements: [Int] {
+        guard let device = scheduleSelectedDevice else { return [0] }
+        return viewModel.elementIds(for: device)
+    }
+
+    private var scheduleFlowView: some View {
+        List {
+            scheduleInputSection
+            scheduleActionsSection
+            flowLogSection
+            resultSection
+        }
+    }
+
+    private var scheduleInputSection: some View {
+        Section {
+            HStack {
+                Text("Label").frame(width: 80, alignment: .leading)
+                TextField("Schedule name", text: $scheduleLabel)
+                    .textFieldStyle(.roundedBorder)
+            }
+            HStack {
+                Text("Location").frame(width: 80, alignment: .leading)
+                TextField("Location ID", text: $locationId)
+                    .autocapitalization(.none)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+            }
+
+            if viewModel.isLoadingDevices {
+                HStack { ProgressView().frame(width: 20); Text("Loading devices...").foregroundColor(.secondary) }
+            } else if viewModel.devices.isEmpty {
+                Button { viewModel.fetchDevices() } label: {
+                    Label("Load Devices", systemImage: "arrow.clockwise")
+                }
+            } else {
+                Picker("Device", selection: $scheduleDeviceIndex) {
+                    Text("Select device").tag(nil as Int?)
+                    ForEach(Array(viewModel.devices.enumerated()), id: \.offset) { index, device in
+                        Text(device.displayName).tag(index as Int?)
+                    }
+                }
+                .onChange(of: scheduleDeviceIndex) { _ in
+                    scheduleElementId = scheduleAvailableElements.first ?? 0
+                }
+            }
+
+            if scheduleSelectedDevice != nil {
+                Picker("Element", selection: $scheduleElementId) {
+                    ForEach(scheduleAvailableElements, id: \.self) { elmId in
+                        let label = scheduleSelectedDevice?.elementInfos?["\(elmId)"]?.label
+                        Text(label != nil ? "\(elmId) — \(label!)" : "Element \(elmId)")
+                            .tag(elmId)
+                    }
+                }
+            }
+
+            Picker("Action", selection: $scheduleOnOff) {
+                Text("OFF").tag(0)
+                Text("ON").tag(1)
+            }
+
+            DatePicker("Time", selection: $scheduleTime, displayedComponents: .hourAndMinute)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Weekdays").font(.caption).foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    ForEach(0..<7, id: \.self) { day in
+                        let isOn = scheduleWeekdays.contains(day)
+                        Button {
+                            if isOn { scheduleWeekdays.remove(day) }
+                            else { scheduleWeekdays.insert(day) }
+                        } label: {
+                            Text(Self.weekdayNames[day])
+                                .font(.caption2)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 6)
+                                .background(isOn ? Color.blue : Color.gray.opacity(0.2))
+                                .foregroundColor(isOn ? .white : .primary)
+                                .cornerRadius(6)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            HStack {
+                Text("Endpoint").frame(width: 80, alignment: .leading)
+                TextField("MQTT endpoint (optional)", text: $scheduleEndpoint)
+                    .autocapitalization(.none)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+                    .onChange(of: scheduleEndpoint) { _ in scheduleEndpointFromSDK = false }
+                if scheduleEndpointFromSDK {
+                    Text("(from SDK)").font(.caption2).foregroundColor(.secondary)
+                }
+            }
+            HStack {
+                Text("Partner").frame(width: 80, alignment: .leading)
+                TextField("Partner ID (optional)", text: $schedulePartner)
+                    .autocapitalization(.none)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+                    .onChange(of: schedulePartner) { _ in schedulePartnerFromSDK = false }
+                if schedulePartnerFromSDK {
+                    Text("(from SDK)").font(.caption2).foregroundColor(.secondary)
+                }
+            }
+        } header: {
+            Text("Schedule Parameters")
+        } footer: {
+            Text("Time is in local timezone. SDK converts to UTC before sending. Sun=0..Sat=6.\nendpoint/partner mirror the legacy RGBSchedule body; leave blank if backend tolerates omission.")
+        }
+    }
+
+    private var scheduleActionsSection: some View {
+        Section {
+            Button {
+                guard let device = scheduleSelectedDevice, let devUuid = device.uuid else { return }
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: scheduleTime)
+                let localMinutes = (comps.hour ?? 0) * 60 + (comps.minute ?? 0)
+                viewModel.runScheduleFlow(
+                    label: scheduleLabel,
+                    locationId: locationId,
+                    targetDeviceId: devUuid,
+                    elementId: scheduleElementId,
+                    onOffValue: scheduleOnOff,
+                    localMinutesFromMidnight: localMinutes,
+                    localWeekdays: Array(scheduleWeekdays).sorted(),
+                    endpoint: scheduleEndpoint.isEmpty ? nil : scheduleEndpoint,
+                    partner: schedulePartner.isEmpty ? nil : schedulePartner
+                )
+            } label: {
+                HStack {
+                    Image(systemName: "calendar.badge.plus").foregroundColor(.blue)
+                    VStack(alignment: .leading) {
+                        Text("Run Schedule Flow").fontWeight(.medium)
+                        Text("smart/add → bindCmd → smartcmd/add → schedule/add")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                }
+            }
+            .disabled(scheduleSelectedDevice == nil || locationId.isEmpty || scheduleWeekdays.isEmpty)
+
+            Button {
+                viewModel.deleteLastSchedule()
+            } label: {
+                HStack {
+                    Image(systemName: "trash.circle.fill").foregroundColor(.red)
+                    Text("Delete Last Schedule")
+                    Spacer()
+                    if let id = viewModel.createdScheduleUuid {
+                        Text(String(id.prefix(8))).font(.caption).foregroundColor(.secondary)
+                    }
+                }
+            }
+            .disabled(viewModel.createdScheduleUuid == nil)
+        } header: {
+            Text("Actions")
+        }
+    }
+
+    // MARK: - Automation Flow View
+
+    private static let smartSubTypes: [(label: String, value: Int)] = [
+        ("MIX_OR", 0),
+        ("STAIR_SWITCH", 64),
+        ("NOTIFICATION", 65),
+        ("MOTION", 66),
+        ("NO_MOTION_SIM", 67),
+        ("NO_MOTION", 68),
+        ("DOOR_SENSOR", 69),
+        ("SELF_REVERSE", 70),
+        ("SMART_AC", 128)
+    ]
+
+    private static let conditionTypes: [(label: String, value: Int)] = [
+        ("ANY", 1),
+        ("EQUAL", 2),
+        ("IN", 3),
+        ("BETWEEN", 4),
+        ("LESS_THAN", 5),
+        ("LESS_EQUAL", 6),
+        ("GREATER_THAN", 7),
+        ("GREATER_EQUAL", 8)
+    ]
+
+    private var autoTriggerDevice: IoTDevice? {
+        guard let idx = autoTriggerDeviceIndex, idx < viewModel.devices.count else { return nil }
+        return viewModel.devices[idx]
+    }
+
+    private var autoTriggerElements: [Int] {
+        guard let device = autoTriggerDevice else { return [0] }
+        return viewModel.elementIds(for: device)
+    }
+
+    private var autoCmdDevice: IoTDevice? {
+        guard let idx = autoCmdDeviceIndex, idx < viewModel.devices.count else { return nil }
+        return viewModel.devices[idx]
+    }
+
+    private var autoCmdElements: [Int] {
+        guard let device = autoCmdDevice else { return [0] }
+        return viewModel.elementIds(for: device)
+    }
+
+    private var automationFlowView: some View {
+        List {
+            autoInputSection
+            autoTriggerSection
+            autoCmdSection
+            autoActionsSection
+            flowLogSection
+            resultSection
+        }
+    }
+
+    private var autoInputSection: some View {
+        Section {
+            HStack {
+                Text("Label").frame(width: 80, alignment: .leading)
+                TextField("Automation name", text: $autoLabel)
+                    .textFieldStyle(.roundedBorder)
+            }
+            HStack {
+                Text("Location").frame(width: 80, alignment: .leading)
+                TextField("Location ID", text: $locationId)
+                    .autocapitalization(.none)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+            }
+            Picker("Sub Type", selection: $autoSmartSubType) {
+                ForEach(Self.smartSubTypes, id: \.value) { item in
+                    Text("\(item.label) (\(item.value))").tag(item.value)
+                }
+            }
+        } header: {
+            HStack {
+                Text("Automation Parameters")
+                Spacer()
+                Button { viewModel.fetchDevices() } label: {
+                    Image(systemName: "arrow.clockwise").font(.caption)
+                }
+            }
+        }
+    }
+
+    private var autoTriggerSection: some View {
+        Section {
+            // Trigger device picker
+            if viewModel.isLoadingDevices {
+                HStack { ProgressView().frame(width: 20); Text("Loading...").foregroundColor(.secondary) }
+            } else if viewModel.devices.isEmpty {
+                Button { viewModel.fetchDevices() } label: {
+                    Label("Load Devices", systemImage: "arrow.clockwise")
+                }
+            } else {
+                Picker("Trigger Device", selection: $autoTriggerDeviceIndex) {
+                    Text("Select device").tag(nil as Int?)
+                    ForEach(Array(viewModel.devices.enumerated()), id: \.offset) { index, device in
+                        Text(device.displayName).tag(index as Int?)
+                    }
+                }
+                .onChange(of: autoTriggerDeviceIndex) { _ in
+                    autoTriggerElm = autoTriggerElements.first ?? 0
+                }
+            }
+
+            if autoTriggerDevice != nil {
+                Picker("Element", selection: $autoTriggerElm) {
+                    ForEach(autoTriggerElements, id: \.self) { elmId in
+                        let label = autoTriggerDevice?.elementInfos?["\(elmId)"]?.label
+                        Text(label != nil ? "\(elmId) — \(label!)" : "Element \(elmId)")
+                            .tag(elmId)
+                    }
+                }
+            }
+
+            Picker("Condition", selection: $autoCondition) {
+                ForEach(Self.conditionTypes, id: \.value) { item in
+                    Text("\(item.label) (\(item.value))").tag(item.value)
+                }
+            }
+
+            HStack {
+                Text("Attr Value").frame(width: 80, alignment: .leading)
+                TextField("comma-separated ints (e.g. 8,1)", text: $autoTriggerAttrVal)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+            }
+
+            Picker("Type Trigger", selection: $autoTypeTrigger) {
+                Text("OWNER (0)").tag(0)
+                Text("EXT (1)").tag(1)
+            }
+            .pickerStyle(.segmented)
+
+            HStack {
+                Text("timeCfg").frame(width: 80, alignment: .leading)
+                TextField("optional, comma-separated ints", text: $autoTimeCfg)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+            }
+            HStack {
+                Text("timeJob").frame(width: 80, alignment: .leading)
+                TextField("optional, comma-separated ints", text: $autoTimeJob)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+            }
+        } header: {
+            Text("Trigger")
+        } footer: {
+            Text("Attr Value example: 8,1 = EVT_MOTION=ON")
+        }
+    }
+
+    private var autoCmdSection: some View {
+        Section {
+            if !viewModel.devices.isEmpty {
+                Picker("Cmd Device", selection: $autoCmdDeviceIndex) {
+                    Text("Select device").tag(nil as Int?)
+                    ForEach(Array(viewModel.devices.enumerated()), id: \.offset) { index, device in
+                        Text(device.displayName).tag(index as Int?)
+                    }
+                }
+                .onChange(of: autoCmdDeviceIndex) { _ in
+                    autoCmdElm = autoCmdElements.first ?? 0
+                }
+            }
+
+            if autoCmdDevice != nil {
+                Picker("Element", selection: $autoCmdElm) {
+                    ForEach(autoCmdElements, id: \.self) { elmId in
+                        let label = autoCmdDevice?.elementInfos?["\(elmId)"]?.label
+                        Text(label != nil ? "\(elmId) — \(label!)" : "Element \(elmId)")
+                            .tag(elmId)
+                    }
+                }
+            }
+
+            Picker("Action", selection: $autoCmdAction) {
+                Text("OFF").tag(0)
+                Text("ON").tag(1)
+            }
+            .pickerStyle(.segmented)
+
+            HStack {
+                Text("Custom Attr").frame(width: 80, alignment: .leading)
+                TextField("override ON/OFF (e.g. 1,1)", text: $autoCmdAttrVal)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.caption, design: .monospaced))
+            }
+
+            HStack {
+                Text("Delay").frame(width: 80, alignment: .leading)
+                TextField("0", text: $autoCmdDelay)
+                    .keyboardType(.numberPad)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 80)
+            }
+        } header: {
+            Text("Command")
+        } footer: {
+            Text("Custom Attr overrides ON/OFF picker if non-empty. Format: comma-separated ints.")
+        }
+    }
+
+    private var autoActionsSection: some View {
+        Section {
+            Button {
+                guard let triggerDev = autoTriggerDevice, let triggerDevUuid = triggerDev.uuid else { return }
+                guard let cmdDev = autoCmdDevice, let cmdDevUuid = cmdDev.uuid else { return }
+
+                let triggerAttr = parseIntArray(autoTriggerAttrVal) ?? []
+                let cmdAttr: [Int]
+                if let custom = parseIntArray(autoCmdAttrVal), !custom.isEmpty {
+                    cmdAttr = custom
+                } else {
+                    cmdAttr = [1, autoCmdAction]  // [ACT_ONOFF, value]
+                }
+                let delay = Int(autoCmdDelay) ?? 0
+                let timeCfgArr = parseIntArray(autoTimeCfg)
+                let timeJobArr = parseIntArray(autoTimeJob)
+
+                viewModel.runAutomationFlow(
+                    label: autoLabel,
+                    locationId: locationId,
+                    smartSubType: autoSmartSubType,
+                    triggerDeviceId: triggerDevUuid,
+                    triggerElm: autoTriggerElm,
+                    condition: autoCondition,
+                    attrValueCondition: triggerAttr,
+                    typeTrigger: autoTypeTrigger,
+                    timeCfg: timeCfgArr,
+                    timeJob: timeJobArr,
+                    cmdDeviceId: cmdDevUuid,
+                    cmdElm: autoCmdElm,
+                    cmdAttrValue: cmdAttr,
+                    cmdDelay: delay
+                )
+            } label: {
+                HStack {
+                    Image(systemName: "bolt.circle.fill").foregroundColor(.blue)
+                    VStack(alignment: .leading) {
+                        Text("Run Automation Flow").fontWeight(.medium)
+                        Text("smart/add -> bindTrigger -> smarttrigger/add -> bindCmd -> smartcmd/add")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                }
+            }
+            .disabled(autoTriggerDevice == nil || autoCmdDevice == nil || locationId.isEmpty
+                      || autoTriggerAttrVal.trimmingCharacters(in: .whitespaces).isEmpty)
+
+            Button {
+                viewModel.deleteLastAutomation()
+            } label: {
+                HStack {
+                    Image(systemName: "trash.circle.fill").foregroundColor(.red)
+                    Text("Delete Last Automation")
+                    Spacer()
+                    if let uuid = viewModel.createdAutomationSmartUuid {
+                        Text(String(uuid.prefix(8))).font(.caption).foregroundColor(.secondary)
+                    }
+                }
+            }
+            .disabled(viewModel.createdAutomationSmartUuid == nil)
+        } header: {
+            Text("Actions")
         }
     }
 

@@ -71,12 +71,19 @@ struct ContentView: View {
                 }
                 .tag(1)
 
+            // Smart Tab - Browse and delete created Smart entities
+            SmartListView()
+                .tabItem {
+                    Label("Smart", systemImage: "list.bullet.rectangle")
+                }
+                .tag(2)
+
             // Settings Tab - SDK config, auth, API testing, debug tools
             SettingsTabView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
-                .tag(2)
+                .tag(3)
         }
     }
 
