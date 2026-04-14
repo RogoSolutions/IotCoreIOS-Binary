@@ -1,8 +1,7 @@
 // swift-tools-version:5.7
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 //
 // IotCoreIOS SDK - Binary Distribution
-// CocoaMQTT is automatically installed as a transitive dependency.
+// CocoaMQTT is bundled as a pre-built binary alongside the SDK.
 
 import PackageDescription
 
@@ -17,26 +16,22 @@ let package = Package(
             targets: ["IotCoreIOSWrapper"]
         )
     ],
-    dependencies: [
-        // MQTT library - automatically fetched when app adds SDK
-        // This prevents duplicate symbols if app also uses CocoaMQTT
-        .package(url: "https://github.com/emqx/CocoaMQTT.git", from: "2.1.0")
-    ],
     targets: [
-        // Binary target - pre-compiled XCFramework
-        // Per closed-source policy, this SDK is distributed as pre-compiled binary
         .binaryTarget(
             name: "IotCoreIOSBinary",
-            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.3/IotCoreIOS-0.0.3.xcframework.zip",
-            checksum: "c33123abd0df3f338da5a519cbf45dcf637b57ac7d643d184144159325f10ddf"
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.4/IotCoreIOS-0.0.4.xcframework.zip",
+            checksum: "f87837954743127c388245e877db120f711ee768dc2eaeda590001a15c7982bd"
         ),
-        // Wrapper target links binary with CocoaMQTT dependency
-        // When apps add IotCoreIOS, SPM automatically resolves CocoaMQTT
+        .binaryTarget(
+            name: "CocoaMQTTBinary",
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.4/CocoaMQTT-0.0.4.xcframework.zip",
+            checksum: "81baef3460eefb384068a0b188346c5556b05a340f81bc728e5b7d69ae9e3669"
+        ),
         .target(
             name: "IotCoreIOSWrapper",
             dependencies: [
                 "IotCoreIOSBinary",
-                .product(name: "CocoaMQTT", package: "CocoaMQTT")
+                "CocoaMQTTBinary"
             ],
             path: "Sources/IotCoreIOSWrapper"
         )
