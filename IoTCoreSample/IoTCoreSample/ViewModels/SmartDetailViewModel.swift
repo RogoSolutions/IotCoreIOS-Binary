@@ -411,13 +411,13 @@ final class SmartDetailViewModel: ObservableObject {
         }
 
         // 2) MQTT bind (new element + cmd)
+        let elmCmd = RGBSmartElmCmd(reversing: 0, delay: draft.delay, cmd: draft.cmd)
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
             sdk.deviceCmdHandler.bindDeviceSmartCmd(
                 smid: smid,
                 devId: draft.targetId,
-                elm: draft.elementId,
-                attrValue: draft.cmd,
-                delay: draft.delay
+                devType: 0,
+                smartElmCmds: [draft.elementId: elmCmd]
             ) { result in
                 switch result {
                 case .success: cont.resume()
@@ -530,10 +530,11 @@ final class SmartDetailViewModel: ObservableObject {
 
         do {
             // 1) MQTT bind
+            let elmCmd = RGBSmartElmCmd(reversing: 0, delay: delay, cmd: cmd)
             try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
                 sdk.deviceCmdHandler.bindDeviceSmartCmd(
-                    smid: smid, devId: targetDeviceId, elm: elementId,
-                    attrValue: cmd, delay: delay
+                    smid: smid, devId: targetDeviceId, devType: 0,
+                    smartElmCmds: [elementId: elmCmd]
                 ) { result in
                     switch result {
                     case .success: cont.resume()

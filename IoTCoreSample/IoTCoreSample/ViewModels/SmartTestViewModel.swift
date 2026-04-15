@@ -151,12 +151,12 @@ class SmartTestViewModel: ObservableObject {
     ) {
         appendLog("[Step 2/3] MQTT: bindDeviceSmartCmd(smid=\(smid), elm=\(elementId), delay=\(delay)) ...")
 
+        let elmCmd = RGBSmartElmCmd(reversing: 0, delay: delay, cmd: cmd)
         sdk.deviceCmdHandler.bindDeviceSmartCmd(
             smid: smid,
             devId: targetDeviceId,
-            elm: elementId,
-            attrValue: cmd,
-            delay: delay
+            devType: 0,
+            smartElmCmds: [elementId: elmCmd]
         ) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -343,7 +343,8 @@ class SmartTestViewModel: ObservableObject {
         guard let sdk = IoTAppCore.current else { showError("SDK not initialized"); return }
         guard !devId.isEmpty else { showError("Device ID required"); return }
         isLoading = true; lastError = nil; lastResult = nil
-        sdk.deviceCmdHandler.bindDeviceSmartCmd(smid: smid, devId: devId, elm: elm, attrValue: attrValue, delay: delay) { [weak self] result in
+        let elmCmd = RGBSmartElmCmd(reversing: 0, delay: delay ?? 0, cmd: attrValue)
+        sdk.deviceCmdHandler.bindDeviceSmartCmd(smid: smid, devId: devId, devType: 0, smartElmCmds: [elm: elmCmd]) { [weak self] result in
             Task { @MainActor in
                 self?.isLoading = false
                 self?.handleAckResult(result, commandName: "Bind Smart Cmd")
@@ -534,12 +535,12 @@ class SmartTestViewModel: ObservableObject {
         partner: String?
     ) {
         appendLog("[Step 2/4] MQTT: bindDeviceSmartCmd(smid=\(smid), elm=\(elementId)) ...")
+        let elmCmd = RGBSmartElmCmd(reversing: 0, delay: 0, cmd: cmd)
         sdk.deviceCmdHandler.bindDeviceSmartCmd(
             smid: smid,
             devId: targetDeviceId,
-            elm: elementId,
-            attrValue: cmd,
-            delay: 0
+            devType: 0,
+            smartElmCmds: [elementId: elmCmd]
         ) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -936,12 +937,12 @@ class SmartTestViewModel: ObservableObject {
     ) {
         appendLog("[Step 4/5] MQTT: bindDeviceSmartCmd(smid=\(smid), elm=\(cmdElm), delay=\(cmdDelay)) ...")
 
+        let elmCmd = RGBSmartElmCmd(reversing: 0, delay: cmdDelay, cmd: cmdAttrValue)
         sdk.deviceCmdHandler.bindDeviceSmartCmd(
             smid: smid,
             devId: cmdDeviceId,
-            elm: cmdElm,
-            attrValue: cmdAttrValue,
-            delay: cmdDelay
+            devType: 0,
+            smartElmCmds: [cmdElm: elmCmd]
         ) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }

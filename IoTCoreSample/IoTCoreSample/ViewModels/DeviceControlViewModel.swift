@@ -396,7 +396,7 @@ class DeviceControlViewModel: ObservableObject {
 
         let parameters = ["devId": device.id]
 
-        sdk.deviceCmdHandler.getDeviceState(devId: device.id) { [weak self] result in
+        sdk.deviceCmdHandler.getDeviceState(devId: device.id, timeOut: 10) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoadingState = false

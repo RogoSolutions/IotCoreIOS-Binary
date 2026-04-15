@@ -122,7 +122,7 @@ class OperationTestViewModel: ObservableObject {
                 self.addLog("✅ Ready to execute operations")
                 // Try a simple operation to verify connection
 //                let result = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
-//                    handler.getDeviceState(devId: devId) { result in
+//                    handler.getDeviceState(devId: devId, timeOut: 10) { result in
 //                        switch result {
 //                        case .success:
 //                            continuation.resume(returning: "Connection verified")
@@ -339,7 +339,7 @@ class OperationTestViewModel: ObservableObject {
 
     private func executeGetDeviceState(handler: RGBIotDeviceCmdHandler, devId: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.getDeviceState(devId: devId) { result in
+            handler.getDeviceState(devId: devId, timeOut: 10) { result in
                 switch result {
                 case .success(let state):
                     let stateDesc = "Device state retrieved successfully"
@@ -366,7 +366,7 @@ class OperationTestViewModel: ObservableObject {
 
     private func executeRequestScanWifi(handler: RGBIotDeviceCmdHandler, devId: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.requestScanWifi(devId: devId) { result in
+            handler.requestScanWifi(devId: devId, infNo: 0, time: 10) { result in
                 switch result {
                 case .success(let networks):
                     continuation.resume(returning: "Found \(networks.count) WiFi networks")
@@ -379,7 +379,7 @@ class OperationTestViewModel: ObservableObject {
 
     private func executeRequestConnectWifi(handler: RGBIotDeviceCmdHandler, devId: String, ssid: String, password: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.requestConnectWifi(devId: devId, ssid: ssid, pwd: password) { result in
+            handler.requestConnectWifi(devId: devId, infNo: 0, ssid: ssid, pwd: password) { result in
                 switch result {
                 case .success(let connectivity):
                     continuation.resume(returning: "WiFi connection initiated")

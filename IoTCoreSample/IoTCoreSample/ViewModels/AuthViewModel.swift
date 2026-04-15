@@ -168,10 +168,11 @@ class AuthViewModel: ObservableObject {
     }
 
     func logout() {
-        IoTAppCore.current?.signOut()
-        isAuthenticated = false
-        successMessage = "Logged out successfully"
-        password = ""
+        IoTAppCore.current?.signOut { [weak self] _ in
+            self?.isAuthenticated = false
+            self?.successMessage = "Logged out successfully"
+            self?.password = ""
+        }
     }
 
     func signUp() {

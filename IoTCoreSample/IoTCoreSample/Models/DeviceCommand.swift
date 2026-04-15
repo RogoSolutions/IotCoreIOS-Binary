@@ -646,6 +646,13 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     placeholder: "Device UUID"
                 ),
                 CommandParameter(
+                    name: "devType",
+                    displayName: "Device Type",
+                    type: .int,
+                    defaultValue: "0",
+                    placeholder: "Device type filter"
+                ),
+                CommandParameter(
                     name: "elm",
                     displayName: "Element",
                     type: .int,
@@ -662,8 +669,8 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     name: "delay",
                     displayName: "Delay",
                     type: .int,
-                    placeholder: "Optional delay in seconds",
-                    isRequired: false
+                    defaultValue: "0",
+                    placeholder: "Delay in seconds"
                 )
             ]
 

@@ -797,7 +797,7 @@ struct DeviceControlDetailView: View {
         case .stopWileDirectBle:
             return executeStopWileDirectBle(handler: handler)
         case .checkDeviceSoftwareVersion:
-            return executeCheckDeviceSoftwareVersion(handler: handler)
+            return try await executeCheckDeviceSoftwareVersion(handler: handler)
         case .updateDeviceSoftware:
             return executeUpdateDeviceSoftware(handler: handler)
         case .resetDevice:
@@ -815,7 +815,7 @@ struct DeviceControlDetailView: View {
     private func executeGetDeviceState(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let devId = parameterValues["devId"] ?? device.id
         return try await withCheckedThrowingContinuation { continuation in
-            handler.getDeviceState(devId: devId) { result in
+            handler.getDeviceState(devId: devId, timeOut: 10) { result in
                 switch result {
                 case .success(let state):
                     continuation.resume(returning: "Device state retrieved: \(state)")
@@ -960,7 +960,7 @@ struct DeviceControlDetailView: View {
     private func executeRequestScanWifi(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let devId = parameterValues["devId"] ?? device.id
         return try await withCheckedThrowingContinuation { continuation in
-            handler.requestScanWifi(devId: devId) { result in
+            handler.requestScanWifi(devId: devId, infNo: 0, time: 10) { result in
                 switch result {
                 case .success(let networks):
                     let networkList = networks.map { $0.ssid ?? "Unknown" }.joined(separator: ", ")
@@ -977,7 +977,7 @@ struct DeviceControlDetailView: View {
         let ssid = parameterValues["ssid"] ?? ""
         let pwd = parameterValues["pwd"] ?? ""
         return try await withCheckedThrowingContinuation { continuation in
-            handler.requestConnectWifi(devId: devId, ssid: ssid, pwd: pwd) { result in
+            handler.requestConnectWifi(devId: devId, infNo: 0, ssid: ssid, pwd: pwd) { result in
                 switch result {
                 case .success(let connectivity):
                     let connected = connectivity.isWiFiConnected ?? false
@@ -1058,14 +1058,15 @@ struct DeviceControlDetailView: View {
         let devId = parameterValues["devId"] ?? device.id
         let elm = Int(parameterValues["elm"] ?? "0") ?? 0
         let attrValue = parseIntArray(parameterValues["attrValue"] ?? "")
-        let delay: Int? = parameterValues["delay"].flatMap { Int($0) }
+        let delay = Int(parameterValues["delay"] ?? "0") ?? 0
+        let devType = Int(parameterValues["devType"] ?? "0") ?? 0
+        let elmCmd = RGBSmartElmCmd(reversing: 0, delay: delay, cmd: attrValue)
         return try await withCheckedThrowingContinuation { continuation in
             handler.bindDeviceSmartCmd(
                 smid: smid,
                 devId: devId,
-                elm: elm,
-                attrValue: attrValue,
-                delay: delay
+                devType: devType,
+                smartElmCmds: [elm: elmCmd]
             ) { result in
                 switch result {
                 case .success(let ack):
@@ -1133,10 +1134,24 @@ struct DeviceControlDetailView: View {
 
     // MARK: - OTA & System Commands
 
-    private func executeCheckDeviceSoftwareVersion(handler: RGBIotDeviceCmdHandler) -> String {
+    private func executeCheckDeviceSoftwareVersion(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let devId = parameterValues["devId"] ?? device.id
-        handler.checkDeviceSoftwareVersion(devId: devId)
-        return "Software version check initiated (fire-and-forget)"
+        return try await withCheckedThrowingContinuation { continuation in
+            handler.checkDeviceSoftwareVersion(devId: devId) { result in
+                switch result {
+                case .success(let info):
+                    let desc = """
+                    Version: \(info.softwareVersion)
+                    Package Type: \(info.softwarePackageType)
+                    OTA Type: \(info.softwareOtaType)
+                    Version Code: \(info.softwareVersionCode.map { String($0) }.joined(separator: "."))
+                    """
+                    continuation.resume(returning: desc)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     private func executeUpdateDeviceSoftware(handler: RGBIotDeviceCmdHandler) -> String {

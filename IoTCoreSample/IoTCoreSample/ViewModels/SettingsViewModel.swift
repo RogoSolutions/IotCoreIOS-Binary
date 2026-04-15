@@ -143,10 +143,11 @@ class SettingsViewModel: ObservableObject {
     }
 
     func logout() {
-        IoTAppCore.current?.signOut()
-        isAuthenticated = false
-        userEmail = ""
-        showStatus("Logged out successfully", success: true)
+        IoTAppCore.current?.signOut { [weak self] _ in
+            self?.isAuthenticated = false
+            self?.userEmail = ""
+            self?.showStatus("Logged out successfully", success: true)
+        }
     }
 
     // MARK: - Private Helpers

@@ -63,7 +63,7 @@ class DeviceCommandTestViewModel: ObservableObject {
 
         print("📡 Getting device state: \(devId)")
 
-        sdk.deviceCmdHandler.getDeviceState(devId: devId) { [weak self] result in
+        sdk.deviceCmdHandler.getDeviceState(devId: devId, timeOut: 10) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -274,7 +274,7 @@ class DeviceCommandTestViewModel: ObservableObject {
 
         print("📡 Requesting WiFi scan: \(devId)")
 
-        sdk.deviceCmdHandler.requestScanWifi(devId: devId) { [weak self] result in
+        sdk.deviceCmdHandler.requestScanWifi(devId: devId, infNo: 0, time: 10) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
