@@ -16,6 +16,8 @@ struct DeviceCommandTestView: View {
     @State private var elements = "[0]"
     @State private var attrValue = "[1, 255, 255, 255]"
     @State private var targetDevType = "1"
+    @State private var wifiSSID = ""
+    @State private var wifiPassword = ""
     @State private var isServiceConnected = false
     @State private var isConnectingService = false
 
@@ -257,6 +259,21 @@ struct DeviceCommandTestView: View {
                 }
             }
             .disabled(deviceId.isEmpty)
+
+            // Connect WiFi
+            TextField("SSID", text: $wifiSSID)
+                .textFieldStyle(.roundedBorder)
+            SecureField("Password", text: $wifiPassword)
+                .textFieldStyle(.roundedBorder)
+            Button {
+                viewModel.requestConnectWifi(devId: deviceId, ssid: wifiSSID, pwd: wifiPassword)
+            } label: {
+                HStack {
+                    Image(systemName: "wifi.circle.fill")
+                    Text("Connect WiFi")
+                }
+            }
+            .disabled(deviceId.isEmpty || wifiSSID.isEmpty)
         } header: {
             Text("WiFi Commands")
         }

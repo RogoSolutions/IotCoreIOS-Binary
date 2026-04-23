@@ -257,6 +257,47 @@ class DeviceCommandTestViewModel: ObservableObject {
         }
     }
 
+    func requestConnectWifi(devId: String, ssid: String, pwd: String) {
+        guard let sdk = IoTAppCore.current else {
+            showError("SDK not initialized")
+            return
+        }
+
+        guard !devId.isEmpty else {
+            showError("Device ID is required")
+            return
+        }
+
+        isLoading = true
+        lastError = nil
+        lastResult = nil
+
+        print("📡 Connecting WiFi: \(devId) → \(ssid)")
+
+        sdk.deviceCmdHandler.requestConnectWifi(devId: devId, infNo: 0, ssid: ssid, pwd: pwd) { [weak self] result in
+            Task { @MainActor in
+                guard let self = self else { return }
+                self.isLoading = false
+
+                switch result {
+                case .success(let connectivity):
+                    var resultText = "WiFi Connect Result:\n"
+                    resultText += "  Interface: \(connectivity.interfaceNumber)\n"
+                    resultText += "  Type: \(connectivity.interfaceType?.rawValue ?? 0)\n"
+                    resultText += "  State: \(connectivity.wifiConnectionState?.rawValue ?? 0)\n"
+                    if let ip = connectivity.ipV4Address {
+                        resultText += "  IPv4: \(ip)\n"
+                    }
+                    self.lastResult = resultText
+                    print("✅ WiFi connect success")
+
+                case .failure(let error):
+                    self.handleError(error, commandName: "Request Connect WiFi")
+                }
+            }
+        }
+    }
+
     func requestScanWifi(devId: String) {
         guard let sdk = IoTAppCore.current else {
             showError("SDK not initialized")

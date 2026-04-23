@@ -106,11 +106,11 @@ struct SmartTestView: View {
             }
             isServiceConnected = IoTAppCore.current?.isMQTTConnected() ?? false
             // Auto-populate Schedule endpoint/partner from SDK public APIs
-            if scheduleEndpoint.isEmpty, let ep = IoTAppCore.current?.mqttEndpoint {
+            if scheduleEndpoint.isEmpty, let ep = IoTAppCore.current?.getAppEndpoint() {
                 scheduleEndpoint = ep
                 scheduleEndpointFromSDK = true
             }
-            if schedulePartner.isEmpty, let pid = IoTAppCore.current?.partnerId {
+            if schedulePartner.isEmpty, let pid = IoTAppCore.current?.getAppPartnerId() {
                 schedulePartner = pid
                 schedulePartnerFromSDK = true
             }
