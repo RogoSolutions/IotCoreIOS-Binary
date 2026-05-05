@@ -324,10 +324,10 @@ class DeviceCommandTestViewModel: ObservableObject {
                 case .success(let networks):
                     var resultText = "WiFi Networks Found: \(networks.count)\n"
                     for (index, network) in networks.enumerated() {
-                        resultText += "\n[\(index + 1)] \(network.ssid ?? "Unknown")\n"
-                        resultText += "  RSSI: \(network.rssi ?? 0) dBm\n"
-                        resultText += "  Security: \(network.security?.rawValue ?? 0)\n"
-                        resultText += "  Channel: \(network.channel ?? 0)\n"
+                        resultText += "\n[\(index + 1)] \(network.ssid)\n"
+                        resultText += "  RSSI: \(network.rssi) dBm\n"
+                        resultText += "  AuthType: \(network.authType)\n"
+                        resultText += "  Freq: \(network.freq) MHz\n"
                     }
                     self.lastResult = resultText
                     print("✅ WiFi scan success: \(networks.count) networks")

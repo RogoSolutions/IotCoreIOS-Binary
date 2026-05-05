@@ -765,24 +765,22 @@ struct OnboardingTabView: View {
                             .foregroundColor(.secondary)
 
                         ForEach(viewModel.scannedNetworks, id: \.ssid) { network in
-                            if let ssid = network.ssid {
-                                Button {
-                                    viewModel.selectedSSID = ssid
-                                } label: {
-                                    HStack {
-                                        Image(systemName: viewModel.selectedSSID == ssid ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(viewModel.selectedSSID == ssid ? .green : .gray)
-                                        Text(ssid)
-                                            .foregroundColor(.primary)
-                                        Spacer()
-                                        Text("\(network.rssi ?? 0) dBm")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .padding()
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(8)
+                            Button {
+                                viewModel.selectedSSID = network.ssid
+                            } label: {
+                                HStack {
+                                    Image(systemName: viewModel.selectedSSID == network.ssid ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(viewModel.selectedSSID == network.ssid ? .green : .gray)
+                                    Text(network.ssid)
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                    Text("\(network.rssi) dBm")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .cornerRadius(8)
                             }
                         }
                     }

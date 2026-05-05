@@ -380,9 +380,9 @@ class OperatorsTestingViewModel: ObservableObject {
                     self.scannedNetworks = networks
                     var resultText = "WiFi Networks Found: \(networks.count)\n"
                     for (index, network) in networks.enumerated() {
-                        resultText += "\n[\(index + 1)] \(network.ssid ?? "Unknown")"
-                        resultText += "\n    RSSI: \(network.rssi ?? 0) dBm"
-                        resultText += "\n    Channel: \(network.channel ?? 0)"
+                        resultText += "\n[\(index + 1)] \(network.ssid)"
+                        resultText += "\n    RSSI: \(network.rssi) dBm"
+                        resultText += "\n    Freq: \(network.freq) MHz"
                     }
                     self.lastResult = resultText
 
@@ -516,7 +516,7 @@ class OperatorsTestingViewModel: ObservableObject {
     }
 
     func selectNetwork(_ network: RGBIoTWifiInfo) {
-        wifiSSID = network.ssid ?? ""
+        wifiSSID = network.ssid
     }
 
     // MARK: - Sample Certificates

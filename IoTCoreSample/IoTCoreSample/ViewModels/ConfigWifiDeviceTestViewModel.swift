@@ -213,10 +213,10 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
 
                     var resultText = "✅ WiFi Networks Found: \(networks.count)\n"
                     for (index, network) in networks.enumerated() {
-                        resultText += "\n[\(index + 1)] \(network.ssid ?? "Unknown")\n"
-                        resultText += "  RSSI: \(network.rssi ?? 0) dBm\n"
-                        resultText += "  Security: \(self.securityTypeString(network.security))\n"
-                        resultText += "  Channel: \(network.channel ?? 0)\n"
+                        resultText += "\n[\(index + 1)] \(network.ssid)\n"
+                        resultText += "  RSSI: \(network.rssi) dBm\n"
+                        resultText += "  AuthType: \(network.authType)\n"
+                        resultText += "  Freq: \(network.freq) MHz\n"
                     }
                     self.lastResult = resultText
                     print("✅ WiFi scan success: \(networks.count) networks")
@@ -368,31 +368,19 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
         lastError = message
     }
 
-    private func securityTypeString(_ security: RGBWiFiSecurityType?) -> String {
-        guard let security = security else { return "Unknown" }
-        switch security {
-        case .WIFI_AUTH_OPEN:
-            return "Open"
-        case .WIFI_AUTH_WEP:
-            return "WEP"
-        case .WIFI_AUTH_WPA_PSK:
-            return "WPA-PSK"
-        case .WIFI_AUTH_WPA2_PSK:
-            return "WPA2-PSK"
-        case .WIFI_AUTH_WPA_WPA2_PSK:
-            return "WPA/WPA2-PSK"
-        case .WIFI_AUTH_WPA2_ENTERPRISE:
-            return "WPA2-Enterprise"
-        case .WIFI_AUTH_WPA3_PSK:
-            return "WPA3-PSK"
-        case .WIFI_AUTH_WPA2_WPA3_PSK:
-            return "WPA2/WPA3-PSK"
-        case .WIFI_AUTH_WAPI_PSK:
-            return "WAPI-PSK"
-        case .WIFI_AUTH_MAX:
-            return "MAX"
-        @unknown default:
-            return "Unknow"
+    private func securityTypeString(_ authType: Int) -> String {
+        switch RGBWiFiSecurityType(rawValue: UInt8(authType)) {
+        case .WIFI_AUTH_OPEN:            return "Open"
+        case .WIFI_AUTH_WEP:             return "WEP"
+        case .WIFI_AUTH_WPA_PSK:         return "WPA-PSK"
+        case .WIFI_AUTH_WPA2_PSK:        return "WPA2-PSK"
+        case .WIFI_AUTH_WPA_WPA2_PSK:    return "WPA/WPA2-PSK"
+        case .WIFI_AUTH_WPA2_ENTERPRISE: return "WPA2-Enterprise"
+        case .WIFI_AUTH_WPA3_PSK:        return "WPA3-PSK"
+        case .WIFI_AUTH_WPA2_WPA3_PSK:   return "WPA2/WPA3-PSK"
+        case .WIFI_AUTH_WAPI_PSK:        return "WAPI-PSK"
+        case .WIFI_AUTH_MAX:             return "MAX"
+        default:                         return "Unknown(\(authType))"
         }
     }
 

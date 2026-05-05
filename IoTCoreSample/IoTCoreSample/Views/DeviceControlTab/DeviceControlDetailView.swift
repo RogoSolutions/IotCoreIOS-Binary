@@ -21,11 +21,25 @@ struct DeviceControlDetailView: View {
     // MARK: - UI State for Collapsible Sections
     @State private var selectedCommand: DeviceCommand? = nil
     @State private var parameterValues: [String: String] = [:]
-    @State private var expandedSections: Set<String> = ["quickActions", "history"]
+    @State private var expandedSections: Set<String> = ["quickActions", "wifi", "history"]
     @State private var expandedCategories: Set<String> = []
 
     // MARK: - Command Execution State
     @State private var isExecutingCommand = false
+
+    // MARK: - WiFi Manager State
+    @State private var scannedNetworks: [RGBIoTWifiInfo] = []
+    @State private var isWifiScanning = false
+    @State private var wifiPassword = ""
+    @State private var isWifiConnecting = false
+    @State private var wifiConnectResult: String? = nil
+    @State private var wifiConnectError: String? = nil
+    @State private var showingWifiPasswordSheet = false
+    // Flat state for selected network (avoids Optional timing issue in sheet)
+    @State private var selectedSSID = ""
+    @State private var selectedAuthType = 0
+    @State private var selectedRSSI = 0
+    @State private var selectedFreq = 0
 
     var body: some View {
         ScrollView {
@@ -45,6 +59,9 @@ struct DeviceControlDetailView: View {
 
                 // 3. Quick Actions (collapsible)
                 quickActionsSection
+
+                // 3.5 WiFi Manager (collapsible)
+                wifiManagerSection
 
                 // 4. All Commands (collapsible)
                 allCommandsSection
@@ -74,6 +91,9 @@ struct DeviceControlDetailView: View {
                         .scaleEffect(0.8)
                 }
             }
+        }
+        .sheet(isPresented: $showingWifiPasswordSheet) {
+            wifiPasswordSheet
         }
         .alert("Reboot Device?", isPresented: $showingRebootConfirm) {
             Button("Cancel", role: .cancel) { }
@@ -209,6 +229,298 @@ struct DeviceControlDetailView: View {
             .buttonStyle(.bordered)
         }
         .padding(.horizontal, 4)
+    }
+
+    // MARK: - 3.5 WiFi Manager Section (Collapsible)
+
+    private var wifiManagerSection: some View {
+        VStack(spacing: 0) {
+            DisclosureGroup(isExpanded: binding(for: "wifi")) {
+                VStack(spacing: 12) {
+
+                    // Scan button
+                    Button {
+                        scanWifi()
+                    } label: {
+                        HStack {
+                            if isWifiScanning {
+                                ProgressView().scaleEffect(0.8)
+                                Text("Scanning... (10s)")
+                            } else {
+                                Image(systemName: "wifi")
+                                Text(scannedNetworks.isEmpty ? "Scan WiFi Networks" : "Re-scan")
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue.opacity(0.1))
+                        .foregroundColor(.blue)
+                        .cornerRadius(8)
+                    }
+                    .disabled(isWifiScanning)
+
+                    // Network list
+                    if !scannedNetworks.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Found \(scannedNetworks.count) networks — tap to connect")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+
+                            ForEach(Array(scannedNetworks.enumerated()), id: \.offset) { _, network in
+                                wifiNetworkRow(network)
+                            }
+                        }
+                    }
+
+                    // Connect result
+                    if let result = wifiConnectResult {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+                            Text(result).font(.caption)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(10)
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+
+                    if let error = wifiConnectError {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "xmark.circle.fill").foregroundColor(.red)
+                            Text(error).font(.caption)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(10)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(8)
+                    }
+                }
+                .padding(.top, 12)
+            } label: {
+                HStack {
+                    Image(systemName: "wifi").foregroundColor(.blue)
+                    Text("WiFi Manager").font(.headline)
+                    Spacer()
+                    if !scannedNetworks.isEmpty {
+                        Text("\(scannedNetworks.count)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(4)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(UIColor.systemGray6))
+        .cornerRadius(12)
+    }
+
+    private func wifiNetworkRow(_ network: RGBIoTWifiInfo) -> some View {
+        Button {
+            selectedSSID = network.ssid
+            selectedAuthType = network.authType
+            selectedRSSI = network.rssi
+            selectedFreq = network.freq
+            wifiPassword = ""
+            wifiConnectResult = nil
+            wifiConnectError = nil
+            showingWifiPasswordSheet = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: wifiSignalIcon(rssi: network.rssi))
+                    .foregroundColor(wifiSignalColor(rssi: network.rssi))
+                    .frame(width: 20)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(network.ssid)
+                        .font(.subheadline)
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+
+                    HStack(spacing: 8) {
+                        Text("\(network.rssi) dBm")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        if network.freq > 0 {
+                            Text(network.freq >= 5000 ? "5 GHz" : "2.4 GHz")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+
+                Spacer()
+
+                if network.authType > 0 {
+                    Image(systemName: "lock.fill")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(Color(UIColor.systemBackground))
+            .cornerRadius(8)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
+    private var wifiPasswordSheet: some View {
+        NavigationView {
+            VStack(spacing: 24) {
+                // Network info header
+                VStack(spacing: 10) {
+                    Image(systemName: wifiSignalIcon(rssi: selectedRSSI))
+                        .font(.system(size: 48))
+                        .foregroundColor(wifiSignalColor(rssi: selectedRSSI))
+
+                    Text(selectedSSID)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+
+                    HStack(spacing: 16) {
+                        Label("\(selectedRSSI) dBm", systemImage: "antenna.radiowaves.left.and.right")
+                        if selectedFreq > 0 {
+                            Label(selectedFreq >= 5000 ? "5 GHz" : "2.4 GHz", systemImage: "wifi.circle")
+                        }
+                        if selectedAuthType == 0 {
+                            Label("Open", systemImage: "lock.open.fill")
+                                .foregroundColor(.green)
+                        } else {
+                            Label("Secured", systemImage: "lock.fill")
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+                .padding(.top, 20)
+
+                Divider()
+
+                // Password field
+                VStack(alignment: .leading, spacing: 8) {
+                    if selectedAuthType > 0 {
+                        Text("Password")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .padding(.horizontal)
+
+                        SecureField("Enter WiFi password", text: $wifiPassword)
+                            .textFieldStyle(.roundedBorder)
+                            .textContentType(.password)
+                            .padding(.horizontal)
+                    } else {
+                        Text("Open network — no password required")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal)
+                    }
+                }
+
+                // Connect button
+                Button {
+                    connectWifi(ssid: selectedSSID, authType: selectedAuthType)
+                } label: {
+                    HStack {
+                        if isWifiConnecting {
+                            ProgressView().scaleEffect(0.8).tint(.white)
+                            Text("Connecting...")
+                        } else {
+                            Image(systemName: "wifi")
+                            Text("Connect")
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .disabled(isWifiConnecting || (selectedAuthType > 0 && wifiPassword.isEmpty))
+                .padding(.horizontal)
+
+                Spacer()
+            }
+            .navigationTitle("Connect to WiFi")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        showingWifiPasswordSheet = false
+                    }
+                    .disabled(isWifiConnecting)
+                }
+            }
+        }
+    }
+
+    private func wifiSignalIcon(rssi: Int) -> String {
+        switch rssi {
+        case _ where rssi >= -60: return "wifi"
+        case _ where rssi >= -75: return "wifi.2.bar"
+        default: return "wifi.1.bar"
+        }
+    }
+
+    private func wifiSignalColor(rssi: Int) -> Color {
+        switch rssi {
+        case _ where rssi >= -60: return .green
+        case _ where rssi >= -75: return .orange
+        default: return .red
+        }
+    }
+
+    private func scanWifi() {
+        guard let sdk = IoTAppCore.current else {
+            wifiConnectError = "SDK not initialized"
+            return
+        }
+        isWifiScanning = true
+        scannedNetworks = []
+        wifiConnectResult = nil
+        wifiConnectError = nil
+
+        sdk.deviceCmdHandler.requestScanWifi(devId: device.id, infNo: 0, time: 10) { result in
+            DispatchQueue.main.async {
+                self.isWifiScanning = false
+                switch result {
+                case .success(let networks):
+                    self.scannedNetworks = networks.sorted { $0.rssi > $1.rssi }
+                case .failure(let error):
+                    self.wifiConnectError = "Scan failed: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
+
+    private func connectWifi(ssid: String, authType: Int) {
+        guard let sdk = IoTAppCore.current else { return }
+        isWifiConnecting = true
+
+        sdk.deviceCmdHandler.requestConnectWifi(devId: device.id, infNo: 0, ssid: ssid, pwd: wifiPassword) { result in
+            DispatchQueue.main.async {
+                self.isWifiConnecting = false
+                self.showingWifiPasswordSheet = false
+                switch result {
+                case .success(let connectivity):
+                    let connected = connectivity.isWiFiConnected ?? false
+                    self.wifiConnectResult = connected
+                        ? "Connected to \"\(ssid)\" successfully"
+                        : "Connection to \"\(ssid)\" initiated"
+                    self.wifiConnectError = nil
+                case .failure(let error):
+                    self.wifiConnectError = "Failed to connect to \"\(ssid)\": \(error.localizedDescription)"
+                    self.wifiConnectResult = nil
+                }
+            }
+        }
     }
 
     // MARK: - 3. Quick Actions Section (Collapsible)

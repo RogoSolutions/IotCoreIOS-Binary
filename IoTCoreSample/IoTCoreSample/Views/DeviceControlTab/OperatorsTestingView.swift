@@ -304,12 +304,12 @@ struct OperatorsTestingView: View {
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(network.ssid ?? "Unknown")
+                                Text(network.ssid)
                                     .font(.subheadline)
                                     .foregroundColor(.primary)
                                 HStack(spacing: 8) {
-                                    Text("RSSI: \(network.rssi ?? 0) dBm")
-                                    Text("Ch: \(network.channel ?? 0)")
+                                    Text("RSSI: \(network.rssi) dBm")
+                                    Text("Freq: \(network.freq) MHz")
                                 }
                                 .font(.caption)
                                 .foregroundColor(.secondary)

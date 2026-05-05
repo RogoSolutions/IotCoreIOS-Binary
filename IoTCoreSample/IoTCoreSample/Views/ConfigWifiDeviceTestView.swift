@@ -344,16 +344,14 @@ struct ConfigWifiDeviceTestView: View {
                 Picker("Select Network", selection: $selectedSSID) {
                     Text("Select...").tag("")
                     ForEach(viewModel.scannedNetworks, id: \.ssid) { network in
-                        if let ssid = network.ssid {
-                            HStack {
-                                Text(ssid)
-                                Spacer()
-                                Text("\(network.rssi ?? 0) dBm")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .tag(ssid)
+                        HStack {
+                            Text(network.ssid)
+                            Spacer()
+                            Text("\(network.rssi) dBm")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
+                        .tag(network.ssid)
                     }
                 }
                 .disabled(!viewModel.isConnected)
