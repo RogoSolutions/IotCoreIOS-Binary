@@ -40,6 +40,7 @@
 		8D0E80238714B5A486A72F70 /* DeviceCommandTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */; };
 		9472C541675F284841476D1E /* SmartDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75109671C3AC968C1215A4F8 /* SmartDetailView.swift */; };
 		951BC9EE862221C4AD3675B6 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D59A8D83AEBB78F52F34E3C /* AuthView.swift */; };
+		9593445D58BC034CF1E6A1D0 /* RestApiBodyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */; };
 		962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */; };
 		9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */; };
 		A16E6D27200576EA328D3F94 /* LocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */; };
@@ -90,6 +91,7 @@
 		638D0F941424D5588904ED3E /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
 		75109671C3AC968C1215A4F8 /* SmartDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartDetailView.swift; sourceTree = "<group>"; };
+		76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestApiBodyHelper.swift; sourceTree = "<group>"; };
 		77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConfigurationManager.swift; sourceTree = "<group>"; };
 		84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartDetailViewModel.swift; sourceTree = "<group>"; };
 		89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 		565E16DCBBFC03A08B992B25 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */,
 				42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */,
 			);
 			path = Extensions;
@@ -380,6 +383,7 @@
 				354108AFA5F775FEFAFB3D9B /* OperationTestViewModel.swift in Sources */,
 				FD7DFDA0521F1784AAA9EBFA /* OperatorsTestingView.swift in Sources */,
 				A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */,
+				9593445D58BC034CF1E6A1D0 /* RestApiBodyHelper.swift in Sources */,
 				962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */,
 				279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */,
 				DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */,

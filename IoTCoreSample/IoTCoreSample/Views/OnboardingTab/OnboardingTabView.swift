@@ -383,6 +383,14 @@ struct OnboardingTabView: View {
                 Text(device.displayName)
                     .font(.subheadline.bold())
 
+                // Secondary line: show raw productId/modelId for lookup
+                // only when the title is the human-readable model name.
+                if device.productModelName != nil, let pid = device.productId {
+                    Text(pid)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+
                 HStack(spacing: 6) {
                     Text(device.type.rawValue)
                         .font(.caption2)

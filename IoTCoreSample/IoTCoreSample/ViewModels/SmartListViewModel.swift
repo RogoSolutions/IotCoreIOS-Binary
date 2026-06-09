@@ -57,7 +57,7 @@ final class SmartListViewModel: ObservableObject {
         errorMessage = nil
         lastInfo = nil
 
-        sdk.callApiGet("smart/get", params: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("smart/get", urlParam: nil, headers: nil) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -93,7 +93,7 @@ final class SmartListViewModel: ObservableObject {
             sdk.deviceCmdHandler.smartRemoveAnnounce(smid: smid)
         }
 
-        sdk.callApiPost("smart/delete", params: ["uuid": smart.uuid], headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smart.uuid])) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false

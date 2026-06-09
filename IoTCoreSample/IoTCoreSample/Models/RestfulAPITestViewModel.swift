@@ -19,7 +19,10 @@ class RestfulAPITestViewModel: ObservableObject {
     @Published var lastError: String?
 
     @Published var customPath: String = "/api/v1/devices"
-    @Published var customParams: String = ""
+    /// Raw query-string appended to the URL, e.g. "a=1&b=2"
+    @Published var customUrlParam: String = ""
+    /// Raw request body sent verbatim (POST/PATCH/UPDATE/DELETE), e.g. a JSON string
+    @Published var customBody: String = ""
     @Published var selectedMethod: HTTPMethod = .get
     @Published var isSupportProductDevelopment: Bool = false
 
@@ -168,21 +171,13 @@ class RestfulAPITestViewModel: ObservableObject {
         lastError = nil
         lastResult = nil
 
-        // Parse params
-        var params: [String: Any]? = nil
-        if !customParams.isEmpty {
-            if let data = customParams.data(using: .utf8),
-               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                params = json
-            } else {
-                showError("Invalid JSON parameters")
-                isLoading = false
-                return
-            }
-        }
+        // Raw query-string + raw body (Android-parity, String-based)
+        let urlParam: String? = customUrlParam.isEmpty ? nil : customUrlParam
+        let body: String? = customBody.isEmpty ? nil : customBody
 
         print("📡 Calling custom API: \(selectedMethod.rawValue) \(customPath)")
-        print("   Params: \(params ?? [:])")
+        print("   urlParam: \(urlParam ?? "<none>")")
+        print("   body: \(body ?? "<none>")")
 
         let completion: IoTApiResultCallback = { [weak self] result in
             Task { @MainActor in
@@ -201,15 +196,15 @@ class RestfulAPITestViewModel: ObservableObject {
 
         switch selectedMethod {
         case .get:
-            sdk.callApiGet(customPath, params: params, headers: nil, completion: completion)
+            sdk.callApiGet(customPath, urlParam: urlParam, headers: nil, completion: completion)
         case .post:
-            sdk.callApiPost(customPath, params: params, headers: nil, completion: completion)
+            sdk.callApiPost(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
         case .patch:
-            sdk.callApiPatch(customPath, params: params, headers: nil, completion: completion)
+            sdk.callApiPatch(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
         case .update:
-            sdk.callApiUpdate(customPath, params: params, headers: nil, completion: completion)
+            sdk.callApiUpdate(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
         case .delete:
-            sdk.callApiDelete(customPath, params: params, headers: nil, completion: completion)
+            sdk.callApiDelete(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
         }
     }
 

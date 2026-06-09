@@ -47,7 +47,7 @@ class GroupViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        sdk.callApiGet("group/get", params: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("group/get", urlParam: nil, headers: nil) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false

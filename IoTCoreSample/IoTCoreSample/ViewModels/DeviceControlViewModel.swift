@@ -273,7 +273,7 @@ class DeviceControlViewModel: ObservableObject {
             return
         }
 
-        sdk.callApiGet("location/get", params: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("location/get", urlParam: nil, headers: nil) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
 
@@ -335,7 +335,7 @@ class DeviceControlViewModel: ObservableObject {
             return
         }
 
-        sdk.callApiGet("group/get", params: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("group/get", urlParam: nil, headers: nil) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
 
@@ -714,7 +714,7 @@ class DeviceControlViewModel: ObservableObject {
 
         let params: [String: Any] = ["uuid": deviceUuid]
 
-        sdk.callApiPost("device/delete", params: params, headers: nil) { [weak self] result in
+        sdk.callApiPost("device/delete", urlParam: nil, headers: nil, body: jsonBody(params)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoadingState = false

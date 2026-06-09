@@ -257,7 +257,7 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func fetchSmartCmds(sdk: any RGBIotCore, smartUuid: String) async throws -> [SmartCmdDraft] {
         let data: Data = try await withCheckedThrowingContinuation { cont in
-            sdk.callApiGet("smartcmd/get", params: nil, headers: nil) { result in
+            sdk.callApiGet("smartcmd/get", urlParam: nil, headers: nil) { result in
                 switch result {
                 case .success(let d): cont.resume(returning: d)
                 case .failure(let e): cont.resume(throwing: e)
@@ -300,7 +300,7 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func fetchScheduleRow(sdk: any RGBIotCore, ownerId: String) async throws -> [String: Any]? {
         let data: Data = try await withCheckedThrowingContinuation { cont in
-            sdk.callApiGet("schedule/getAll", params: nil, headers: nil) { result in
+            sdk.callApiGet("schedule/getAll", urlParam: nil, headers: nil) { result in
                 switch result {
                 case .success(let d): cont.resume(returning: d)
                 case .failure(let e): cont.resume(throwing: e)
@@ -472,7 +472,7 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func restPost(sdk: any RGBIotCore, path: String, params: [String: Any]) async throws -> Data {
         try await withCheckedThrowingContinuation { cont in
-            sdk.callApiPost(path, params: params, headers: nil) { result in
+            sdk.callApiPost(path, urlParam: nil, headers: nil, body: jsonBody(params)) { result in
                 switch result {
                 case .success(let d): cont.resume(returning: d)
                 case .failure(let e): cont.resume(throwing: e)
@@ -619,7 +619,7 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func fetchSmartTriggers(sdk: any RGBIotCore, smartUuid: String) async throws -> [SmartTriggerRow] {
         let data: Data = try await withCheckedThrowingContinuation { cont in
-            sdk.callApiGet("smarttrigger/get", params: nil, headers: nil) { result in
+            sdk.callApiGet("smarttrigger/get", urlParam: nil, headers: nil) { result in
                 switch result {
                 case .success(let d): cont.resume(returning: d)
                 case .failure(let e): cont.resume(throwing: e)
@@ -735,8 +735,7 @@ final class SmartDetailViewModel: ObservableObject {
                     conditionExt: conditionExt,
                     attrValueConditionExt: attrValueConditionExt,
                     timeCfg: timeCfg,
-                    timeJob: timeJob,
-                    cfm: cfm
+                    timeJob: timeJob
                 ) { result in
                     switch result {
                     case .success: cont.resume()
@@ -876,8 +875,7 @@ final class SmartDetailViewModel: ObservableObject {
                     conditionExt: conditionExt,
                     attrValueConditionExt: attrValueConditionExt,
                     timeCfg: timeCfg,
-                    timeJob: timeJob,
-                    cfm: newCfm
+                    timeJob: timeJob
                 ) { result in
                     switch result {
                     case .success: cont.resume()

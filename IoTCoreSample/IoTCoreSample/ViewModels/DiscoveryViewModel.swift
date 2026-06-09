@@ -203,12 +203,13 @@ struct DiscoveredDevice: Identifiable {
     // Convenience accessors
     var macAddr: String? { device.macAddress }
     var productId: String? { device.productId }
+    var productModelName: String? { device.productModelName }
     var categoryName: String? { device.deviceCategoryType.displayName }
     var advertisementData: Data? { device.advertisementData }
     var peripheral: CBPeripheral { device.peripheral }
 
     var displayName: String {
-        return productId ?? macAddr ?? peripheral.name ?? "Unknown Device"
+        return productModelName ?? productId ?? macAddr ?? peripheral.name ?? "Unknown Device"
     }
 
     var signalStrength: String {

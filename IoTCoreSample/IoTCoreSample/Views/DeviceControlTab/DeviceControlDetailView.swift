@@ -1111,7 +1111,7 @@ struct DeviceControlDetailView: View {
         case .checkDeviceSoftwareVersion:
             return try await executeCheckDeviceSoftwareVersion(handler: handler)
         case .updateDeviceSoftware:
-            return executeUpdateDeviceSoftware(handler: handler)
+            return try await executeUpdateDeviceSoftware(handler: handler)
         case .resetDevice:
             return try await executeResetDevice(handler: handler)
         case .rebootDevice:
@@ -1322,7 +1322,6 @@ struct DeviceControlDetailView: View {
         let attrValueConditionExt: [Int]? = parameterValues["attrValueConditionExt"].map { parseIntArray($0) }
         let timeCfg: [Int]? = parameterValues["timeCfg"].map { parseIntArray($0) }
         let timeJob: [Int]? = parameterValues["timeJob"].map { parseIntArray($0) }
-        let cfm = Int(parameterValues["cfm"] ?? "1") ?? 1
 
         return try await withCheckedThrowingContinuation { continuation in
             handler.bindDeviceSmartTrigger(
@@ -1337,8 +1336,7 @@ struct DeviceControlDetailView: View {
                 conditionExt: conditionExt,
                 attrValueConditionExt: attrValueConditionExt,
                 timeCfg: timeCfg,
-                timeJob: timeJob,
-                cfm: cfm
+                timeJob: timeJob
             ) { result in
                 switch result {
                 case .success(let ack):
@@ -1466,12 +1464,31 @@ struct DeviceControlDetailView: View {
         }
     }
 
-    private func executeUpdateDeviceSoftware(handler: RGBIotDeviceCmdHandler) -> String {
+    private func executeUpdateDeviceSoftware(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let devId = parameterValues["devId"] ?? device.id
         let urlOta = parameterValues["urlOta"] ?? ""
         let forceHttpNonSecure = (parameterValues["forceHttpNonSecure"] ?? "false").lowercased() == "true"
-        handler.updateDeviceSoftware(devId: devId, urlOta: urlOta, forceHttpNonSecure: forceHttpNonSecure)
-        return "OTA update initiated (fire-and-forget)"
+
+        // versionCode as dot/comma-separated bytes, e.g. "3.0.75" or "3,0,75".
+        let versionCode: [UInt8] = (parameterValues["versionCode"] ?? "")
+            .split(whereSeparator: { $0 == "." || $0 == "," })
+            .compactMap { UInt8($0.trimmingCharacters(in: .whitespaces)) }
+
+        return try await withCheckedThrowingContinuation { continuation in
+            handler.updateDeviceSoftware(
+                devId: devId,
+                urlOta: urlOta,
+                versionCode: versionCode,
+                forceHttpNonSecure: forceHttpNonSecure
+            ) { result in
+                switch result {
+                case .success(let ackStatus):
+                    continuation.resume(returning: "OTA update command sent (ack=\(ackStatus))")
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     private func executeResetDevice(handler: RGBIotDeviceCmdHandler) async throws -> String {

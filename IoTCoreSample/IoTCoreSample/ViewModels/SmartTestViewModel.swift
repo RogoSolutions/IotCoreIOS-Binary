@@ -101,7 +101,7 @@ class SmartTestViewModel: ObservableObject {
             "subType": -1     // Default
         ]
 
-        sdk.callApiPost("smart/add", params: smartParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
 
@@ -213,7 +213,7 @@ class SmartTestViewModel: ObservableObject {
             "cmds": ["\(elementId)": cmdEntry]
         ]
 
-        sdk.callApiPost("smartcmd/add", params: smartCmdParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -276,7 +276,7 @@ class SmartTestViewModel: ObservableObject {
 
         // Step 2: REST delete
         appendLog("[Delete 2/2] REST: POST /api/v1/smart/delete uuid=\(smartUuid) ...")
-        sdk.callApiPost("smart/delete", params: ["uuid": smartUuid], headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -317,8 +317,7 @@ class SmartTestViewModel: ObservableObject {
             conditionExt: nil,
             attrValueConditionExt: nil,
             timeCfg: timeCfg,
-            timeJob: nil,
-            cfm: 1
+            timeJob: nil
         ) { [weak self] result in
             Task { @MainActor in
                 self?.isLoading = false
@@ -425,7 +424,7 @@ class SmartTestViewModel: ObservableObject {
     /// flow failure (any step after smart/add). Logs the rollback attempt.
     private func rollbackSmartContainer(sdk: any RGBIotCore, smartUuid: String, flowName: String) {
         appendLog("[Rollback] \(flowName): deleting orphaned smart uuid=\(smartUuid)")
-        sdk.callApiPost("smart/delete", params: ["uuid": smartUuid], headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -482,7 +481,7 @@ class SmartTestViewModel: ObservableObject {
             "subType": 0
         ]
 
-        sdk.callApiPost("smart/add", params: smartParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -600,7 +599,7 @@ class SmartTestViewModel: ObservableObject {
             "cfm": 0,
             "cmds": ["\(elementId)": cmdEntry]
         ]
-        sdk.callApiPost("smartcmd/add", params: smartCmdParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -664,7 +663,7 @@ class SmartTestViewModel: ObservableObject {
             scheduleParams["partner"] = p
         }
 
-        sdk.callApiPost("schedule/add", params: scheduleParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("schedule/add", urlParam: nil, headers: nil, body: jsonBody(scheduleParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -700,7 +699,7 @@ class SmartTestViewModel: ObservableObject {
         lastResult = nil
         appendLog("=== Delete Schedule ===")
         appendLog("[Delete 1/2] REST: POST schedule/delete uuid=\(scheduleUuid)")
-        sdk.callApiPost("schedule/delete", params: ["uuid": scheduleUuid], headers: nil) { [weak self] result in
+        sdk.callApiPost("schedule/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": scheduleUuid])) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -711,7 +710,7 @@ class SmartTestViewModel: ObservableObject {
                     if let smartUuid = self.createdScheduleSmartUuid, let smid = self.createdSmid {
                         self.appendLog("[Delete 2/2] MQTT removeAnnounce + REST smart delete")
                         sdk.deviceCmdHandler.smartRemoveAnnounce(smid: smid)
-                        sdk.callApiPost("smart/delete", params: ["uuid": smartUuid], headers: nil) { delResult in
+                        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { delResult in
                             Task { @MainActor in
                                 self.isLoading = false
                                 switch delResult {
@@ -783,7 +782,7 @@ class SmartTestViewModel: ObservableObject {
             "subType": smartSubType
         ]
 
-        sdk.callApiPost("smart/add", params: smartParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -843,8 +842,7 @@ class SmartTestViewModel: ObservableObject {
             conditionExt: nil,
             attrValueConditionExt: nil,
             timeCfg: timeCfg,
-            timeJob: timeJob,
-            cfm: 1
+            timeJob: timeJob
         ) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -904,7 +902,7 @@ class SmartTestViewModel: ObservableObject {
             params["timeJob"] = tj
         }
 
-        sdk.callApiPost("smarttrigger/add", params: params, headers: nil) { [weak self] result in
+        sdk.callApiPost("smarttrigger/add", urlParam: nil, headers: nil, body: jsonBody(params)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -989,7 +987,7 @@ class SmartTestViewModel: ObservableObject {
             "cmds": ["\(cmdElm)": cmdEntry]
         ]
 
-        sdk.callApiPost("smartcmd/add", params: smartCmdParams, headers: nil) { [weak self] result in
+        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams)) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -1030,7 +1028,7 @@ class SmartTestViewModel: ObservableObject {
         appendLog("[Delete 1/2] OK: sent (fire-and-forget)")
 
         appendLog("[Delete 2/2] REST: POST smart/delete uuid=\(smartUuid)")
-        sdk.callApiPost("smart/delete", params: ["uuid": smartUuid], headers: nil) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false

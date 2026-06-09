@@ -220,11 +220,11 @@ class MQTTStatusViewModel: ObservableObject {
                 self?.connectServiceCalled = true
 
                 switch result {
-                case .success(let success):
+                case .success(let isAuthenticated):
                     let resultEvent = MQTTEvent(
                         timestamp: Date(),
                         type: .connectServiceCall,
-                        description: "connectService() completed: \(success ? "success" : "partial")",
+                        description: "connectService() completed: authenticated=\(isAuthenticated ? "yes" : "no")",
                         deviceEid: nil
                     )
                     self?.addEvent(resultEvent)

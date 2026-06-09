@@ -774,6 +774,15 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     placeholder: "https://example.com/firmware.bin"
                 ),
                 CommandParameter(
+                    name: "versionCode",
+                    displayName: "Version Code",
+                    type: .string,
+                    defaultValue: "",
+                    placeholder: "3.0.75",
+                    isRequired: false,
+                    helpText: "Dot/comma-separated bytes, e.g. 3.0.75"
+                ),
+                CommandParameter(
                     name: "forceHttpNonSecure",
                     displayName: "Force HTTP (Non-Secure)",
                     type: .bool,

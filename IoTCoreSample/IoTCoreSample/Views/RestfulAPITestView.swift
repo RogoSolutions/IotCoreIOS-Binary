@@ -151,12 +151,23 @@ struct RestfulAPITestView: View {
                     .autocorrectionDisabled()
             }
 
-            // Params (JSON)
+            // URL param (raw query-string)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Params (JSON)")
+                Text("URL Param (raw query-string)")
                     .font(.caption)
                     .foregroundColor(.secondary)
-                TextEditor(text: $viewModel.customParams)
+                TextField("a=1&b=2", text: $viewModel.customUrlParam)
+                    .textFieldStyle(.roundedBorder)
+                    .autocapitalization(.none)
+                    .autocorrectionDisabled()
+            }
+
+            // Body (raw)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Body (raw)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                TextEditor(text: $viewModel.customBody)
                     .frame(height: 100)
                     .font(.system(.body, design: .monospaced))
                     .autocapitalization(.none)
@@ -178,7 +189,7 @@ struct RestfulAPITestView: View {
         } header: {
             Text("Custom API Call")
         } footer: {
-            Text("Enter path and params (JSON format). Leave params empty for GET requests.")
+            Text("URL Param is a raw query-string (a=1&b=2). Body is sent verbatim. GET ignores body.")
                 .font(.caption)
         }
     }
