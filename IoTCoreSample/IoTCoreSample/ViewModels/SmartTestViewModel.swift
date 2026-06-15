@@ -383,8 +383,8 @@ class SmartTestViewModel: ObservableObject {
                 switch result {
                 case .success(let enabled):
                     self?.lastResult = "Trigger Mode: \(enabled ? "ENABLED" : "DISABLED")"
-                case .failure(let error):
-                    self?.handleError(error, commandName: "Get Trigger Mode")
+                case .failure(let errorCode):
+                    self?.handleError(errorCode: errorCode, commandName: "Get Trigger Mode")
                 }
             }
         }
@@ -414,6 +414,12 @@ class SmartTestViewModel: ObservableObject {
 
     private func handleError(_ error: Error, commandName: String) {
         lastError = "\(commandName) failed: \(error.localizedDescription)"
+    }
+
+    /// T-025: public callbacks now deliver an Int errorCode
+    /// (Android IoTErrorCode-aligned) instead of a Swift Error.
+    private func handleError(errorCode: Int, commandName: String) {
+        lastError = "\(commandName) failed (code \(errorCode))"
     }
 
     private func showError(_ message: String) {

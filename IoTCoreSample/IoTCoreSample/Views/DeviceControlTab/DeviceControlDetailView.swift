@@ -493,8 +493,8 @@ struct DeviceControlDetailView: View {
                 switch result {
                 case .success(let networks):
                     self.scannedNetworks = networks.sorted { $0.rssi > $1.rssi }
-                case .failure(let error):
-                    self.wifiConnectError = "Scan failed: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    self.wifiConnectError = "Scan failed (code \(errorCode))"
                 }
             }
         }
@@ -515,8 +515,8 @@ struct DeviceControlDetailView: View {
                         ? "Connected to \"\(ssid)\" successfully"
                         : "Connection to \"\(ssid)\" initiated"
                     self.wifiConnectError = nil
-                case .failure(let error):
-                    self.wifiConnectError = "Failed to connect to \"\(ssid)\": \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    self.wifiConnectError = "Failed to connect to \"\(ssid)\" (code \(errorCode))"
                     self.wifiConnectResult = nil
                 }
             }
@@ -1277,8 +1277,8 @@ struct DeviceControlDetailView: View {
                 case .success(let networks):
                     let networkList = networks.map { $0.ssid ?? "Unknown" }.joined(separator: ", ")
                     continuation.resume(returning: "Found \(networks.count) networks: \(networkList)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -1294,8 +1294,8 @@ struct DeviceControlDetailView: View {
                 case .success(let connectivity):
                     let connected = connectivity.isWiFiConnected ?? false
                     continuation.resume(returning: "WiFi connection \(connected ? "successful" : "initiated")")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -1457,8 +1457,8 @@ struct DeviceControlDetailView: View {
                     Version Code: \(info.softwareVersionCode.map { String($0) }.joined(separator: "."))
                     """
                     continuation.resume(returning: desc)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -1498,8 +1498,8 @@ struct DeviceControlDetailView: View {
                 switch result {
                 case .success:
                     continuation.resume(returning: "Device reset to factory defaults")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -1512,8 +1512,8 @@ struct DeviceControlDetailView: View {
                 switch result {
                 case .success:
                     continuation.resume(returning: "Device rebooted successfully")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -1531,8 +1531,8 @@ struct DeviceControlDetailView: View {
                 switch result {
                 case .success(let blocks):
                     continuation.resume(returning: "Retrieved \(blocks.count) log blocks")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }

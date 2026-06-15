@@ -250,8 +250,8 @@ class OnboardingViewModel: ObservableObject {
                     self.hasNetworkStatus = true
                     self.completedSteps.insert(.networkStatus)
 
-                case .failure(let error):
-                    self.errorMessage = "Failed to get network status: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    self.errorMessage = "Failed to get network status (code \(errorCode))"
                 }
             }
         }
@@ -283,8 +283,8 @@ class OnboardingViewModel: ObservableObject {
                 case .success(let networks):
                     self.scannedNetworks = networks
 
-                case .failure(let error):
-                    self.errorMessage = "WiFi scan failed: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    self.errorMessage = "WiFi scan failed (code \(errorCode))"
                 }
             }
         }
@@ -319,8 +319,8 @@ class OnboardingViewModel: ObservableObject {
                     self.isWifiConnected = true
                     self.completedSteps.insert(.wifiConfig)
 
-                case .failure(let error):
-                    self.errorMessage = "WiFi connection failed: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    self.errorMessage = "WiFi connection failed (code \(errorCode))"
                 }
             }
         }

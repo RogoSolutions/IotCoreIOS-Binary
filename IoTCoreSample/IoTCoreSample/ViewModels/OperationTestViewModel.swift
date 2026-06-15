@@ -357,8 +357,9 @@ class OperationTestViewModel: ObservableObject {
                 switch result {
                 case .success(let connectivity):
                     continuation.resume(returning: "Connectivity: \(connectivity.count) interfaces")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    // T-025: RequestResultCallback now delivers an Int errorCode.
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -370,8 +371,9 @@ class OperationTestViewModel: ObservableObject {
                 switch result {
                 case .success(let networks):
                     continuation.resume(returning: "Found \(networks.count) WiFi networks")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    // T-025: RequestResultCallback now delivers an Int errorCode.
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -383,8 +385,9 @@ class OperationTestViewModel: ObservableObject {
                 switch result {
                 case .success(let connectivity):
                     continuation.resume(returning: "WiFi connection initiated")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    // T-025: RequestResultCallback now delivers an Int errorCode.
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -422,8 +425,9 @@ class OperationTestViewModel: ObservableObject {
                 switch result {
                 case .success:
                     continuation.resume(returning: "Device rebooted")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    // T-025: RequestStatusCallback now delivers an Int errorCode.
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }
@@ -435,8 +439,9 @@ class OperationTestViewModel: ObservableObject {
                 switch result {
                 case .success:
                     continuation.resume(returning: "Device reset to factory defaults")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    // T-025: RequestStatusCallback now delivers an Int errorCode.
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
         }

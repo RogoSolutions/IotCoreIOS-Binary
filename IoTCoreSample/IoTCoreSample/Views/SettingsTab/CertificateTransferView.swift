@@ -570,17 +570,19 @@ class CertificateTransferViewModel: ObservableObject {
         )
     }
 
-    private func handleTransferResult(_ result: Result<Void, Error>, type: String) {
+    private func handleTransferResult(_ result: RequestStatus, type: String) {
         switch result {
         case .success:
             transferProgress = 100
             lastTransferSuccessful = true
             lastResult = "\(type) certificate transferred successfully"
 
-        case .failure(let error):
+        case .failure(let errorCode):
+            // T-025: public callbacks now deliver an Int errorCode
+            // (Android IoTErrorCode-aligned) instead of a Swift Error.
             transferProgress = 0
             lastTransferSuccessful = false
-            lastError = "\(type) certificate transfer failed: \(error.localizedDescription)"
+            lastError = "\(type) certificate transfer failed (code \(errorCode))"
         }
     }
 

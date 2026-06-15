@@ -260,8 +260,8 @@ class OperatorsTestingViewModel: ObservableObject {
                     switch result {
                     case .success:
                         self.lastResult = "HTTPS Certificate sent successfully\nSize: \(certificate.count) bytes"
-                    case .failure(let error):
-                        self.finishWithError("Failed to send HTTPS certificate: \(error.localizedDescription)")
+                    case .failure(let errorCode):
+                        self.finishWithError("Failed to send HTTPS certificate (code \(errorCode))")
                     }
                 }
             }
@@ -292,8 +292,8 @@ class OperatorsTestingViewModel: ObservableObject {
                     switch result {
                     case .success:
                         self.lastResult = "MQTT Certificate sent successfully\nSize: \(certificate.count) bytes"
-                    case .failure(let error):
-                        self.finishWithError("Failed to send MQTT certificate: \(error.localizedDescription)")
+                    case .failure(let errorCode):
+                        self.finishWithError("Failed to send MQTT certificate (code \(errorCode))")
                     }
                 }
             }
@@ -346,8 +346,8 @@ class OperatorsTestingViewModel: ObservableObject {
                     Location ID: \(self.cloudLocationId)
                     Partner ID: \(self.cloudPartnerId)
                     """
-                case .failure(let error):
-                    self.finishWithError("Failed to send cloud info: \(error.localizedDescription)")
+                case .failure(let errorCode):
+                    self.finishWithError("Failed to send cloud info (code \(errorCode))")
                 }
             }
         }
@@ -386,8 +386,8 @@ class OperatorsTestingViewModel: ObservableObject {
                     }
                     self.lastResult = resultText
 
-                case .failure(let error):
-                    self.finishWithError("Failed to scan WiFi: \(error.localizedDescription)")
+                case .failure(let errorCode):
+                    self.finishWithError("Failed to scan WiFi (code \(errorCode))")
                 }
             }
         }
@@ -419,8 +419,8 @@ class OperatorsTestingViewModel: ObservableObject {
                     SSID: \(self.wifiSSID)
                     Interface: \(infNo)
                     """
-                case .failure(let error):
-                    self.finishWithError("Failed to connect WiFi: \(error.localizedDescription)")
+                case .failure(let errorCode):
+                    self.finishWithError("Failed to connect WiFi (code \(errorCode))")
                 }
             }
         }
@@ -468,8 +468,8 @@ class OperatorsTestingViewModel: ObservableObject {
                     }
                     self.lastResult = resultText
 
-                case .failure(let error):
-                    self.finishWithError("Failed to get connectivity: \(error.localizedDescription)")
+                case .failure(let errorCode):
+                    self.finishWithError("Failed to get connectivity (code \(errorCode))")
                 }
             }
         }
@@ -490,8 +490,8 @@ class OperatorsTestingViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self.lastResult = "Device identify request sent successfully\nDevice should be blinking/identifying now"
-                case .failure(let error):
-                    self.finishWithError("Failed to send identify request: \(error.localizedDescription)")
+                case .failure(let errorCode):
+                    self.finishWithError("Failed to send identify request (code \(errorCode))")
                 }
             }
         }

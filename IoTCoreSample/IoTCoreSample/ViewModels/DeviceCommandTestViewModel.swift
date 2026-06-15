@@ -170,8 +170,8 @@ class DeviceCommandTestViewModel: ObservableObject {
                     self.lastResult = "Device reset successfully"
                     print("✅ Reset device success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Reset Device")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Reset Device")
                 }
             }
         }
@@ -204,8 +204,8 @@ class DeviceCommandTestViewModel: ObservableObject {
                     self.lastResult = "Device rebooted successfully"
                     print("✅ Reboot device success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Reboot Device")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Reboot Device")
                 }
             }
         }
@@ -250,8 +250,8 @@ class DeviceCommandTestViewModel: ObservableObject {
                     self.lastResult = resultText
                     print("✅ Get device connectivity success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Get Device Connectivity")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Get Device Connectivity")
                 }
             }
         }
@@ -291,8 +291,8 @@ class DeviceCommandTestViewModel: ObservableObject {
                     self.lastResult = resultText
                     print("✅ WiFi connect success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Request Connect WiFi")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Request Connect WiFi")
                 }
             }
         }
@@ -332,8 +332,8 @@ class DeviceCommandTestViewModel: ObservableObject {
                     self.lastResult = resultText
                     print("✅ WiFi scan success: \(networks.count) networks")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Request Scan WiFi")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Request Scan WiFi")
                 }
             }
         }
@@ -358,6 +358,13 @@ class DeviceCommandTestViewModel: ObservableObject {
     private func handleError(_ error: Error, commandName: String) {
         print("❌ \(commandName) error: \(error.localizedDescription)")
         showError("\(commandName) failed: \(error.localizedDescription)")
+    }
+
+    /// T-025: public callbacks now deliver an Int errorCode
+    /// (Android IoTErrorCode-aligned) instead of a Swift Error.
+    private func handleError(errorCode: Int, commandName: String) {
+        print("❌ \(commandName) error code: \(errorCode)")
+        showError("\(commandName) failed (code \(errorCode))")
     }
 
     private func showError(_ message: String) {

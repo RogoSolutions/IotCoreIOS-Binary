@@ -146,7 +146,7 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    private func handleLoginResult(_ result: Result<Void, Error>) {
+    private func handleLoginResult(_ result: RequestStatus) {
         DispatchQueue.main.async { [weak self] in
             self?.isLoading = false
 
@@ -156,13 +156,10 @@ class AuthViewModel: ObservableObject {
                 self?.successMessage = "Login successful!"
                 self?.password = ""  // Clear password
 
-            case .failure(let error):
-                if let iotError = error as? IotCoreError,
-                   case IotCoreError.unauthorized(let reason) = iotError {
-                    self?.errorMessage = "\(reason)"
-                } else {
-                    self?.errorMessage = "\(error)"
-                }
+            case .failure(let errorCode):
+                // T-025: public callbacks now deliver an Int errorCode
+                // (Android IoTErrorCode-aligned) instead of a Swift Error.
+                self?.errorMessage = "Login failed (code \(errorCode))"
             }
         }
     }
@@ -198,8 +195,8 @@ class AuthViewModel: ObservableObject {
                 case .success:
                     self?.successMessage = "Sign up successful! Check your email for verification code."
                     self?.signUpStep = .verifyEmail
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                case .failure(let errorCode):
+                    self?.errorMessage = "Error (code \(errorCode))"
                 }
             }
         }
@@ -224,8 +221,8 @@ class AuthViewModel: ObservableObject {
                     self?.authMode = .login
                     self?.signUpStep = .fillForm
                     self?.clearSignUpFields()
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                case .failure(let errorCode):
+                    self?.errorMessage = "Error (code \(errorCode))"
                 }
             }
         }
@@ -258,8 +255,8 @@ class AuthViewModel: ObservableObject {
                     self?.successMessage = "Email verified! You can now login."
                     self?.authMode = .login
                     self?.verifyEmailCode = ""
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                case .failure(let errorCode):
+                    self?.errorMessage = "Error (code \(errorCode))"
                 }
             }
         }
@@ -286,8 +283,8 @@ class AuthViewModel: ObservableObject {
                 case .success:
                     self?.successMessage = "Verification code sent to your email."
                     self?.forgotPasswordStep = .enterCode
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                case .failure(let errorCode):
+                    self?.errorMessage = "Error (code \(errorCode))"
                 }
             }
         }
@@ -320,8 +317,8 @@ class AuthViewModel: ObservableObject {
                     self?.authMode = .login
                     self?.forgotPasswordStep = .enterEmail
                     self?.clearForgotPasswordFields()
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                case .failure(let errorCode):
+                    self?.errorMessage = "Error (code \(errorCode))"
                 }
             }
         }

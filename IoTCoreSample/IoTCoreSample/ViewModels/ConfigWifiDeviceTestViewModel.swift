@@ -172,8 +172,8 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                     self.lastResult = resultText
                     print("✅ Get connectivity success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Network Status Check")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Network Status Check")
                 }
             }
         }
@@ -221,8 +221,8 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                     self.lastResult = resultText
                     print("✅ WiFi scan success: \(networks.count) networks")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "WiFi Scan")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "WiFi Scan")
                 }
             }
         }
@@ -270,8 +270,8 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                     """
                     print("✅ WiFi connect success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "WiFi Connection")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "WiFi Connection")
                 }
             }
         }
@@ -364,6 +364,13 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
         showError("\(commandName) failed: \(error.localizedDescription)")
     }
 
+    /// T-025: public callbacks now deliver an Int errorCode
+    /// (Android IoTErrorCode-aligned) instead of a Swift Error.
+    private func handleError(errorCode: Int, commandName: String) {
+        print("❌ \(commandName) error code: \(errorCode)")
+        showError("\(commandName) failed (code \(errorCode))")
+    }
+
     private func showError(_ message: String) {
         lastError = message
     }
@@ -422,8 +429,8 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                     """
                     print("✅ Device identify request sent")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Device Identify")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Device Identify")
                 }
             }
         }
@@ -473,8 +480,8 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                         """
                         print("✅ HTTPS certificate sent successfully")
 
-                    case .failure(let error):
-                        self.handleError(error, commandName: "Send HTTPS Certificate")
+                    case .failure(let errorCode):
+                        self.handleError(errorCode: errorCode, commandName: "Send HTTPS Certificate")
                     }
                 }
             }
@@ -525,8 +532,8 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                         """
                         print("✅ MQTT certificate sent successfully")
 
-                    case .failure(let error):
-                        self.handleError(error, commandName: "Send MQTT Certificate")
+                    case .failure(let errorCode):
+                        self.handleError(errorCode: errorCode, commandName: "Send MQTT Certificate")
                     }
                 }
             }

@@ -528,8 +528,8 @@ class DeviceControlViewModel: ObservableObject {
                         isSuccess: true
                     )
 
-                case .failure(let error):
-                    let errorText = "Reboot failed: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    let errorText = "Reboot failed (code \(errorCode))"
                     self.lastOperationError = errorText
                     self.addToHistory(
                         command: DeviceCommand.rebootDevice.rawValue,
@@ -571,8 +571,8 @@ class DeviceControlViewModel: ObservableObject {
                         isSuccess: true
                     )
 
-                case .failure(let error):
-                    let errorText = "Reset failed: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    let errorText = "Reset failed (code \(errorCode))"
                     self.lastOperationError = errorText
                     self.addToHistory(
                         command: DeviceCommand.resetDevice.rawValue,
@@ -638,8 +638,8 @@ class DeviceControlViewModel: ObservableObject {
                         responseData: .connectivity(connectivityInfos)
                     )
 
-                case .failure(let error):
-                    let errorText = "Failed to get connectivity: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    let errorText = "Failed to get connectivity (code \(errorCode))"
                     self.lastOperationError = errorText
                     self.addToHistory(
                         command: "getConnectivity",
