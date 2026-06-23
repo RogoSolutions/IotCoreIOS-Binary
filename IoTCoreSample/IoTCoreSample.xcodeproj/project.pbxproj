@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		098DB21D06B17584F9669E8F /* SampleCallbackAdapters.swift in Sources */ = {isa = PBXBuildFile; fileRef = C22BAB3BC21392B84E6ADE2C /* SampleCallbackAdapters.swift */; };
 		0ABE693045C6C8CCAC9E21ED /* DebugLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2BA32EDBE75459E461D06C /* DebugLogView.swift */; };
 		0B3CA1CA1FB4CDB503FBEF51 /* SmartListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7FA8E1EA018C82335D1466 /* SmartListViewModel.swift */; };
 		0B74D20A2D7B0D85AC832530 /* CommandParameterFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4714BAB606B4B132B7EB58 /* CommandParameterFormView.swift */; };
@@ -103,6 +104,7 @@
 		B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		C03D1788202A3571AB3B7AFB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C0B27DE0E695B2217F694769 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C22BAB3BC21392B84E6ADE2C /* SampleCallbackAdapters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleCallbackAdapters.swift; sourceTree = "<group>"; };
 		C28C710A559089B7D6AE8C45 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
 		C603850BCEC52F2B28B6B6FE /* RestfulAPITestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestViewModel.swift; sourceTree = "<group>"; };
 		C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCallbackDemoView.swift; sourceTree = "<group>"; };
@@ -178,6 +180,7 @@
 			isa = PBXGroup;
 			children = (
 				76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */,
+				C22BAB3BC21392B84E6ADE2C /* SampleCallbackAdapters.swift */,
 				42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */,
 			);
 			path = Extensions;
@@ -387,6 +390,7 @@
 				962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */,
 				279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */,
 				DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */,
+				098DB21D06B17584F9669E8F /* SampleCallbackAdapters.swift in Sources */,
 				FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */,
 				9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */,
 				C9CA0E02AFE56205761A754C /* SettingsTabView.swift in Sources */,

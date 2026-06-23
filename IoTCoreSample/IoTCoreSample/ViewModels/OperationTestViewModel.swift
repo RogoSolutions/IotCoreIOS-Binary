@@ -300,54 +300,54 @@ class OperationTestViewModel: ObservableObject {
     private func executeControlDevice(handler: RGBIotDeviceCmdHandler, devId: String, elements: [Int], attrValue: [Int]) async throws -> String {
         addLog("   Calling handler.controlDevice...")
         return try await withCheckedThrowingContinuation { continuation in
-            handler.controlDevice(devId: devId, elements: elements, attrValue: attrValue) { result in
+            handler.controlDevice(devId: devId, elements: elements, attrValue: attrValue, completion: AckClosureAdapter { result in
                 switch result {
                 case .success:
                     continuation.resume(returning: "Control sent successfully")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
     private func executeControlDeviceGroup(handler: RGBIotDeviceCmdHandler, groupAddr: Int, attrValue: [Int], targetDevType: Int) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.controlDeviceGroup(groupAddr: groupAddr, attrValue: attrValue, targetDevType: targetDevType) { result in
+            handler.controlDeviceGroup(groupAddr: groupAddr, attrValue: attrValue, targetDevType: targetDevType, completion: AckClosureAdapter { result in
                 switch result {
                 case .success:
                     continuation.resume(returning: "Group control sent successfully")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
     private func executeSettingAttribute(handler: RGBIotDeviceCmdHandler, devId: String, element: Int, attrValue: [Int]) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.settingAttribute(devId: devId, element: element, attrValue: attrValue) { result in
+            handler.settingAttribute(devId: devId, element: element, attrValue: attrValue, completion: AckClosureAdapter { result in
                 switch result {
                 case .success:
                     continuation.resume(returning: "Setting sent successfully")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
     private func executeGetDeviceState(handler: RGBIotDeviceCmdHandler, devId: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.getDeviceState(devId: devId, timeOut: 10) { result in
+            handler.getDeviceState(devId: devId, timeOut: 10, completion: GetDeviceStateClosureAdapter { result in
                 switch result {
                 case .success(let state):
-                    let stateDesc = "Device state retrieved successfully"
+                    let stateDesc = "Device state retrieved successfully (deviceId=\(state.deviceId))"
                     continuation.resume(returning: stateDesc)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -395,27 +395,27 @@ class OperationTestViewModel: ObservableObject {
 
     private func executeConnect(handler: RGBIotDeviceCmdHandler, devId: String, groupAddr: Int) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.connect(devId: devId, groupAddr: groupAddr) { result in
+            handler.connect(devId: devId, groupAddr: groupAddr, completion: AckClosureAdapter { result in
                 switch result {
                 case .success:
                     continuation.resume(returning: "Bound to group \(groupAddr)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
     private func executeUnbindDeviceGroup(handler: RGBIotDeviceCmdHandler, devId: String, elements: [Int], groupAddr: Int) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.unbindDeviceGroup(devId: devId, elements: elements, groupAddr: groupAddr) { result in
+            handler.unbindDeviceGroup(devId: devId, elements: elements, groupAddr: groupAddr, completion: AckClosureAdapter { result in
                 switch result {
                 case .success:
                     continuation.resume(returning: "Unbound from group \(groupAddr)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 

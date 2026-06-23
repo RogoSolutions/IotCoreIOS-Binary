@@ -40,17 +40,17 @@ class SmartTestViewModel: ObservableObject {
     func fetchDevices() {
         guard let sdk = IoTAppCore.current else { return }
         isLoadingDevices = true
-        sdk.callApiGetUserDevices { [weak self] result in
+        sdk.callApiGetUserDevices(completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoadingDevices = false
-                if case .success(let data) = result {
-                    if let parsed = try? JSONDecoder().decode([IoTDevice].self, from: data) {
+                if case .success(let response) = result {
+                    if let parsed = try? JSONDecoder().decode([IoTDevice].self, from: Data(response.utf8)) {
                         self.devices = parsed
                     }
                 }
             }
-        }
+        })
     }
 
     /// Get element IDs for a device from elementInfos keys
@@ -101,13 +101,13 @@ class SmartTestViewModel: ObservableObject {
             "subType": -1     // Default
         ]
 
-        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams)) { [weak self] result in
+        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
 
                 switch result {
-                case .success(let data):
-                    guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                case .success(let response):
+                    guard let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                           let uuid = json["uuid"] as? String,
                           let smid = json["smid"] as? Int else {
                         self.isLoading = false
@@ -133,11 +133,11 @@ class SmartTestViewModel: ObservableObject {
 
                 case .failure(let error):
                     self.isLoading = false
-                    self.appendLog("[Step 1] FAILED: \(error.localizedDescription)")
-                    self.showError("Create Smart failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 1] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("Create Smart failed (code \(error.errorCode)): \(error.message)")
                 }
             }
-        }
+        })
     }
 
     private func step2_bindSmartCmd(
@@ -156,33 +156,34 @@ class SmartTestViewModel: ObservableObject {
             smid: smid,
             devId: targetDeviceId,
             devType: 0,
-            smartElmCmds: [elementId: elmCmd]
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
+            smartElmCmds: [elementId: elmCmd],
+            completion: SmartBindCmdClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
 
-                switch result {
-                case .success:
-                    self.appendLog("[Step 2] OK: MQTT bind ACK received")
+                    switch result {
+                    case .success:
+                        self.appendLog("[Step 2] OK: MQTT bind ACK received")
 
-                    // Step 3: REST — Persist SmartCmd to cloud
-                    self.step3_persistSmartCmd(
-                        sdk: sdk,
-                        smartUuid: smartUuid,
-                        targetDeviceId: targetDeviceId,
-                        elementId: elementId,
-                        cmd: cmd,
-                        delay: delay
-                    )
+                        // Step 3: REST — Persist SmartCmd to cloud
+                        self.step3_persistSmartCmd(
+                            sdk: sdk,
+                            smartUuid: smartUuid,
+                            targetDeviceId: targetDeviceId,
+                            elementId: elementId,
+                            cmd: cmd,
+                            delay: delay
+                        )
 
-                case .failure(let error):
-                    self.isLoading = false
-                    self.appendLog("[Step 2] FAILED: \(error.localizedDescription)")
-                    self.showError("MQTT bindCmd failed: \(error.localizedDescription)")
-                    self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Scenario")
+                    case .failure(let errorCode):
+                        self.isLoading = false
+                        self.appendLog("[Step 2] FAILED: code=\(errorCode)")
+                        self.showError("MQTT bindCmd failed (code \(errorCode))")
+                        self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Scenario")
+                    }
                 }
             }
-        }
+        )
     }
 
     private func step3_persistSmartCmd(
@@ -213,15 +214,15 @@ class SmartTestViewModel: ObservableObject {
             "cmds": ["\(elementId)": cmdEntry]
         ]
 
-        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams)) { [weak self] result in
+        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
 
                 switch result {
-                case .success(let data):
+                case .success(let response):
                     var detail = ""
-                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    if let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                        let cmdUuid = json["uuid"] as? String {
                         detail = ", cmdUuid=\(cmdUuid)"
                     }
@@ -231,12 +232,12 @@ class SmartTestViewModel: ObservableObject {
                     self.lastResult = "Scenario created! smid=\(self.createdSmid ?? 0)"
 
                 case .failure(let error):
-                    self.appendLog("[Step 3] FAILED: \(error.localizedDescription)")
-                    self.showError("Persist SmartCmd failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 3] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("Persist SmartCmd failed (code \(error.errorCode)): \(error.message)")
                     self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Scenario")
                 }
             }
-        }
+        })
     }
 
     // MARK: - Smart Active
@@ -276,7 +277,7 @@ class SmartTestViewModel: ObservableObject {
 
         // Step 2: REST delete
         appendLog("[Delete 2/2] REST: POST /api/v1/smart/delete uuid=\(smartUuid) ...")
-        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid]), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -288,11 +289,11 @@ class SmartTestViewModel: ObservableObject {
                     self.createdSmartUuid = nil
                     self.createdSmid = nil
                 case .failure(let error):
-                    self.appendLog("[Delete 2/2] FAILED: \(error.localizedDescription)")
-                    self.showError("Delete failed: \(error.localizedDescription)")
+                    self.appendLog("[Delete 2/2] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("Delete failed (code \(error.errorCode)): \(error.message)")
                 }
             }
-        }
+        })
     }
 
     // MARK: - Individual MQTT Primitives (for manual testing)
@@ -317,25 +318,26 @@ class SmartTestViewModel: ObservableObject {
             conditionExt: nil,
             attrValueConditionExt: nil,
             timeCfg: timeCfg,
-            timeJob: nil
-        ) { [weak self] result in
-            Task { @MainActor in
-                self?.isLoading = false
-                self?.handleAckResult(result, commandName: "Bind Smart Trigger")
+            timeJob: nil,
+            completion: SmartBindTriggerClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    self?.isLoading = false
+                    self?.handleAckResult(result, commandName: "Bind Smart Trigger")
+                }
             }
-        }
+        )
     }
 
     func unbindSmartTrigger(smid: Int, devId: String) {
         guard let sdk = IoTAppCore.current else { showError("SDK not initialized"); return }
         guard !devId.isEmpty else { showError("Device ID required"); return }
         isLoading = true; lastError = nil; lastResult = nil
-        sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: devId) { [weak self] result in
+        sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: devId, completion: AckClosureAdapter { [weak self] result in
             Task { @MainActor in
                 self?.isLoading = false
                 self?.handleAckResult(result, commandName: "Unbind Smart Trigger")
             }
-        }
+        })
     }
 
     func bindSmartCmd(smid: Int, devId: String, elm: Int, attrValue: [Int], delay: Int?) {
@@ -343,35 +345,35 @@ class SmartTestViewModel: ObservableObject {
         guard !devId.isEmpty else { showError("Device ID required"); return }
         isLoading = true; lastError = nil; lastResult = nil
         let elmCmd = RGBSmartElmCmd(reversing: 0, delay: delay ?? 0, cmd: attrValue)
-        sdk.deviceCmdHandler.bindDeviceSmartCmd(smid: smid, devId: devId, devType: 0, smartElmCmds: [elm: elmCmd]) { [weak self] result in
+        sdk.deviceCmdHandler.bindDeviceSmartCmd(smid: smid, devId: devId, devType: 0, smartElmCmds: [elm: elmCmd], completion: SmartBindCmdClosureAdapter { [weak self] result in
             Task { @MainActor in
                 self?.isLoading = false
                 self?.handleAckResult(result, commandName: "Bind Smart Cmd")
             }
-        }
+        })
     }
 
     func unbindSmartCmd(smid: Int, devId: String) {
         guard let sdk = IoTAppCore.current else { showError("SDK not initialized"); return }
         guard !devId.isEmpty else { showError("Device ID required"); return }
         isLoading = true; lastError = nil; lastResult = nil
-        sdk.deviceCmdHandler.unbindDeviceSmartCmd(smid: smid, devId: devId) { [weak self] result in
+        sdk.deviceCmdHandler.unbindDeviceSmartCmd(smid: smid, devId: devId, completion: AckClosureAdapter { [weak self] result in
             Task { @MainActor in
                 self?.isLoading = false
                 self?.handleAckResult(result, commandName: "Unbind Smart Cmd")
             }
-        }
+        })
     }
 
     func setSmartTriggerMode(smid: Int, smartType: Int, enabled: Bool, disableMinutes: Int?) {
         guard let sdk = IoTAppCore.current else { showError("SDK not initialized"); return }
         isLoading = true; lastError = nil; lastResult = nil
-        sdk.deviceCmdHandler.setSmartTriggerMode(smid: smid, smartType: smartType, enabled: enabled, disableMinutes: disableMinutes) { [weak self] result in
+        sdk.deviceCmdHandler.setSmartTriggerMode(smid: smid, smartType: smartType, enabled: enabled, disableMinutes: disableMinutes, completion: AckClosureAdapter { [weak self] result in
             Task { @MainActor in
                 self?.isLoading = false
                 self?.handleAckResult(result, commandName: "Set Trigger Mode (\(enabled ? "enable" : "disable"))")
             }
-        }
+        })
     }
 
     func getSmartTriggerMode(smid: Int) {
@@ -403,17 +405,13 @@ class SmartTestViewModel: ObservableObject {
         print("Smart: \(message)")
     }
 
-    private func handleAckResult(_ result: Result<Int, Error>, commandName: String) {
+    private func handleAckResult(_ result: SampleResult<Int>, commandName: String) {
         switch result {
         case .success(let code):
             lastResult = "\(commandName): Success (code=\(code))"
-        case .failure(let error):
-            handleError(error, commandName: commandName)
+        case .failure(let errorCode):
+            handleError(errorCode: errorCode, commandName: commandName)
         }
-    }
-
-    private func handleError(_ error: Error, commandName: String) {
-        lastError = "\(commandName) failed: \(error.localizedDescription)"
     }
 
     /// T-025: public callbacks now deliver an Int errorCode
@@ -430,17 +428,17 @@ class SmartTestViewModel: ObservableObject {
     /// flow failure (any step after smart/add). Logs the rollback attempt.
     private func rollbackSmartContainer(sdk: any RGBIotCore, smartUuid: String, flowName: String) {
         appendLog("[Rollback] \(flowName): deleting orphaned smart uuid=\(smartUuid)")
-        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid]), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
                 case .success:
                     self.appendLog("[Rollback] \(flowName): smart/delete OK")
                 case .failure(let error):
-                    self.appendLog("[Rollback] \(flowName): smart/delete FAILED: \(error.localizedDescription)")
+                    self.appendLog("[Rollback] \(flowName): smart/delete FAILED: code=\(error.errorCode) \(error.message)")
                 }
             }
-        }
+        })
     }
 
     // MARK: - Schedule Full Flow
@@ -487,12 +485,12 @@ class SmartTestViewModel: ObservableObject {
             "subType": 0
         ]
 
-        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams)) { [weak self] result in
+        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
-                case .success(let data):
-                    guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                case .success(let response):
+                    guard let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                           let uuid = json["uuid"] as? String,
                           let smid = json["smid"] as? Int else {
                         self.isLoading = false
@@ -519,11 +517,11 @@ class SmartTestViewModel: ObservableObject {
                     )
                 case .failure(let error):
                     self.isLoading = false
-                    self.appendLog("[Step 1] FAILED: \(error.localizedDescription)")
-                    self.showError("smart/add failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 1] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("smart/add failed (code \(error.errorCode)): \(error.message)")
                 }
             }
-        }
+        })
     }
 
     private func scheduleStep2_bindCmd(
@@ -545,34 +543,35 @@ class SmartTestViewModel: ObservableObject {
             smid: smid,
             devId: targetDeviceId,
             devType: 0,
-            smartElmCmds: [elementId: elmCmd]
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    self.appendLog("[Step 2] OK: MQTT bind ACK received")
-                    self.scheduleStep3_persistSmartCmd(
-                        sdk: sdk,
-                        smartUuid: smartUuid,
-                        smid: smid,
-                        targetDeviceId: targetDeviceId,
-                        elementId: elementId,
-                        cmd: cmd,
-                        locationId: locationId,
-                        localMinutesFromMidnight: localMinutesFromMidnight,
-                        localWeekdays: localWeekdays,
-                        endpoint: endpoint,
-                        partner: partner
-                    )
-                case .failure(let error):
-                    self.isLoading = false
-                    self.appendLog("[Step 2] FAILED: \(error.localizedDescription)")
-                    self.showError("MQTT bindCmd failed: \(error.localizedDescription)")
-                    self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Schedule")
+            smartElmCmds: [elementId: elmCmd],
+            completion: SmartBindCmdClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success:
+                        self.appendLog("[Step 2] OK: MQTT bind ACK received")
+                        self.scheduleStep3_persistSmartCmd(
+                            sdk: sdk,
+                            smartUuid: smartUuid,
+                            smid: smid,
+                            targetDeviceId: targetDeviceId,
+                            elementId: elementId,
+                            cmd: cmd,
+                            locationId: locationId,
+                            localMinutesFromMidnight: localMinutesFromMidnight,
+                            localWeekdays: localWeekdays,
+                            endpoint: endpoint,
+                            partner: partner
+                        )
+                    case .failure(let errorCode):
+                        self.isLoading = false
+                        self.appendLog("[Step 2] FAILED: code=\(errorCode)")
+                        self.showError("MQTT bindCmd failed (code \(errorCode))")
+                        self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Schedule")
+                    }
                 }
             }
-        }
+        )
     }
 
     private func scheduleStep3_persistSmartCmd(
@@ -605,7 +604,7 @@ class SmartTestViewModel: ObservableObject {
             "cfm": 0,
             "cmds": ["\(elementId)": cmdEntry]
         ]
-        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams)) { [weak self] result in
+        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -623,12 +622,12 @@ class SmartTestViewModel: ObservableObject {
                     )
                 case .failure(let error):
                     self.isLoading = false
-                    self.appendLog("[Step 3] FAILED: \(error.localizedDescription)")
-                    self.showError("smartcmd/add failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 3] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("smartcmd/add failed (code \(error.errorCode)): \(error.message)")
                     self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Schedule")
                 }
             }
-        }
+        })
     }
 
     private func scheduleStep4_addSchedule(
@@ -669,14 +668,14 @@ class SmartTestViewModel: ObservableObject {
             scheduleParams["partner"] = p
         }
 
-        sdk.callApiPost("schedule/add", urlParam: nil, headers: nil, body: jsonBody(scheduleParams)) { [weak self] result in
+        sdk.callApiPost("schedule/add", urlParam: nil, headers: nil, body: jsonBody(scheduleParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
                 switch result {
-                case .success(let data):
+                case .success(let response):
                     var detail = ""
-                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    if let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                        let scheduleUuid = json["uuid"] as? String {
                         self.createdScheduleUuid = scheduleUuid
                         detail = ", scheduleUuid=\(scheduleUuid)"
@@ -685,12 +684,12 @@ class SmartTestViewModel: ObservableObject {
                     self.appendLog("=== Schedule Created! smid=\(smid) ===")
                     self.lastResult = "Schedule created! smid=\(smid)"
                 case .failure(let error):
-                    self.appendLog("[Step 4] FAILED: \(error.localizedDescription)")
-                    self.showError("schedule/add failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 4] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("schedule/add failed (code \(error.errorCode)): \(error.message)")
                     self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Schedule")
                 }
             }
-        }
+        })
     }
 
     /// Delete the last created schedule (REST schedule/delete) and its parent Smart.
@@ -705,7 +704,7 @@ class SmartTestViewModel: ObservableObject {
         lastResult = nil
         appendLog("=== Delete Schedule ===")
         appendLog("[Delete 1/2] REST: POST schedule/delete uuid=\(scheduleUuid)")
-        sdk.callApiPost("schedule/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": scheduleUuid])) { [weak self] result in
+        sdk.callApiPost("schedule/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": scheduleUuid]), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
@@ -716,7 +715,7 @@ class SmartTestViewModel: ObservableObject {
                     if let smartUuid = self.createdScheduleSmartUuid, let smid = self.createdSmid {
                         self.appendLog("[Delete 2/2] MQTT removeAnnounce + REST smart delete")
                         sdk.deviceCmdHandler.smartRemoveAnnounce(smid: smid)
-                        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { delResult in
+                        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid]), completion: ApiResultClosureAdapter { delResult in
                             Task { @MainActor in
                                 self.isLoading = false
                                 switch delResult {
@@ -727,22 +726,22 @@ class SmartTestViewModel: ObservableObject {
                                     self.createdSmartUuid = nil
                                     self.createdSmid = nil
                                 case .failure(let error):
-                                    self.appendLog("[Delete 2/2] FAILED: \(error.localizedDescription)")
-                                    self.showError("Smart delete failed: \(error.localizedDescription)")
+                                    self.appendLog("[Delete 2/2] FAILED: code=\(error.errorCode) \(error.message)")
+                                    self.showError("Smart delete failed (code \(error.errorCode)): \(error.message)")
                                 }
                             }
-                        }
+                        })
                     } else {
                         self.isLoading = false
                         self.lastResult = "Schedule deleted"
                     }
                 case .failure(let error):
                     self.isLoading = false
-                    self.appendLog("[Delete 1/2] FAILED: \(error.localizedDescription)")
-                    self.showError("schedule/delete failed: \(error.localizedDescription)")
+                    self.appendLog("[Delete 1/2] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("schedule/delete failed (code \(error.errorCode)): \(error.message)")
                 }
             }
-        }
+        })
     }
 
     // MARK: - Automation Full Flow
@@ -788,12 +787,12 @@ class SmartTestViewModel: ObservableObject {
             "subType": smartSubType
         ]
 
-        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams)) { [weak self] result in
+        sdk.callApiPost("smart/add", urlParam: nil, headers: nil, body: jsonBody(smartParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
-                case .success(let data):
-                    guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                case .success(let response):
+                    guard let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                           let uuid = json["uuid"] as? String,
                           let smid = json["smid"] as? Int else {
                         self.isLoading = false
@@ -819,11 +818,11 @@ class SmartTestViewModel: ObservableObject {
 
                 case .failure(let error):
                     self.isLoading = false
-                    self.appendLog("[Step 1] FAILED: \(error.localizedDescription)")
-                    self.showError("smart/add failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 1] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("smart/add failed (code \(error.errorCode)): \(error.message)")
                 }
             }
-        }
+        })
     }
 
     private func autoStep2_bindTrigger(
@@ -848,30 +847,31 @@ class SmartTestViewModel: ObservableObject {
             conditionExt: nil,
             attrValueConditionExt: nil,
             timeCfg: timeCfg,
-            timeJob: timeJob
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    self.appendLog("[Step 2] OK: MQTT bind trigger ACK received")
-                    self.autoStep3_persistTrigger(
-                        sdk: sdk, smid: smid, smartUuid: smartUuid,
-                        locationId: locationId,
-                        triggerDeviceId: triggerDeviceId, triggerElm: triggerElm,
-                        condition: condition, attrValueCondition: attrValueCondition,
-                        typeTrigger: typeTrigger, timeCfg: timeCfg, timeJob: timeJob,
-                        cmdDeviceId: cmdDeviceId, cmdElm: cmdElm,
-                        cmdAttrValue: cmdAttrValue, cmdDelay: cmdDelay
-                    )
-                case .failure(let error):
-                    self.isLoading = false
-                    self.appendLog("[Step 2] FAILED: \(error.localizedDescription)")
-                    self.showError("MQTT bindTrigger failed: \(error.localizedDescription)")
-                    self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Automation")
+            timeJob: timeJob,
+            completion: SmartBindTriggerClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success:
+                        self.appendLog("[Step 2] OK: MQTT bind trigger ACK received")
+                        self.autoStep3_persistTrigger(
+                            sdk: sdk, smid: smid, smartUuid: smartUuid,
+                            locationId: locationId,
+                            triggerDeviceId: triggerDeviceId, triggerElm: triggerElm,
+                            condition: condition, attrValueCondition: attrValueCondition,
+                            typeTrigger: typeTrigger, timeCfg: timeCfg, timeJob: timeJob,
+                            cmdDeviceId: cmdDeviceId, cmdElm: cmdElm,
+                            cmdAttrValue: cmdAttrValue, cmdDelay: cmdDelay
+                        )
+                    case .failure(let errorCode):
+                        self.isLoading = false
+                        self.appendLog("[Step 2] FAILED: code=\(errorCode)")
+                        self.showError("MQTT bindTrigger failed (code \(errorCode))")
+                        self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Automation")
+                    }
                 }
             }
-        }
+        )
     }
 
     private func autoStep3_persistTrigger(
@@ -908,13 +908,13 @@ class SmartTestViewModel: ObservableObject {
             params["timeJob"] = tj
         }
 
-        sdk.callApiPost("smarttrigger/add", urlParam: nil, headers: nil, body: jsonBody(params)) { [weak self] result in
+        sdk.callApiPost("smarttrigger/add", urlParam: nil, headers: nil, body: jsonBody(params), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 switch result {
-                case .success(let data):
+                case .success(let response):
                     var detail = ""
-                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    if let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                        let triggerUuid = json["uuid"] as? String {
                         detail = ", triggerUuid=\(triggerUuid)"
                     }
@@ -926,12 +926,12 @@ class SmartTestViewModel: ObservableObject {
                     )
                 case .failure(let error):
                     self.isLoading = false
-                    self.appendLog("[Step 3] FAILED: \(error.localizedDescription)")
-                    self.showError("smarttrigger/add failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 3] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("smarttrigger/add failed (code \(error.errorCode)): \(error.message)")
                     self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Automation")
                 }
             }
-        }
+        })
     }
 
     private func autoStep4_bindCmd(
@@ -946,26 +946,27 @@ class SmartTestViewModel: ObservableObject {
             smid: smid,
             devId: cmdDeviceId,
             devType: 0,
-            smartElmCmds: [cmdElm: elmCmd]
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    self.appendLog("[Step 4] OK: MQTT bind cmd ACK received")
-                    self.autoStep5_persistCmd(
-                        sdk: sdk, smid: smid, smartUuid: smartUuid,
-                        cmdDeviceId: cmdDeviceId, cmdElm: cmdElm,
-                        cmdAttrValue: cmdAttrValue, cmdDelay: cmdDelay
-                    )
-                case .failure(let error):
-                    self.isLoading = false
-                    self.appendLog("[Step 4] FAILED: \(error.localizedDescription)")
-                    self.showError("MQTT bindCmd failed: \(error.localizedDescription)")
-                    self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Automation")
+            smartElmCmds: [cmdElm: elmCmd],
+            completion: SmartBindCmdClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success:
+                        self.appendLog("[Step 4] OK: MQTT bind cmd ACK received")
+                        self.autoStep5_persistCmd(
+                            sdk: sdk, smid: smid, smartUuid: smartUuid,
+                            cmdDeviceId: cmdDeviceId, cmdElm: cmdElm,
+                            cmdAttrValue: cmdAttrValue, cmdDelay: cmdDelay
+                        )
+                    case .failure(let errorCode):
+                        self.isLoading = false
+                        self.appendLog("[Step 4] FAILED: code=\(errorCode)")
+                        self.showError("MQTT bindCmd failed (code \(errorCode))")
+                        self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Automation")
+                    }
                 }
             }
-        }
+        )
     }
 
     private func autoStep5_persistCmd(
@@ -993,14 +994,14 @@ class SmartTestViewModel: ObservableObject {
             "cmds": ["\(cmdElm)": cmdEntry]
         ]
 
-        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams)) { [weak self] result in
+        sdk.callApiPost("smartcmd/add", urlParam: nil, headers: nil, body: jsonBody(smartCmdParams), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
                 switch result {
-                case .success(let data):
+                case .success(let response):
                     var detail = ""
-                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    if let json = try? JSONSerialization.jsonObject(with: Data(response.utf8)) as? [String: Any],
                        let cmdUuid = json["uuid"] as? String {
                         detail = ", cmdUuid=\(cmdUuid)"
                     }
@@ -1008,12 +1009,12 @@ class SmartTestViewModel: ObservableObject {
                     self.appendLog("=== Automation Created! smid=\(smid) ===")
                     self.lastResult = "Automation created! smid=\(smid)"
                 case .failure(let error):
-                    self.appendLog("[Step 5] FAILED: \(error.localizedDescription)")
-                    self.showError("smartcmd/add failed: \(error.localizedDescription)")
+                    self.appendLog("[Step 5] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("smartcmd/add failed (code \(error.errorCode)): \(error.message)")
                     self.rollbackSmartContainer(sdk: sdk, smartUuid: smartUuid, flowName: "Automation")
                 }
             }
-        }
+        })
     }
 
     /// Delete the last created automation (REST smart/delete).
@@ -1034,7 +1035,7 @@ class SmartTestViewModel: ObservableObject {
         appendLog("[Delete 1/2] OK: sent (fire-and-forget)")
 
         appendLog("[Delete 2/2] REST: POST smart/delete uuid=\(smartUuid)")
-        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid])) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smartUuid]), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -1047,11 +1048,11 @@ class SmartTestViewModel: ObservableObject {
                     self.createdSmartUuid = nil
                     self.createdSmid = nil
                 case .failure(let error):
-                    self.appendLog("[Delete 2/2] FAILED: \(error.localizedDescription)")
-                    self.showError("Delete failed: \(error.localizedDescription)")
+                    self.appendLog("[Delete 2/2] FAILED: code=\(error.errorCode) \(error.message)")
+                    self.showError("Delete failed (code \(error.errorCode)): \(error.message)")
                 }
             }
-        }
+        })
     }
 
     // MARK: - Schedule Time Conversion

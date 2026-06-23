@@ -37,13 +37,13 @@ class DeviceCommandTestViewModel: ObservableObject {
 
         print("📡 Connecting device: \(devId), groupAddr: \(groupAddr)")
 
-        sdk.deviceCmdHandler.connect(devId: devId, groupAddr: groupAddr) { [weak self] result in
+        sdk.deviceCmdHandler.connect(devId: devId, groupAddr: groupAddr, completion: AckClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
                 self.handleAckResult(result, commandName: "Connect Device")
             }
-        }
+        })
     }
 
     func getDeviceState(devId: String) {
@@ -63,7 +63,7 @@ class DeviceCommandTestViewModel: ObservableObject {
 
         print("📡 Getting device state: \(devId)")
 
-        sdk.deviceCmdHandler.getDeviceState(devId: devId, timeOut: 10) { [weak self] result in
+        sdk.deviceCmdHandler.getDeviceState(devId: devId, timeOut: 10, completion: GetDeviceStateClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -73,15 +73,15 @@ class DeviceCommandTestViewModel: ObservableObject {
                     self.lastResult = """
                     Device State:
                     - Device ID: \(devId)
-                    - State: \(state)
+                    - State: deviceId=\(state.deviceId), elementStates=\(state.elementStates), timeOffset=\(state.timeOffset)
                     """
                     print("✅ Get device state success")
 
-                case .failure(let error):
-                    self.handleError(error, commandName: "Get Device State")
+                case .failure(let errorCode):
+                    self.handleError(errorCode: errorCode, commandName: "Get Device State")
                 }
             }
-        }
+        })
     }
 
     func controlDevice(devId: String, elements: [Int], attrValue: [Int]) {
@@ -106,14 +106,15 @@ class DeviceCommandTestViewModel: ObservableObject {
         sdk.deviceCmdHandler.controlDevice(
             devId: devId,
             elements: elements,
-            attrValue: attrValue
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.isLoading = false
-                self.handleAckResult(result, commandName: "Control Device")
+            attrValue: attrValue,
+            completion: AckClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    self.isLoading = false
+                    self.handleAckResult(result, commandName: "Control Device")
+                }
             }
-        }
+        )
     }
 
     func controlDeviceGroup(groupAddr: Int, attrValue: [Int], targetDevType: Int) {
@@ -133,14 +134,15 @@ class DeviceCommandTestViewModel: ObservableObject {
         sdk.deviceCmdHandler.controlDeviceGroup(
             groupAddr: groupAddr,
             attrValue: attrValue,
-            targetDevType: targetDevType
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.isLoading = false
-                self.handleAckResult(result, commandName: "Control Device Group")
+            targetDevType: targetDevType,
+            completion: AckClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    self.isLoading = false
+                    self.handleAckResult(result, commandName: "Control Device Group")
+                }
             }
-        }
+        )
     }
 
     func resetDevice(devId: String) {
@@ -341,7 +343,7 @@ class DeviceCommandTestViewModel: ObservableObject {
 
     // MARK: - Private Helpers
 
-    private func handleAckResult(_ result: Result<Int, Error>, commandName: String) {
+    private func handleAckResult(_ result: SampleResult<Int>, commandName: String) {
         switch result {
         case .success(let ackCode):
             lastResult = """
@@ -350,14 +352,9 @@ class DeviceCommandTestViewModel: ObservableObject {
             """
             print("✅ \(commandName) success, ACK: \(ackCode)")
 
-        case .failure(let error):
-            handleError(error, commandName: commandName)
+        case .failure(let errorCode):
+            handleError(errorCode: errorCode, commandName: commandName)
         }
-    }
-
-    private func handleError(_ error: Error, commandName: String) {
-        print("❌ \(commandName) error: \(error.localizedDescription)")
-        showError("\(commandName) failed: \(error.localizedDescription)")
     }
 
     /// T-025: public callbacks now deliver an Int errorCode

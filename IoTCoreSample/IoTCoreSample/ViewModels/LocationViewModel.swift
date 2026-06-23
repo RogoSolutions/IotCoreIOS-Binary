@@ -64,21 +64,21 @@ class LocationViewModel: ObservableObject {
 
         print("Fetching locations from API...")
 
-        sdk.callApiGet("location/get", urlParam: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("location/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
 
                 switch result {
-                case .success(let data):
-                    self.handleLocationResponse(data)
+                case .success(let response):
+                    self.handleLocationResponse(Data(response.utf8))
 
                 case .failure(let error):
-                    print("Failed to fetch locations: \(error)")
-                    self.errorMessage = "Failed to fetch locations: \(error.localizedDescription)"
+                    print("Failed to fetch locations: code=\(error.errorCode) \(error.message)")
+                    self.errorMessage = "Failed to fetch locations (code \(error.errorCode)): \(error.message)"
                 }
             }
-        }
+        })
     }
 
     /// Set active location

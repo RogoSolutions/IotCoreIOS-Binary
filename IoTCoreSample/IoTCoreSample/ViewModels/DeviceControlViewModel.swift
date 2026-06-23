@@ -202,7 +202,7 @@ class DeviceControlViewModel: ObservableObject {
 
     // Detail view state
     @Published var isLoadingState = false
-    @Published var deviceState: RGBDeviceState?
+    @Published var deviceState: GetDeviceStateClosureAdapter.State?
     @Published var stateDescription: String = ""
 
     // Control inputs
@@ -232,20 +232,20 @@ class DeviceControlViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        sdk.callApiGetUserDevices { [weak self] result in
+        sdk.callApiGetUserDevices(completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
 
                 switch result {
-                case .success(let data):
-                    self.parseDevicesResponse(data)
+                case .success(let response):
+                    self.parseDevicesResponse(Data(response.utf8))
 
                 case .failure(let error):
-                    self.errorMessage = "Failed to fetch devices: \(error.localizedDescription)"
+                    self.errorMessage = "Failed to fetch devices (code \(error.errorCode)): \(error.message)"
                 }
             }
-        }
+        })
     }
 
     private func parseDevicesResponse(_ data: Data) {
@@ -273,13 +273,13 @@ class DeviceControlViewModel: ObservableObject {
             return
         }
 
-        sdk.callApiGet("location/get", urlParam: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("location/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
 
                 switch result {
-                case .success(let data):
-                    if let parsedLocations = Location.parseFromAPIResponse(data) {
+                case .success(let response):
+                    if let parsedLocations = Location.parseFromAPIResponse(Data(response.utf8)) {
                         self.locations = parsedLocations
                         self.loadSavedLocation()
                         print("[DeviceControlViewModel] Loaded \(parsedLocations.count) locations")
@@ -288,10 +288,10 @@ class DeviceControlViewModel: ObservableObject {
                     }
 
                 case .failure(let error):
-                    print("[DeviceControlViewModel] Failed to fetch locations: \(error.localizedDescription)")
+                    print("[DeviceControlViewModel] Failed to fetch locations: code=\(error.errorCode) \(error.message)")
                 }
             }
-        }
+        })
     }
 
     /// Select a location for filtering devices
@@ -335,13 +335,13 @@ class DeviceControlViewModel: ObservableObject {
             return
         }
 
-        sdk.callApiGet("group/get", urlParam: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("group/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
 
                 switch result {
-                case .success(let data):
-                    if let parsedGroups = DeviceGroup.parseFromAPIResponse(data) {
+                case .success(let response):
+                    if let parsedGroups = DeviceGroup.parseFromAPIResponse(Data(response.utf8)) {
                         self.groups = parsedGroups
                         print("[DeviceControlViewModel] Loaded \(parsedGroups.count) groups")
                     } else {
@@ -349,10 +349,10 @@ class DeviceControlViewModel: ObservableObject {
                     }
 
                 case .failure(let error):
-                    print("[DeviceControlViewModel] Failed to fetch groups: \(error.localizedDescription)")
+                    print("[DeviceControlViewModel] Failed to fetch groups: code=\(error.errorCode) \(error.message)")
                 }
             }
-        }
+        })
     }
 
     /// Get device count for a specific location
@@ -396,7 +396,7 @@ class DeviceControlViewModel: ObservableObject {
 
         let parameters = ["devId": device.id]
 
-        sdk.deviceCmdHandler.getDeviceState(devId: device.id, timeOut: 10) { [weak self] result in
+        sdk.deviceCmdHandler.getDeviceState(devId: device.id, timeOut: 10, completion: GetDeviceStateClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoadingState = false
@@ -407,9 +407,8 @@ class DeviceControlViewModel: ObservableObject {
                     self.stateDescription = "State retrieved successfully"
                     let resultText = "Device state retrieved via \(self.selectedTransport.displayName)"
                     self.lastOperationResult = resultText
-                    // Extract state data for history display using String(describing:)
-                    // Note: RGBDeviceState has internal properties, so we capture the description
-                    let stateDescription = String(describing: state)
+                    // Extract state data for history display.
+                    let stateDescription = "deviceId=\(state.deviceId), elementStates=\(state.elementStates), timeOffset=\(state.timeOffset)"
                     let responseData = CommandResponseData.deviceStateDescription(stateDescription)
                     self.addToHistory(
                         command: DeviceCommand.getDeviceState.rawValue,
@@ -419,8 +418,8 @@ class DeviceControlViewModel: ObservableObject {
                         responseData: responseData
                     )
 
-                case .failure(let error):
-                    let errorText = "Failed to get state: \(error.localizedDescription)"
+                case .failure(let errorCode):
+                    let errorText = "Failed to get state (code \(errorCode))"
                     self.lastOperationError = errorText
                     self.addToHistory(
                         command: DeviceCommand.getDeviceState.rawValue,
@@ -430,7 +429,7 @@ class DeviceControlViewModel: ObservableObject {
                     )
                 }
             }
-        }
+        })
     }
 
     // MARK: - Device Control
@@ -467,36 +466,37 @@ class DeviceControlViewModel: ObservableObject {
         sdk.deviceCmdHandler.controlDevice(
             devId: device.id,
             elements: elements,
-            attrValue: attrValue
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.isLoadingState = false
+            attrValue: attrValue,
+            completion: AckClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    self.isLoadingState = false
 
-                switch result {
-                case .success(let ackCode):
-                    let resultText = "Control sent via \(self.selectedTransport.displayName) (ACK: \(ackCode))"
-                    self.lastOperationResult = resultText
-                    self.addToHistory(
-                        command: DeviceCommand.controlDevice.rawValue,
-                        parameters: parameters,
-                        result: resultText,
-                        isSuccess: true,
-                        responseData: .ackCode(ackCode)
-                    )
+                    switch result {
+                    case .success(let ackCode):
+                        let resultText = "Control sent via \(self.selectedTransport.displayName) (ACK: \(ackCode))"
+                        self.lastOperationResult = resultText
+                        self.addToHistory(
+                            command: DeviceCommand.controlDevice.rawValue,
+                            parameters: parameters,
+                            result: resultText,
+                            isSuccess: true,
+                            responseData: .ackCode(ackCode)
+                        )
 
-                case .failure(let error):
-                    let errorText = "Control failed: \(error.localizedDescription)"
-                    self.lastOperationError = errorText
-                    self.addToHistory(
-                        command: DeviceCommand.controlDevice.rawValue,
-                        parameters: parameters,
-                        result: errorText,
-                        isSuccess: false
-                    )
+                    case .failure(let errorCode):
+                        let errorText = "Control failed (code \(errorCode))"
+                        self.lastOperationError = errorText
+                        self.addToHistory(
+                            command: DeviceCommand.controlDevice.rawValue,
+                            parameters: parameters,
+                            result: errorText,
+                            isSuccess: false
+                        )
+                    }
                 }
             }
-        }
+        )
     }
 
     func rebootDevice() {
@@ -667,21 +667,22 @@ class DeviceControlViewModel: ObservableObject {
         sdk.deviceCmdHandler.controlDeviceGroup(
             groupAddr: groupAddr,
             attrValue: attrValue,
-            targetDevType: targetDevType
-        ) { [weak self] result in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.isLoadingState = false
+            targetDevType: targetDevType,
+            completion: AckClosureAdapter { [weak self] result in
+                Task { @MainActor in
+                    guard let self = self else { return }
+                    self.isLoadingState = false
 
-                switch result {
-                case .success(let ackCode):
-                    self.lastOperationResult = "Group control sent successfully (ACK: \(ackCode))"
+                    switch result {
+                    case .success(let ackCode):
+                        self.lastOperationResult = "Group control sent successfully (ACK: \(ackCode))"
 
-                case .failure(let error):
-                    self.lastOperationError = "Group control failed: \(error.localizedDescription)"
+                    case .failure(let errorCode):
+                        self.lastOperationError = "Group control failed (code \(errorCode))"
+                    }
                 }
             }
-        }
+        )
     }
 
     // MARK: - Delete Device
@@ -714,15 +715,15 @@ class DeviceControlViewModel: ObservableObject {
 
         let params: [String: Any] = ["uuid": deviceUuid]
 
-        sdk.callApiPost("device/delete", urlParam: nil, headers: nil, body: jsonBody(params)) { [weak self] result in
+        sdk.callApiPost("device/delete", urlParam: nil, headers: nil, body: jsonBody(params), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoadingState = false
 
                 switch result {
-                case .success(let data):
+                case .success(let responseString):
                     // Parse response: {"uuid": "xxx", "success": true}
-                    if let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                    if let response = try? JSONSerialization.jsonObject(with: Data(responseString.utf8)) as? [String: Any],
                        let success = response["success"] as? Bool,
                        success == true {
                         self.lastOperationResult = "Device deleted successfully"
@@ -736,11 +737,11 @@ class DeviceControlViewModel: ObservableObject {
                     }
 
                 case .failure(let error):
-                    self.lastOperationError = "Delete failed: \(error.localizedDescription)"
+                    self.lastOperationError = "Delete failed (code \(error.errorCode)): \(error.message)"
                     completion(false)
                 }
             }
-        }
+        })
     }
 
     // MARK: - Transport Status

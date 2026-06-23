@@ -48,7 +48,7 @@ class RestfulAPITestViewModel: ObservableObject {
 
         print("📡 Calling getUserDevices...")
 
-        sdk.callApiGetUserDevices { [weak self] result in
+        sdk.callApiGetUserDevices(completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -61,7 +61,7 @@ class RestfulAPITestViewModel: ObservableObject {
                     self.handleError(error, apiName: "getUserDevices")
                 }
             }
-        }
+        })
     }
 
     func getSupportProductModels() {
@@ -77,7 +77,7 @@ class RestfulAPITestViewModel: ObservableObject {
         let isDev = isSupportProductDevelopment
         print("📡 Calling getSupportProductModel (isDev: \(isDev))...")
 
-        sdk.callApiGetSupportProductModel(isSupportProductDevelopment: isDev) { [weak self] result in
+        sdk.callApiGetSupportProductModel(isSupportProductDevelopment: isDev, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -90,7 +90,7 @@ class RestfulAPITestViewModel: ObservableObject {
                     self.handleError(error, apiName: "getSupportProductModel")
                 }
             }
-        }
+        })
     }
 
     func getLocationDevices(locationId: String) {
@@ -110,7 +110,7 @@ class RestfulAPITestViewModel: ObservableObject {
 
         print("📡 Calling getLocationDevices with locationId: \(locationId)")
 
-        sdk.callApiGetLocationDevices(locationId: locationId) { [weak self] result in
+        sdk.callApiGetLocationDevices(locationId: locationId, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -123,7 +123,7 @@ class RestfulAPITestViewModel: ObservableObject {
                     self.handleError(error, apiName: "getLocationDevices")
                 }
             }
-        }
+        })
     }
 
     func getDevice(deviceId: String) {
@@ -143,7 +143,7 @@ class RestfulAPITestViewModel: ObservableObject {
 
         print("📡 Calling getDevice with deviceId: \(deviceId)")
 
-        sdk.callApiGetDevice(deviceId: deviceId) { [weak self] result in
+        sdk.callApiGetDevice(deviceId: deviceId, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -156,7 +156,7 @@ class RestfulAPITestViewModel: ObservableObject {
                     self.handleError(error, apiName: "getDevice")
                 }
             }
-        }
+        })
     }
 
     // MARK: - Custom API Call
@@ -179,7 +179,9 @@ class RestfulAPITestViewModel: ObservableObject {
         print("   urlParam: \(urlParam ?? "<none>")")
         print("   body: \(body ?? "<none>")")
 
-        let completion: IoTApiResultCallback = { [weak self] result in
+        // Protocol callbacks are per-call objects, so build a fresh adapter for
+        // each method via this closure body.
+        let onResult: (Result<String, ApiResultClosureAdapter.ApiError>) -> Void = { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -196,38 +198,37 @@ class RestfulAPITestViewModel: ObservableObject {
 
         switch selectedMethod {
         case .get:
-            sdk.callApiGet(customPath, urlParam: urlParam, headers: nil, completion: completion)
+            sdk.callApiGet(customPath, urlParam: urlParam, headers: nil, completion: ApiResultClosureAdapter(onResult))
         case .post:
-            sdk.callApiPost(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
+            sdk.callApiPost(customPath, urlParam: urlParam, headers: nil, body: body, completion: ApiResultClosureAdapter(onResult))
         case .patch:
-            sdk.callApiPatch(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
+            sdk.callApiPatch(customPath, urlParam: urlParam, headers: nil, body: body, completion: ApiResultClosureAdapter(onResult))
         case .update:
-            sdk.callApiUpdate(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
+            sdk.callApiUpdate(customPath, urlParam: urlParam, headers: nil, body: body, completion: ApiResultClosureAdapter(onResult))
         case .delete:
-            sdk.callApiDelete(customPath, urlParam: urlParam, headers: nil, body: body, completion: completion)
+            sdk.callApiDelete(customPath, urlParam: urlParam, headers: nil, body: body, completion: ApiResultClosureAdapter(onResult))
         }
     }
 
     // MARK: - Private Helpers
 
-    private func handleSuccess(_ data: Data, apiName: String) {
-        print("✅ \(apiName) success: \(data.count) bytes")
+    private func handleSuccess(_ response: String, apiName: String) {
+        print("✅ \(apiName) success: \(response.count) chars")
 
         // Try to parse as JSON for pretty printing
+        let data = Data(response.utf8)
         if let json = try? JSONSerialization.jsonObject(with: data),
            let prettyData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
            let prettyString = String(data: prettyData, encoding: .utf8) {
             lastResult = prettyString
-        } else if let string = String(data: data, encoding: .utf8) {
-            lastResult = string
         } else {
-            lastResult = "Binary data: \(data.count) bytes"
+            lastResult = response
         }
     }
 
-    private func handleError(_ error: Error, apiName: String) {
-        print("❌ \(apiName) error: \(error.localizedDescription)")
-        showError("\(apiName) failed: \(error.localizedDescription)")
+    private func handleError(_ error: ApiResultClosureAdapter.ApiError, apiName: String) {
+        print("❌ \(apiName) error: code=\(error.errorCode) \(error.message)")
+        showError("\(apiName) failed (code \(error.errorCode)): \(error.message)")
     }
 
     private func showError(_ message: String) {

@@ -257,12 +257,12 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func fetchSmartCmds(sdk: any RGBIotCore, smartUuid: String) async throws -> [SmartCmdDraft] {
         let data: Data = try await withCheckedThrowingContinuation { cont in
-            sdk.callApiGet("smartcmd/get", urlParam: nil, headers: nil) { result in
+            sdk.callApiGet("smartcmd/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { result in
                 switch result {
-                case .success(let d): cont.resume(returning: d)
+                case .success(let d): cont.resume(returning: Data(d.utf8))
                 case .failure(let e): cont.resume(throwing: e)
                 }
-            }
+            })
         }
         guard let arr = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
             return []
@@ -300,12 +300,12 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func fetchScheduleRow(sdk: any RGBIotCore, ownerId: String) async throws -> [String: Any]? {
         let data: Data = try await withCheckedThrowingContinuation { cont in
-            sdk.callApiGet("schedule/getAll", urlParam: nil, headers: nil) { result in
+            sdk.callApiGet("schedule/getAll", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { result in
                 switch result {
-                case .success(let d): cont.resume(returning: d)
+                case .success(let d): cont.resume(returning: Data(d.utf8))
                 case .failure(let e): cont.resume(throwing: e)
                 }
-            }
+            })
         }
         guard let arr = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
             return nil
@@ -402,12 +402,12 @@ final class SmartDetailViewModel: ObservableObject {
 
         // 1) MQTT unbind (old binding)
         try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-            sdk.deviceCmdHandler.unbindDeviceSmartCmd(smid: smid, devId: draft.targetId) { result in
+            sdk.deviceCmdHandler.unbindDeviceSmartCmd(smid: smid, devId: draft.targetId, completion: AckClosureAdapter { result in
                 switch result {
                 case .success: cont.resume()
-                case .failure(let e): cont.resume(throwing: e)
+                case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
                 }
-            }
+            })
         }
 
         // 2) MQTT bind (new element + cmd)
@@ -417,13 +417,14 @@ final class SmartDetailViewModel: ObservableObject {
                 smid: smid,
                 devId: draft.targetId,
                 devType: 0,
-                smartElmCmds: [draft.elementId: elmCmd]
-            ) { result in
-                switch result {
-                case .success: cont.resume()
-                case .failure(let e): cont.resume(throwing: e)
+                smartElmCmds: [draft.elementId: elmCmd],
+                completion: SmartBindCmdClosureAdapter { result in
+                    switch result {
+                    case .success: cont.resume()
+                    case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
+                    }
                 }
-            }
+            )
         }
 
         // 3) REST smartcmd/update
@@ -472,12 +473,12 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func restPost(sdk: any RGBIotCore, path: String, params: [String: Any]) async throws -> Data {
         try await withCheckedThrowingContinuation { cont in
-            sdk.callApiPost(path, urlParam: nil, headers: nil, body: jsonBody(params)) { result in
+            sdk.callApiPost(path, urlParam: nil, headers: nil, body: jsonBody(params), completion: ApiResultClosureAdapter { result in
                 switch result {
-                case .success(let d): cont.resume(returning: d)
+                case .success(let d): cont.resume(returning: Data(d.utf8))
                 case .failure(let e): cont.resume(throwing: e)
                 }
-            }
+            })
         }
     }
 
@@ -492,16 +493,16 @@ final class SmartDetailViewModel: ObservableObject {
     func loadDevicesIfNeeded() {
         guard let sdk = IoTAppCore.current, availableDevices.isEmpty, !isLoadingDevices else { return }
         isLoadingDevices = true
-        sdk.callApiGetUserDevices { [weak self] result in
+        sdk.callApiGetUserDevices(completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoadingDevices = false
-                if case .success(let data) = result,
-                   let parsed = try? JSONDecoder().decode([IoTDevice].self, from: data) {
+                if case .success(let response) = result,
+                   let parsed = try? JSONDecoder().decode([IoTDevice].self, from: Data(response.utf8)) {
                     self.availableDevices = parsed
                 }
             }
-        }
+        })
     }
 
     /// Element ids for a device, mirroring SmartTestViewModel.elementIds.
@@ -534,13 +535,14 @@ final class SmartDetailViewModel: ObservableObject {
             try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
                 sdk.deviceCmdHandler.bindDeviceSmartCmd(
                     smid: smid, devId: targetDeviceId, devType: 0,
-                    smartElmCmds: [elementId: elmCmd]
-                ) { result in
-                    switch result {
-                    case .success: cont.resume()
-                    case .failure(let e): cont.resume(throwing: e)
+                    smartElmCmds: [elementId: elmCmd],
+                    completion: SmartBindCmdClosureAdapter { result in
+                        switch result {
+                        case .success: cont.resume()
+                        case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
+                        }
                     }
-                }
+                )
             }
             appendOpLog("[AddCmd] MQTT bind OK")
 
@@ -597,12 +599,12 @@ final class SmartDetailViewModel: ObservableObject {
         appendOpLog("[DeleteCmd \(draft.uuid.prefix(8))…] MQTT unbind ...")
         do {
             try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-                sdk.deviceCmdHandler.unbindDeviceSmartCmd(smid: smid, devId: draft.targetId) { result in
+                sdk.deviceCmdHandler.unbindDeviceSmartCmd(smid: smid, devId: draft.targetId, completion: AckClosureAdapter { result in
                     switch result {
                     case .success: cont.resume()
-                    case .failure(let e): cont.resume(throwing: e)
+                    case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
                     }
-                }
+                })
             }
             appendOpLog("[DeleteCmd] MQTT unbind OK")
             _ = try await restPost(sdk: sdk, path: "smartcmd/delete", params: ["uuid": draft.uuid])
@@ -619,12 +621,12 @@ final class SmartDetailViewModel: ObservableObject {
 
     private func fetchSmartTriggers(sdk: any RGBIotCore, smartUuid: String) async throws -> [SmartTriggerRow] {
         let data: Data = try await withCheckedThrowingContinuation { cont in
-            sdk.callApiGet("smarttrigger/get", urlParam: nil, headers: nil) { result in
+            sdk.callApiGet("smarttrigger/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { result in
                 switch result {
-                case .success(let d): cont.resume(returning: d)
+                case .success(let d): cont.resume(returning: Data(d.utf8))
                 case .failure(let e): cont.resume(throwing: e)
                 }
-            }
+            })
         }
         guard let arr = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
             return []
@@ -679,12 +681,12 @@ final class SmartDetailViewModel: ObservableObject {
         appendOpLog("[DeleteTrigger \(row.uuid.prefix(8))…] MQTT unbind ...")
         do {
             try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-                sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: row.sourceId) { result in
+                sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: row.sourceId, completion: AckClosureAdapter { result in
                     switch result {
                     case .success: cont.resume()
-                    case .failure(let e): cont.resume(throwing: e)
+                    case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
                     }
-                }
+                })
             }
             appendOpLog("[DeleteTrigger] MQTT unbind OK")
             _ = try await restPost(sdk: sdk, path: "smarttrigger/delete", params: ["uuid": row.uuid])
@@ -735,13 +737,14 @@ final class SmartDetailViewModel: ObservableObject {
                     conditionExt: conditionExt,
                     attrValueConditionExt: attrValueConditionExt,
                     timeCfg: timeCfg,
-                    timeJob: timeJob
-                ) { result in
-                    switch result {
-                    case .success: cont.resume()
-                    case .failure(let e): cont.resume(throwing: e)
+                    timeJob: timeJob,
+                    completion: SmartBindTriggerClosureAdapter { result in
+                        switch result {
+                        case .success: cont.resume()
+                        case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
+                        }
                     }
-                }
+                )
             }
             appendOpLog("[AddTrigger] MQTT bind OK")
 
@@ -843,12 +846,12 @@ final class SmartDetailViewModel: ObservableObject {
             // 1) MQTT unbind old
             do {
                 try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-                    sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: existingRow.sourceId) { result in
+                    sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: existingRow.sourceId, completion: AckClosureAdapter { result in
                         switch result {
                         case .success: cont.resume()
-                        case .failure(let e): cont.resume(throwing: e)
+                        case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
                         }
-                    }
+                    })
                 }
                 appendOpLog("[EditTrigger] MQTT unbind OK")
             } catch {
@@ -875,13 +878,14 @@ final class SmartDetailViewModel: ObservableObject {
                     conditionExt: conditionExt,
                     attrValueConditionExt: attrValueConditionExt,
                     timeCfg: timeCfg,
-                    timeJob: timeJob
-                ) { result in
-                    switch result {
-                    case .success: cont.resume()
-                    case .failure(let e): cont.resume(throwing: e)
+                    timeJob: timeJob,
+                    completion: SmartBindTriggerClosureAdapter { result in
+                        switch result {
+                        case .success: cont.resume()
+                        case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
+                        }
                     }
-                }
+                )
             }
             appendOpLog("[EditTrigger] MQTT bind OK")
 

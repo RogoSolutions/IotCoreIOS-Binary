@@ -320,41 +320,42 @@ class ConfigWifiDeviceTestViewModel: ObservableObject {
                 "da82211a-0014-477c-8631-059aac6fc6be",
                 "36920009-2dc4-48e6-bfb9-5d264a2c9aa1",
                 "5119462c-8977-45ec-ae35-ce534da2c1c5"
-              ]
-        ) { [weak self] status, error in
-            Task { @MainActor in
-                guard let self = self else { return }
+              ],
+            completion: SyncDeviceToCloudClosureAdapter { [weak self] status, errorCode in
+                Task { @MainActor in
+                    guard let self = self else { return }
 
-                self.syncProgress = status
+                    self.syncProgress = status
 
-                if status == 100 {
-                    // Success
-                    self.isLoading = false
-                    self.currentStep = nil
-                    self.completedSteps.insert(.syncCloud)
-                    self.lastResult = """
-                    ✅ Device Synced Successfully
-                    Label: \(label)
-                    Status: Complete (100%)
-                    🎉 Onboarding Complete!
-                    """
-                    print("✅ Device sync complete")
+                    if status == 100 {
+                        // Success
+                        self.isLoading = false
+                        self.currentStep = nil
+                        self.completedSteps.insert(.syncCloud)
+                        self.lastResult = """
+                        ✅ Device Synced Successfully
+                        Label: \(label)
+                        Status: Complete (100%)
+                        🎉 Onboarding Complete!
+                        """
+                        print("✅ Device sync complete")
 
-                } else if status < 0 {
-                    // Error
-                    self.isLoading = false
-                    self.currentStep = nil
+                    } else if status < 0 {
+                        // Error
+                        self.isLoading = false
+                        self.currentStep = nil
 
-                    let errorMessage = error?.localizedDescription ?? "Unknown error"
-                    self.showError("Device sync failed: \(errorMessage)")
-                    print("❌ Device sync failed: \(errorMessage)")
+                        let errorMessage = "error code \(errorCode ?? 0)"
+                        self.showError("Device sync failed: \(errorMessage)")
+                        print("❌ Device sync failed: \(errorMessage)")
 
-                } else {
-                    // Progress update
-                    print("⏳ Sync progress: \(status)%")
+                    } else {
+                        // Progress update
+                        print("⏳ Sync progress: \(status)%")
+                    }
                 }
             }
-        }
+        )
     }
 
     // MARK: - Private Helpers

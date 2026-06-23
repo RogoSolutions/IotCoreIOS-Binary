@@ -382,22 +382,23 @@ class OnboardingViewModel: ObservableObject {
             elementInfos: nil,
             meshUuid: meshUuid,
             meshNwkKeys: meshNwkKeys,
-            meshAppKeys: meshAppKeys
-        ) { [weak self] status, error in
-            Task { @MainActor in
-                guard let self = self else { return }
+            meshAppKeys: meshAppKeys,
+            completion: SyncDeviceToCloudClosureAdapter { [weak self] status, errorCode in
+                Task { @MainActor in
+                    guard let self = self else { return }
 
-                self.syncProgress = status
+                    self.syncProgress = status
 
-                if status == 100 {
-                    self.isLoading = false
-                    self.completedSteps.insert(.cloudSync)
-                } else if status < 0 {
-                    self.isLoading = false
-                    self.errorMessage = "Cloud sync failed: \(error?.localizedDescription ?? "Unknown error")"
+                    if status == 100 {
+                        self.isLoading = false
+                        self.completedSteps.insert(.cloudSync)
+                    } else if status < 0 {
+                        self.isLoading = false
+                        self.errorMessage = "Cloud sync failed: error code \(errorCode ?? 0)"
+                    }
                 }
             }
-        }
+        )
     }
 
     // MARK: - Reset

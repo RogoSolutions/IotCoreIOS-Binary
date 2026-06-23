@@ -57,24 +57,24 @@ final class SmartListViewModel: ObservableObject {
         errorMessage = nil
         lastInfo = nil
 
-        sdk.callApiGet("smart/get", urlParam: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("smart/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
                 switch result {
-                case .success(let data):
+                case .success(let response):
                     do {
-                        let items = try JSONDecoder().decode([SmartItem].self, from: data)
+                        let items = try JSONDecoder().decode([SmartItem].self, from: Data(response.utf8))
                         self.allSmarts = items
                         self.lastInfo = "Fetched \(items.count) Smart(s)"
                     } catch {
                         self.errorMessage = "Decode failed: \(error.localizedDescription)"
                     }
                 case .failure(let error):
-                    self.errorMessage = "smart/get failed: \(error.localizedDescription)"
+                    self.errorMessage = "smart/get failed (code \(error.errorCode)): \(error.message)"
                 }
             }
-        }
+        })
     }
 
     // MARK: - Delete
@@ -93,7 +93,7 @@ final class SmartListViewModel: ObservableObject {
             sdk.deviceCmdHandler.smartRemoveAnnounce(smid: smid)
         }
 
-        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smart.uuid])) { [weak self] result in
+        sdk.callApiPost("smart/delete", urlParam: nil, headers: nil, body: jsonBody(["uuid": smart.uuid]), completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
@@ -102,9 +102,9 @@ final class SmartListViewModel: ObservableObject {
                     self.allSmarts.removeAll { $0.uuid == smart.uuid }
                     self.lastInfo = "Deleted \(smart.displayLabel)"
                 case .failure(let error):
-                    self.errorMessage = "smart/delete failed: \(error.localizedDescription)"
+                    self.errorMessage = "smart/delete failed (code \(error.errorCode)): \(error.message)"
                 }
             }
-        }
+        })
     }
 }

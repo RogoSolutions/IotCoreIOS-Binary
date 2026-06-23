@@ -1127,14 +1127,14 @@ struct DeviceControlDetailView: View {
     private func executeGetDeviceState(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let devId = parameterValues["devId"] ?? device.id
         return try await withCheckedThrowingContinuation { continuation in
-            handler.getDeviceState(devId: devId, timeOut: 10) { result in
+            handler.getDeviceState(devId: devId, timeOut: 10, completion: GetDeviceStateClosureAdapter { result in
                 switch result {
                 case .success(let state):
-                    continuation.resume(returning: "Device state retrieved: \(state)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                    continuation.resume(returning: "Device state retrieved: deviceId=\(state.deviceId), elementStates=\(state.elementStates), timeOffset=\(state.timeOffset)")
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1146,14 +1146,14 @@ struct DeviceControlDetailView: View {
         let values = parseIntArray(parameterValues["values"] ?? "")
         let attrValue = [attribute] + values
         return try await withCheckedThrowingContinuation { continuation in
-            handler.controlDevice(devId: devId, elements: elements, attrValue: attrValue) { result in
+            handler.controlDevice(devId: devId, elements: elements, attrValue: attrValue, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Control sent successfully. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1165,14 +1165,14 @@ struct DeviceControlDetailView: View {
         let attrValue = [attribute] + values
         let targetDevType = Int(parameterValues["targetDevType"] ?? "0") ?? 0
         return try await withCheckedThrowingContinuation { continuation in
-            handler.controlDeviceGroup(groupAddr: groupAddr, attrValue: attrValue, targetDevType: targetDevType) { result in
+            handler.controlDeviceGroup(groupAddr: groupAddr, attrValue: attrValue, targetDevType: targetDevType, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Group control sent. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1183,14 +1183,14 @@ struct DeviceControlDetailView: View {
         let attrValue = [attribute] + values
         let targetDevType = Int(parameterValues["targetDevType"] ?? "0") ?? 0
         return try await withCheckedThrowingContinuation { continuation in
-            handler.controlDeviceLocation(attrValue: attrValue, targetDevType: targetDevType) { result in
+            handler.controlDeviceLocation(attrValue: attrValue, targetDevType: targetDevType, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Location control sent. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1199,14 +1199,14 @@ struct DeviceControlDetailView: View {
         let element = Int(parameterValues["element"] ?? "0") ?? 0
         let attrValue = parseIntArray(parameterValues["attrValue"] ?? "")
         return try await withCheckedThrowingContinuation { continuation in
-            handler.settingAttribute(devId: devId, element: element, attrValue: attrValue) { result in
+            handler.settingAttribute(devId: devId, element: element, attrValue: attrValue, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Setting applied. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1222,15 +1222,16 @@ struct DeviceControlDetailView: View {
                 elements: elements,
                 attrValueStart: attrValueStart,
                 attrValueStop: attrValueStop,
-                minutes: minutes
-            ) { result in
-                switch result {
-                case .success(let ack):
-                    continuation.resume(returning: "Countdown set for \(minutes) minutes. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                minutes: minutes,
+                completion: AckClosureAdapter { result in
+                    switch result {
+                    case .success(let ack):
+                        continuation.resume(returning: "Countdown set for \(minutes) minutes. ACK: \(ack)")
+                    case .failure(let errorCode):
+                        continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -1240,14 +1241,14 @@ struct DeviceControlDetailView: View {
         let devId = parameterValues["devId"] ?? device.id
         let groupAddr = Int(parameterValues["groupAddr"] ?? "49153") ?? 49153
         return try await withCheckedThrowingContinuation { continuation in
-            handler.connect(devId: devId, groupAddr: groupAddr) { result in
+            handler.connect(devId: devId, groupAddr: groupAddr, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Device bound to group \(groupAddr). ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1256,14 +1257,14 @@ struct DeviceControlDetailView: View {
         let elements = parseIntArray(parameterValues["elements"] ?? "0")
         let groupAddr = Int(parameterValues["groupAddr"] ?? "49153") ?? 49153
         return try await withCheckedThrowingContinuation { continuation in
-            handler.unbindDeviceGroup(devId: devId, elements: elements, groupAddr: groupAddr) { result in
+            handler.unbindDeviceGroup(devId: devId, elements: elements, groupAddr: groupAddr, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Device unbound from group \(groupAddr). ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1336,15 +1337,16 @@ struct DeviceControlDetailView: View {
                 conditionExt: conditionExt,
                 attrValueConditionExt: attrValueConditionExt,
                 timeCfg: timeCfg,
-                timeJob: timeJob
-            ) { result in
-                switch result {
-                case .success(let ack):
-                    continuation.resume(returning: "Smart trigger bound. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                timeJob: timeJob,
+                completion: SmartBindTriggerClosureAdapter { result in
+                    switch result {
+                    case .success(let cfm):
+                        continuation.resume(returning: "Smart trigger bound. cfm: \(cfm)")
+                    case .failure(let errorCode):
+                        continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -1352,14 +1354,14 @@ struct DeviceControlDetailView: View {
         let smid = Int(parameterValues["smid"] ?? "0") ?? 0
         let devId = parameterValues["devId"] ?? device.id
         return try await withCheckedThrowingContinuation { continuation in
-            handler.unbindDeviceSmartTrigger(smid: smid, devId: devId) { result in
+            handler.unbindDeviceSmartTrigger(smid: smid, devId: devId, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Smart trigger unbound. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1376,15 +1378,16 @@ struct DeviceControlDetailView: View {
                 smid: smid,
                 devId: devId,
                 devType: devType,
-                smartElmCmds: [elm: elmCmd]
-            ) { result in
-                switch result {
-                case .success(let ack):
-                    continuation.resume(returning: "Smart command bound. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                smartElmCmds: [elm: elmCmd],
+                completion: SmartBindCmdClosureAdapter { result in
+                    switch result {
+                    case .success(let cfm):
+                        continuation.resume(returning: "Smart command bound. cfm: \(cfm)")
+                    case .failure(let errorCode):
+                        continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
+                    }
                 }
-            }
+            )
         }
     }
 
@@ -1392,14 +1395,14 @@ struct DeviceControlDetailView: View {
         let smid = Int(parameterValues["smid"] ?? "0") ?? 0
         let devId = parameterValues["devId"] ?? device.id
         return try await withCheckedThrowingContinuation { continuation in
-            handler.unbindDeviceSmartCmd(smid: smid, devId: devId) { result in
+            handler.unbindDeviceSmartCmd(smid: smid, devId: devId, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
                     continuation.resume(returning: "Smart command unbound. ACK: \(ack)")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            }
+            })
         }
     }
 
@@ -1479,15 +1482,16 @@ struct DeviceControlDetailView: View {
                 devId: devId,
                 urlOta: urlOta,
                 versionCode: versionCode,
-                forceHttpNonSecure: forceHttpNonSecure
-            ) { result in
-                switch result {
-                case .success(let ackStatus):
-                    continuation.resume(returning: "OTA update command sent (ack=\(ackStatus))")
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                forceHttpNonSecure: forceHttpNonSecure,
+                completion: AckClosureAdapter { result in
+                    switch result {
+                    case .success(let ackStatus):
+                        continuation.resume(returning: "OTA update command sent (ack=\(ackStatus))")
+                    case .failure(let errorCode):
+                        continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
+                    }
                 }
-            }
+            )
         }
     }
 

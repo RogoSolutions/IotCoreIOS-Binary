@@ -47,24 +47,24 @@ class GroupViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        sdk.callApiGet("group/get", urlParam: nil, headers: nil) { [weak self] result in
+        sdk.callApiGet("group/get", urlParam: nil, headers: nil, completion: ApiResultClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false
 
                 switch result {
-                case .success(let data):
-                    if let parsedGroups = DeviceGroup.parseFromAPIResponse(data) {
+                case .success(let response):
+                    if let parsedGroups = DeviceGroup.parseFromAPIResponse(Data(response.utf8)) {
                         self.groups = parsedGroups
                     } else {
                         self.errorMessage = "Failed to parse groups response"
                     }
 
                 case .failure(let error):
-                    self.errorMessage = "Failed to fetch groups: \(error.localizedDescription)"
+                    self.errorMessage = "Failed to fetch groups (code \(error.errorCode)): \(error.message)"
                 }
             }
-        }
+        })
     }
 
     // MARK: - Selection
