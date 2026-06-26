@@ -27,6 +27,9 @@ struct DeviceControlDetailView: View {
     // MARK: - Command Execution State
     @State private var isExecutingCommand = false
 
+    // MARK: - OTA "pick version from cloud" sheet
+    @State private var showingOtaVersionPicker = false
+
     // MARK: - WiFi Manager State
     @State private var scannedNetworks: [RGBIoTWifiInfo] = []
     @State private var isWifiScanning = false
@@ -94,6 +97,9 @@ struct DeviceControlDetailView: View {
         }
         .sheet(isPresented: $showingWifiPasswordSheet) {
             wifiPasswordSheet
+        }
+        .sheet(isPresented: $showingOtaVersionPicker) {
+            OtaVersionPickerView(device: device)
         }
         .alert("Reboot Device?", isPresented: $showingRebootConfirm) {
             Button("Cancel", role: .cancel) { }
@@ -756,6 +762,30 @@ struct DeviceControlDetailView: View {
                 deviceId: device.id,
                 parameterValues: $parameterValues
             )
+
+            // OTA: "pick version from cloud" shortcut. Resolves the OTA URL via
+            // the two cloud version APIs instead of pasting it by hand. The
+            // manual URL form above is kept as a fallback.
+            if command == .updateDeviceSoftware {
+                Button {
+                    showingOtaVersionPicker = true
+                } label: {
+                    HStack {
+                        Image(systemName: "icloud.and.arrow.down")
+                        Text("Pick version from cloud")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.purple.opacity(0.15))
+                    .foregroundColor(.purple)
+                    .cornerRadius(10)
+                }
+                .disabled(isExecutingCommand)
+
+                Text("Or fill the fields above and tap Execute to send a manual OTA URL.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
 
             // Execute button
             Button {

@@ -44,6 +44,7 @@
 		9593445D58BC034CF1E6A1D0 /* RestApiBodyHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */; };
 		962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */; };
 		9DB433372090900156846FDC /* ServiceCallbackDemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */; };
+		9FBCF73119C9061C10B5B3C8 /* OtaVersionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D316D2F262B5FA1F3F2DBA74 /* OtaVersionPickerView.swift */; };
 		A16E6D27200576EA328D3F94 /* LocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */; };
 		A65AA6D2B34A6231A2B2F362 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0B27DE0E695B2217F694769 /* Assets.xcassets */; };
 		A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */; };
@@ -55,7 +56,9 @@
 		CC34ABD3911A9E8FD34D52FD /* ConfigWifiDeviceTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */; };
 		CE194FD1F173190034D50EA3 /* GroupControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB02124565D01E4799297828 /* GroupControlView.swift */; };
 		D45B7BBAF667277F1175A70C /* SmartListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE727BE473CB66BB965FFB5 /* SmartListView.swift */; };
+		D94F786933B27A199CC928F3 /* OtaProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C846A63F9A08F04386A63AD6 /* OtaProgressStore.swift */; };
 		DD72902F456DBDC04809F34E /* SDKConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */; };
+		DE55AD16F33C256DD3E7539D /* OtaVersionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8631A4627AB6574740603B70 /* OtaVersionHelper.swift */; };
 		E4B27534E31D967E48DFF2D5 /* SmartItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE01921590D32EAA4A920FE /* SmartItem.swift */; };
 		E4FCF353730FAE6B273E6108 /* DeviceControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */; };
 		FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */; };
@@ -95,6 +98,7 @@
 		76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestApiBodyHelper.swift; sourceTree = "<group>"; };
 		77058EC2D92EF24B94E06268 /* SDKConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKConfigurationManager.swift; sourceTree = "<group>"; };
 		84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartDetailViewModel.swift; sourceTree = "<group>"; };
+		8631A4627AB6574740603B70 /* OtaVersionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtaVersionHelper.swift; sourceTree = "<group>"; };
 		89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
 		8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestViewModel.swift; sourceTree = "<group>"; };
 		8AE727BE473CB66BB965FFB5 /* SmartListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartListView.swift; sourceTree = "<group>"; };
@@ -107,11 +111,13 @@
 		C22BAB3BC21392B84E6ADE2C /* SampleCallbackAdapters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleCallbackAdapters.swift; sourceTree = "<group>"; };
 		C28C710A559089B7D6AE8C45 /* GroupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupViewModel.swift; sourceTree = "<group>"; };
 		C603850BCEC52F2B28B6B6FE /* RestfulAPITestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestViewModel.swift; sourceTree = "<group>"; };
+		C846A63F9A08F04386A63AD6 /* OtaProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtaProgressStore.swift; sourceTree = "<group>"; };
 		C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCallbackDemoView.swift; sourceTree = "<group>"; };
 		CA4714BAB606B4B132B7EB58 /* CommandParameterFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandParameterFormView.swift; sourceTree = "<group>"; };
 		CBC64620FFC8AE3FD1D68E3D /* MQTTStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MQTTStatusViewModel.swift; sourceTree = "<group>"; };
 		CE67E54ADD2A98C05A4337E6 /* CommandExecution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandExecution.swift; sourceTree = "<group>"; };
 		CF2BA32EDBE75459E461D06C /* DebugLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogView.swift; sourceTree = "<group>"; };
+		D316D2F262B5FA1F3F2DBA74 /* OtaVersionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtaVersionPickerView.swift; sourceTree = "<group>"; };
 		D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDefinition.swift; sourceTree = "<group>"; };
 		E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestView.swift; sourceTree = "<group>"; };
 		EB02124565D01E4799297828 /* GroupControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupControlView.swift; sourceTree = "<group>"; };
@@ -146,6 +152,15 @@
 				AEE01921590D32EAA4A920FE /* SmartItem.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		03D3181241187ABFF1EE2447 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				C846A63F9A08F04386A63AD6 /* OtaProgressStore.swift */,
+				8631A4627AB6574740603B70 /* OtaVersionHelper.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		1CF425A1A9E609BAD627C512 /* Packages */ = {
@@ -242,6 +257,7 @@
 				2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */,
 				EB02124565D01E4799297828 /* GroupControlView.swift */,
 				2FD19BAE94D535D0151E6ACB /* OperatorsTestingView.swift */,
+				D316D2F262B5FA1F3F2DBA74 /* OtaVersionPickerView.swift */,
 				34686B49D6F8C29404D1471D /* TransportSelectorView.swift */,
 			);
 			path = DeviceControlTab;
@@ -263,6 +279,7 @@
 			isa = PBXGroup;
 			children = (
 				565E16DCBBFC03A08B992B25 /* Extensions */,
+				03D3181241187ABFF1EE2447 /* Helpers */,
 				0245455B9C36CF48F84E69C9 /* Models */,
 				A120C1BA945E7730C74888F6 /* ViewModels */,
 				4FB127F1A2529C2AC4097A69 /* Views */,
@@ -386,6 +403,9 @@
 				354108AFA5F775FEFAFB3D9B /* OperationTestViewModel.swift in Sources */,
 				FD7DFDA0521F1784AAA9EBFA /* OperatorsTestingView.swift in Sources */,
 				A69052277B367EABD8A6EDEB /* OperatorsTestingViewModel.swift in Sources */,
+				D94F786933B27A199CC928F3 /* OtaProgressStore.swift in Sources */,
+				DE55AD16F33C256DD3E7539D /* OtaVersionHelper.swift in Sources */,
+				9FBCF73119C9061C10B5B3C8 /* OtaVersionPickerView.swift in Sources */,
 				9593445D58BC034CF1E6A1D0 /* RestApiBodyHelper.swift in Sources */,
 				962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */,
 				279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */,

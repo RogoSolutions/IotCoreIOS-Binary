@@ -161,6 +161,10 @@ struct ContentView: View {
                     print("IoT Core SDK initialized successfully")
                     sdkInitialized = true
 
+                    // Register the global OTA progress callback so device-pushed
+                    // OTA NOTIFY (0xFE) events surface in the UI (T-013).
+                    OtaCallbackInstaller.installIfNeeded()
+
                     // Check auth status
                     if IoTAppCore.current?.isAuthenticated == true {
                         print("User is authenticated")
