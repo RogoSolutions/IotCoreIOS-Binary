@@ -96,13 +96,14 @@ struct CommandParameter {
 
 /// All 24 device commands from RGBIotDeviceCmdHandler protocol
 enum DeviceCommand: String, CaseIterable, Identifiable {
-    // Device State & Control (6)
+    // Device State & Control (7)
     case getDeviceState
     case controlDevice
     case controlDeviceGroup
     case controlDeviceLocation
     case settingAttribute
     case setCountdown
+    case cancelCountdown
 
     // Connection & Binding (2)
     case connect
@@ -156,6 +157,8 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
             return "Setting Attribute"
         case .setCountdown:
             return "Set Countdown"
+        case .cancelCountdown:
+            return "Cancel Countdown"
         case .connect:
             return "Connect (Bind to Group)"
         case .unbindDeviceGroup:
@@ -200,7 +203,8 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
     var category: CommandCategory {
         switch self {
         case .getDeviceState, .controlDevice, .controlDeviceGroup,
-             .controlDeviceLocation, .settingAttribute, .setCountdown:
+             .controlDeviceLocation, .settingAttribute, .setCountdown,
+             .cancelCountdown:
             return .deviceStateControl
 
         case .connect, .unbindDeviceGroup:
@@ -244,6 +248,8 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
             return "Set a specific attribute on a device element"
         case .setCountdown:
             return "Set a countdown timer to execute start/stop attribute values"
+        case .cancelCountdown:
+            return "Cancel countdown timer(s). Empty elements clears all countdowns"
         case .connect:
             return "Bind a device to a group address"
         case .unbindDeviceGroup:
@@ -451,6 +457,25 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     type: .int,
                     defaultValue: "30",
                     placeholder: "Countdown duration in minutes"
+                )
+            ]
+
+        case .cancelCountdown:
+            return [
+                CommandParameter(
+                    name: "devId",
+                    displayName: "Device ID",
+                    type: .string,
+                    placeholder: "Device UUID"
+                ),
+                CommandParameter(
+                    name: "elements",
+                    displayName: "Elements",
+                    type: .intArray,
+                    defaultValue: "",
+                    placeholder: "empty = clear ALL, or 0,1,2",
+                    isRequired: false,
+                    helpText: "Leave empty to clear all countdowns on the device"
                 )
             ]
 

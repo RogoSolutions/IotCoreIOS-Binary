@@ -1112,6 +1112,8 @@ struct DeviceControlDetailView: View {
             return try await executeSettingAttribute(handler: handler)
         case .setCountdown:
             return try await executeSetCountdown(handler: handler)
+        case .cancelCountdown:
+            return try await executeCancelCountdown(handler: handler)
         case .connect:
             return try await executeConnect(handler: handler)
         case .unbindDeviceGroup:
@@ -1257,6 +1259,26 @@ struct DeviceControlDetailView: View {
                     switch result {
                     case .success(let ack):
                         continuation.resume(returning: "Countdown set for \(minutes) minutes. ACK: \(ack)")
+                    case .failure(let errorCode):
+                        continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
+                    }
+                }
+            )
+        }
+    }
+
+    private func executeCancelCountdown(handler: RGBIotDeviceCmdHandler) async throws -> String {
+        let devId = parameterValues["devId"] ?? device.id
+        let elements = parseIntArray(parameterValues["elements"] ?? "")
+        return try await withCheckedThrowingContinuation { continuation in
+            handler.cancelCountdown(
+                devId: devId,
+                elements: elements,
+                completion: AckClosureAdapter { result in
+                    switch result {
+                    case .success(let ack):
+                        let scope = elements.isEmpty ? "all countdowns" : "elements \(elements)"
+                        continuation.resume(returning: "Countdown cancelled (\(scope)). ACK: \(ack)")
                     case .failure(let errorCode):
                         continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                     }

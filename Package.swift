@@ -19,13 +19,13 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IotCoreIOSBinary",
-            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.14/IotCoreIOS-0.0.14.xcframework.zip",
-            checksum: "f08b1cea033a27da0d1cfd5e4aafdefeb0ff59626dc8a13456cb110b71c67bd3"
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.15/IotCoreIOS-0.0.15.xcframework.zip",
+            checksum: "4670cd4cd2fa9e69728b27f56bf57d89776bfa5bd5a963821abe3a361acfe44f"
         ),
         .binaryTarget(
             name: "CocoaMQTTBinary",
-            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.14/CocoaMQTT-0.0.14.xcframework.zip",
-            checksum: "c47a6844dbd9e63ac2e3edae1ec2adfc1143432b65135e260417071f23dddcbe"
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.15/CocoaMQTT-0.0.15.xcframework.zip",
+            checksum: "18b169f56fac7384b72d7e04b3a1779e0a819bd0120c6e8cd29ef3b2babeea46"
         ),
         .target(
             name: "IotCoreIOSWrapper",
