@@ -343,6 +343,15 @@ struct SettingsTabView: View {
                 }
             }
 
+            NavigationLink(destination: ConcurrentStateTestView()) {
+                HStack {
+                    Image(systemName: "bolt.horizontal.circle")
+                        .foregroundColor(.red)
+                        .frame(width: 24)
+                    Text("Concurrent State (Bug 2)")
+                }
+            }
+
             NavigationLink(destination: MQTTStatusView()) {
                 HStack {
                     Image(systemName: "network")

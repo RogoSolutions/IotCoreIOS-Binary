@@ -13,12 +13,14 @@
 		0B74D20A2D7B0D85AC832530 /* CommandParameterFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4714BAB606B4B132B7EB58 /* CommandParameterFormView.swift */; };
 		16D315C578605A7893E5C2EF /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */; };
 		1F4F563B91D4BAFB4BC71113 /* DeviceCommandTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */; };
+		27546F3524467C5BA5863000 /* ConcurrentStateTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57F8017461FF40C7DBD7F7E /* ConcurrentStateTestView.swift */; };
 		279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C603850BCEC52F2B28B6B6FE /* RestfulAPITestViewModel.swift */; };
 		31A82C3A5A0B572840A585A6 /* DeviceControlDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1227DA2FCADE3BE176103CC1 /* DeviceControlDetailView.swift */; };
 		354108AFA5F775FEFAFB3D9B /* OperationTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */; };
 		3A5F24A475C8B8E90FB32845 /* SmartDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */; };
 		3CB7810C6E9867F2DBA09F0F /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638D0F941424D5588904ED3E /* Location.swift */; };
 		4026883B59F0ECAA3F626699 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42FA61BD3F1028CB5AF38B05 /* ViewExtensions.swift */; };
+		4598FEB2CB76D990945B32C5 /* ConcurrentStateTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0C60FBA248EE02A8561AC6 /* ConcurrentStateTestViewModel.swift */; };
 		48E2B5C70FB52A8BA1050BC8 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */; };
 		4D77DB8B8CD3687D8FB9B151 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3EA90838CB678CD1EF4695 /* SettingsViewModel.swift */; };
 		514FF485910A2C2352A964F3 /* DiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003AE29675897EF2D6CDFEF /* DiscoveryViewModel.swift */; };
@@ -105,6 +107,7 @@
 		99A127832DFCA628F7473ACC /* IoTCoreSample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IoTCoreSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWifiDeviceTestViewModel.swift; sourceTree = "<group>"; };
 		AEE01921590D32EAA4A920FE /* SmartItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartItem.swift; sourceTree = "<group>"; };
+		B57F8017461FF40C7DBD7F7E /* ConcurrentStateTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentStateTestView.swift; sourceTree = "<group>"; };
 		B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		C03D1788202A3571AB3B7AFB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C0B27DE0E695B2217F694769 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -121,6 +124,7 @@
 		D832F44FF079F10D1BBA1E74 /* OperationDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationDefinition.swift; sourceTree = "<group>"; };
 		E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationTestView.swift; sourceTree = "<group>"; };
 		EB02124565D01E4799297828 /* GroupControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupControlView.swift; sourceTree = "<group>"; };
+		EE0C60FBA248EE02A8561AC6 /* ConcurrentStateTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentStateTestViewModel.swift; sourceTree = "<group>"; };
 		EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCommandTestViewModel.swift; sourceTree = "<group>"; };
 		F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestfulAPITestView.swift; sourceTree = "<group>"; };
@@ -178,6 +182,7 @@
 				6966F2E1B2D4C00BDDDC4322 /* OnboardingTab */,
 				DAF035BC07AF9B9BDC8E6343 /* SettingsTab */,
 				0D59A8D83AEBB78F52F34E3C /* AuthView.swift */,
+				B57F8017461FF40C7DBD7F7E /* ConcurrentStateTestView.swift */,
 				341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */,
 				14344C1318F0E7BB290948E2 /* DeviceCommandTestView.swift */,
 				3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */,
@@ -230,6 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */,
+				EE0C60FBA248EE02A8561AC6 /* ConcurrentStateTestViewModel.swift */,
 				A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */,
 				EF3859CFA0F6418EC7A696F9 /* DeviceCommandTestViewModel.swift */,
 				38C27BA0860A273EBC430C28 /* DeviceControlViewModel.swift */,
@@ -374,6 +380,8 @@
 				8302203271D372AC876C8C6B /* CertificateTransferView.swift in Sources */,
 				68A332708F79F072723A2B07 /* CommandExecution.swift in Sources */,
 				0B74D20A2D7B0D85AC832530 /* CommandParameterFormView.swift in Sources */,
+				27546F3524467C5BA5863000 /* ConcurrentStateTestView.swift in Sources */,
+				4598FEB2CB76D990945B32C5 /* ConcurrentStateTestViewModel.swift in Sources */,
 				CC34ABD3911A9E8FD34D52FD /* ConfigWifiDeviceTestView.swift in Sources */,
 				6AA778672BC87AC06D55CB9F /* ConfigWifiDeviceTestViewModel.swift in Sources */,
 				6378B6AAA55380D401F5B0AE /* ContentView.swift in Sources */,
