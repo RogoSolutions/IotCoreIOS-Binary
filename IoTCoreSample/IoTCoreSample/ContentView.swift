@@ -170,6 +170,27 @@ struct ContentView: View {
                         print("User is authenticated")
                     } else {
                         print("User is not authenticated")
+                        #if DEBUG
+                        // DEV-ONLY auto-login for QA driving on simulator (no UI typing).
+                        // Triggered only when both env vars are present at launch.
+                        let env = ProcessInfo.processInfo.environment
+                        if let email = env["IOTCORE_LOGIN_EMAIL"], !email.isEmpty,
+                           let password = env["IOTCORE_LOGIN_PASSWORD"], !password.isEmpty {
+                            print("Auto-login (DEBUG env) as \(email)...")
+                            IoTAppCore.current?.loginWithEmail(email: email, password: password) { status in
+                                DispatchQueue.main.async {
+                                    if case .success = status {
+                                        print("Auto-login SUCCESS")
+                                        IoTAppCore.current?.connectService { _ in
+                                            print("Auto connectService done")
+                                        }
+                                    } else {
+                                        print("Auto-login FAILURE: \(status)")
+                                    }
+                                }
+                            }
+                        }
+                        #endif
                     }
 
                 case .failure(let error):

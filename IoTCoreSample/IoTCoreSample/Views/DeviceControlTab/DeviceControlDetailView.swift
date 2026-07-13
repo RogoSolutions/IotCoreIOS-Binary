@@ -1255,10 +1255,19 @@ struct DeviceControlDetailView: View {
                 attrValueStart: attrValueStart,
                 attrValueStop: attrValueStop,
                 minutes: minutes,
-                completion: AckClosureAdapter { result in
+                completion: SetDeviceCountdownClosureAdapter { result in
                     switch result {
-                    case .success(let ack):
-                        continuation.resume(returning: "Countdown set for \(minutes) minutes. ACK: \(ack)")
+                    case .success(let report):
+                        // Print the 5 report fields so the dev can confirm the
+                        // real 0x0E frame layout (KN-1 vs KN-2) on hardware.
+                        continuation.resume(returning: """
+                        Countdown started.
+                        elms=\(report.elms)
+                        minutes=\(report.minutes)
+                        timeStart=\(report.timeStart)
+                        attrStart=\(report.attrStart)
+                        attrStop=\(report.attrStop)
+                        """)
                     case .failure(let errorCode):
                         continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                     }
@@ -1271,19 +1280,15 @@ struct DeviceControlDetailView: View {
         let devId = parameterValues["devId"] ?? device.id
         let elements = parseIntArray(parameterValues["elements"] ?? "")
         return try await withCheckedThrowingContinuation { continuation in
-            handler.cancelCountdown(
-                devId: devId,
-                elements: elements,
-                completion: AckClosureAdapter { result in
-                    switch result {
-                    case .success(let ack):
-                        let scope = elements.isEmpty ? "all countdowns" : "elements \(elements)"
-                        continuation.resume(returning: "Countdown cancelled (\(scope)). ACK: \(ack)")
-                    case .failure(let errorCode):
-                        continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
-                    }
+            handler.cancelCountdown(devId: devId, elements: elements) { status in
+                switch status {
+                case .success:
+                    let scope = elements.isEmpty ? "all countdowns" : "elements \(elements)"
+                    continuation.resume(returning: "Countdown cancelled (\(scope))")
+                case .failure(let errorCode):
+                    continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            )
+            }
         }
     }
 
@@ -1292,11 +1297,12 @@ struct DeviceControlDetailView: View {
     private func executeConnect(handler: RGBIotDeviceCmdHandler) async throws -> String {
         let devId = parameterValues["devId"] ?? device.id
         let groupAddr = Int(parameterValues["groupAddr"] ?? "49153") ?? 49153
+        let oldGroupAddr = Int(parameterValues["oldGroupAddr"] ?? "0") ?? 0
         return try await withCheckedThrowingContinuation { continuation in
-            handler.connect(devId: devId, groupAddr: groupAddr, completion: AckClosureAdapter { result in
+            handler.bindDeviceGroup(devId: devId, groupAddr: groupAddr, oldGroupAddr: oldGroupAddr, completion: AckClosureAdapter { result in
                 switch result {
                 case .success(let ack):
-                    continuation.resume(returning: "Device bound to group \(groupAddr). ACK: \(ack)")
+                    continuation.resume(returning: "Device bound to group \(groupAddr) (old \(oldGroupAddr)). ACK: \(ack)")
                 case .failure(let errorCode):
                     continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }

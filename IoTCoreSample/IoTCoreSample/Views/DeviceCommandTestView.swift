@@ -13,6 +13,7 @@ struct DeviceCommandTestView: View {
 
     @State private var deviceId = ""
     @State private var groupAddr = ""
+    @State private var oldGroupAddr = "0"
     @State private var elements = "[0]"
     @State private var attrValue = "[1, 255, 255, 255]"
     @State private var targetDevType = "1"
@@ -143,9 +144,14 @@ struct DeviceCommandTestView: View {
                     .textFieldStyle(.roundedBorder)
                     .keyboardType(.numberPad)
 
+                TextField("Old Group Address", text: $oldGroupAddr)
+                    .textFieldStyle(.roundedBorder)
+                    .keyboardType(.numberPad)
+
                 Button {
                     if let groupAddrInt = Int(groupAddr) {
-                        viewModel.connectDevice(devId: deviceId, groupAddr: groupAddrInt)
+                        let oldGroupAddrInt = Int(oldGroupAddr) ?? 0
+                        viewModel.connectDevice(devId: deviceId, groupAddr: groupAddrInt, oldGroupAddr: oldGroupAddrInt)
                     }
                 } label: {
                     Text("Connect")

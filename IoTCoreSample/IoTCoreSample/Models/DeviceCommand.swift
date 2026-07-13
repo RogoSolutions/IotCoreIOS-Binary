@@ -493,6 +493,13 @@ enum DeviceCommand: String, CaseIterable, Identifiable {
                     type: .int,
                     defaultValue: "49153",
                     placeholder: "Group address to bind to"
+                ),
+                CommandParameter(
+                    name: "oldGroupAddr",
+                    displayName: "Old Group Address",
+                    type: .int,
+                    defaultValue: "0",
+                    placeholder: "0 if device is not in any group yet"
                 )
             ]
 

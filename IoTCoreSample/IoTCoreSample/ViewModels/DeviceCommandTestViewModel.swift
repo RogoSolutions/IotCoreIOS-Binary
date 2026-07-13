@@ -20,7 +20,7 @@ class DeviceCommandTestViewModel: ObservableObject {
 
     // MARK: - Device Commands
 
-    func connectDevice(devId: String, groupAddr: Int) {
+    func connectDevice(devId: String, groupAddr: Int, oldGroupAddr: Int) {
         guard let sdk = IoTAppCore.current else {
             showError("SDK not initialized")
             return
@@ -35,9 +35,9 @@ class DeviceCommandTestViewModel: ObservableObject {
         lastError = nil
         lastResult = nil
 
-        print("📡 Connecting device: \(devId), groupAddr: \(groupAddr)")
+        print("📡 Connecting device: \(devId), groupAddr: \(groupAddr), oldGroupAddr: \(oldGroupAddr)")
 
-        sdk.deviceCmdHandler.connect(devId: devId, groupAddr: groupAddr, completion: AckClosureAdapter { [weak self] result in
+        sdk.deviceCmdHandler.bindDeviceGroup(devId: devId, groupAddr: groupAddr, oldGroupAddr: oldGroupAddr, completion: AckClosureAdapter { [weak self] result in
             Task { @MainActor in
                 guard let self = self else { return }
                 self.isLoading = false

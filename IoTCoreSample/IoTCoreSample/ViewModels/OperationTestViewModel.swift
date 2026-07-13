@@ -275,7 +275,8 @@ class OperationTestViewModel: ObservableObject {
         case "bindDeviceToGroup":
             let elements = try parseIntArray(parameterValues["elements"] ?? "0")
             let groupAddr = try parseInt(parameterValues["groupAddr"] ?? "")
-            return try await executeConnect(handler: handler, devId: devId, groupAddr: groupAddr)
+            let oldGroupAddr = Int(parameterValues["oldGroupAddr"] ?? "0") ?? 0
+            return try await executeConnect(handler: handler, devId: devId, groupAddr: groupAddr, oldGroupAddr: oldGroupAddr)
 
         case "unbindDeviceFromGroup":
             let elements = try parseIntArray(parameterValues["elements"] ?? "0")
@@ -393,12 +394,12 @@ class OperationTestViewModel: ObservableObject {
         }
     }
 
-    private func executeConnect(handler: RGBIotDeviceCmdHandler, devId: String, groupAddr: Int) async throws -> String {
+    private func executeConnect(handler: RGBIotDeviceCmdHandler, devId: String, groupAddr: Int, oldGroupAddr: Int) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            handler.connect(devId: devId, groupAddr: groupAddr, completion: AckClosureAdapter { result in
+            handler.bindDeviceGroup(devId: devId, groupAddr: groupAddr, oldGroupAddr: oldGroupAddr, completion: AckClosureAdapter { result in
                 switch result {
                 case .success:
-                    continuation.resume(returning: "Bound to group \(groupAddr)")
+                    continuation.resume(returning: "Bound to group \(groupAddr) (old \(oldGroupAddr))")
                 case .failure(let errorCode):
                     continuation.resume(throwing: NSError(domain: "OperationTest", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }

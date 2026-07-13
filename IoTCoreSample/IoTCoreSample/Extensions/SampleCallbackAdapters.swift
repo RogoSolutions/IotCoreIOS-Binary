@@ -97,6 +97,39 @@ final class GetDeviceStateClosureAdapter: IoTGetDeviceStateCallback {
     func onError(errorCode: Int) { handler(.failure(errorCode)) }
 }
 
+// MARK: - IoTSetDeviceCountdownCallback
+
+/// Adapts `IoTSetDeviceCountdownCallback` to a closure (5-field report on
+/// success; errorCode Int on failure).
+final class SetDeviceCountdownClosureAdapter: IoTSetDeviceCountdownCallback {
+    struct Report {
+        let elms: [Int]
+        let minutes: Int
+        let timeStart: Int64
+        let attrStart: [Int]
+        let attrStop: [Int]
+    }
+
+    private let handler: (SampleResult<Report>) -> Void
+
+    init(_ handler: @escaping (SampleResult<Report>) -> Void) {
+        self.handler = handler
+    }
+
+    func onSuccess(elms: [Int],
+                   minutes: Int,
+                   timeStart: Int64,
+                   attrStart: [Int],
+                   attrStop: [Int]) {
+        handler(.success(Report(elms: elms,
+                                minutes: minutes,
+                                timeStart: timeStart,
+                                attrStart: attrStart,
+                                attrStop: attrStop)))
+    }
+    func onError(errorCode: Int) { handler(.failure(errorCode)) }
+}
+
 // MARK: - IoTSyncDeviceToCloudCallback
 
 /// Adapts `IoTSyncDeviceToCloudCallback` back to the old `(status, error?)`
