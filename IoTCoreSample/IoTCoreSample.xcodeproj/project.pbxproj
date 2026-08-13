@@ -54,6 +54,7 @@
 		B6573FCC85404D6200080850 /* SmartTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 233883E95F128A5E9D05DC82 /* SmartTestViewModel.swift */; };
 		BE2F4383CDC112AC104F2485 /* MQTTStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC64620FFC8AE3FD1D68E3D /* MQTTStatusViewModel.swift */; };
 		C5D5910AED1B25343356A3BF /* DeviceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24C90E1317F3D4D93EE7FF72 /* DeviceCommand.swift */; };
+		C8BF37027D0FFA681EEA50EC /* PhoneAuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A9985F4FCB0CFD4E1BF5467 /* PhoneAuthViewModel.swift */; };
 		C9CA0E02AFE56205761A754C /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A37CAC2BE34B60F6314230 /* SettingsTabView.swift */; };
 		CC34ABD3911A9E8FD34D52FD /* ConfigWifiDeviceTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341F85A37EDA7CF8AD516B53 /* ConfigWifiDeviceTestView.swift */; };
 		CE194FD1F173190034D50EA3 /* GroupControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB02124565D01E4799297828 /* GroupControlView.swift */; };
@@ -63,6 +64,7 @@
 		DE55AD16F33C256DD3E7539D /* OtaVersionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8631A4627AB6574740603B70 /* OtaVersionHelper.swift */; };
 		E4B27534E31D967E48DFF2D5 /* SmartItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE01921590D32EAA4A920FE /* SmartItem.swift */; };
 		E4FCF353730FAE6B273E6108 /* DeviceControlTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2983C327BFE608FB1C50209B /* DeviceControlTabView.swift */; };
+		E7587F0CD83251F4364D8E65 /* PhoneAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56AC217A8931D2E98FA264E /* PhoneAuthView.swift */; };
 		FBBAC3415AD619027B7B90DF /* ServiceCallbackDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C894F366D577B702710A94B8 /* ServiceCallbackDemoView.swift */; };
 		FC00E013A531F5DCC8CD94D5 /* MQTTStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CD0A877C230F54D17171E4 /* MQTTStatusView.swift */; };
 		FD7DFDA0521F1784AAA9EBFA /* OperatorsTestingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD19BAE94D535D0151E6ACB /* OperatorsTestingView.swift */; };
@@ -95,6 +97,7 @@
 		5A941DE23C8FC514F4A1BC7B /* IotCoreIOS-Binary */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "IotCoreIOS-Binary"; path = ..; sourceTree = SOURCE_ROOT; };
 		6245809A878DF90EB338B0AD /* CredentialsSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialsSetupView.swift; sourceTree = "<group>"; };
 		638D0F941424D5588904ED3E /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		6A9985F4FCB0CFD4E1BF5467 /* PhoneAuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneAuthViewModel.swift; sourceTree = "<group>"; };
 		6C1C7ED51871EE575DAA2F69 /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
 		75109671C3AC968C1215A4F8 /* SmartDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartDetailView.swift; sourceTree = "<group>"; };
 		76C605C984ACAA0370A80256 /* RestApiBodyHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestApiBodyHelper.swift; sourceTree = "<group>"; };
@@ -107,6 +110,7 @@
 		99A127832DFCA628F7473ACC /* IoTCoreSample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IoTCoreSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F9623107B760FDD2865A77 /* ConfigWifiDeviceTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigWifiDeviceTestViewModel.swift; sourceTree = "<group>"; };
 		AEE01921590D32EAA4A920FE /* SmartItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartItem.swift; sourceTree = "<group>"; };
+		B56AC217A8931D2E98FA264E /* PhoneAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneAuthView.swift; sourceTree = "<group>"; };
 		B57F8017461FF40C7DBD7F7E /* ConcurrentStateTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentStateTestView.swift; sourceTree = "<group>"; };
 		B79D8FAD622DA9E09E4466AB /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		C03D1788202A3571AB3B7AFB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -188,6 +192,7 @@
 				3AE9F366BE207DB3990E7C0D /* DiscoveryView.swift */,
 				155FA6E371E06CE8AD1684EC /* LocationSelectionView.swift */,
 				E5F18C13D8FEEA77AE155B4A /* OperationTestView.swift */,
+				B56AC217A8931D2E98FA264E /* PhoneAuthView.swift */,
 				F7FE5D25C3A05F91B18E40F2 /* RestfulAPITestView.swift */,
 				75109671C3AC968C1215A4F8 /* SmartDetailView.swift */,
 				8AE727BE473CB66BB965FFB5 /* SmartListView.swift */,
@@ -246,6 +251,7 @@
 				F2C9979826E8A78773DA9BD3 /* OnboardingViewModel.swift */,
 				8A77F495ED4204FD1DE348C4 /* OperationTestViewModel.swift */,
 				56EE12902E5E9B7943BC9F84 /* OperatorsTestingViewModel.swift */,
+				6A9985F4FCB0CFD4E1BF5467 /* PhoneAuthViewModel.swift */,
 				3AB7C4B11EABCCE6AA8D8872 /* ServiceCallbackDemoViewModel.swift */,
 				2A3EA90838CB678CD1EF4695 /* SettingsViewModel.swift */,
 				84FC202E188EC1152E921C39 /* SmartDetailViewModel.swift */,
@@ -414,6 +420,8 @@
 				D94F786933B27A199CC928F3 /* OtaProgressStore.swift in Sources */,
 				DE55AD16F33C256DD3E7539D /* OtaVersionHelper.swift in Sources */,
 				9FBCF73119C9061C10B5B3C8 /* OtaVersionPickerView.swift in Sources */,
+				E7587F0CD83251F4364D8E65 /* PhoneAuthView.swift in Sources */,
+				C8BF37027D0FFA681EEA50EC /* PhoneAuthViewModel.swift in Sources */,
 				9593445D58BC034CF1E6A1D0 /* RestApiBodyHelper.swift in Sources */,
 				962623A93F577A62BB5BDF15 /* RestfulAPITestView.swift in Sources */,
 				279E1E1746885E23395EDBBC /* RestfulAPITestViewModel.swift in Sources */,

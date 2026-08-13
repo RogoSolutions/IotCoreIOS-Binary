@@ -16,6 +16,17 @@ struct AuthView: View {
                 // Status Section
                 statusSection
 
+                // Phone-number auth (OTP) test screen — Trello 260810-1
+                Section {
+                    NavigationLink(destination: PhoneAuthView()) {
+                        Label("Phone Auth (OTP)", systemImage: "phone.badge.checkmark")
+                    }
+                } footer: {
+                    Text("Test the 6 phone-number auth primitives (sign-up / login / forgot-password).")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
                 // Auth Mode Picker (only show when not authenticated)
                 if !viewModel.isAuthenticated {
                     authModePicker
