@@ -68,8 +68,8 @@ final class PhoneAuthViewModel: ObservableObject {
     func requestSignUpCode() {
         begin("otpRequestSignUpCode")
         IoTAppCore.current?.otpRequestSignUpCode(
-            username: signUpUsername.isEmpty ? nil : signUpUsername,
             phoneNumber: signUpPhone,
+            username: signUpUsername.isEmpty ? nil : signUpUsername,
             password: signUpPassword
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSignUpCode",
