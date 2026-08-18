@@ -319,6 +319,7 @@ class SmartTestViewModel: ObservableObject {
             attrValueConditionExt: nil,
             timeCfg: timeCfg,
             timeJob: nil,
+            triggerCondStatus: nil,
             completion: SmartBindTriggerClosureAdapter { [weak self] result in
                 Task { @MainActor in
                     self?.isLoading = false
@@ -332,12 +333,18 @@ class SmartTestViewModel: ObservableObject {
         guard let sdk = IoTAppCore.current else { showError("SDK not initialized"); return }
         guard !devId.isEmpty else { showError("Device ID required"); return }
         isLoading = true; lastError = nil; lastResult = nil
-        sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: devId, completion: AckClosureAdapter { [weak self] result in
+        sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: devId, conditionStatus: nil) { [weak self] status in
             Task { @MainActor in
                 self?.isLoading = false
-                self?.handleAckResult(result, commandName: "Unbind Smart Trigger")
+                // Map RequestStatus → SampleResult<Int> for the shared UI helper.
+                let mapped: SampleResult<Int>
+                switch status {
+                case .success: mapped = .success(0)
+                case .failure(let code): mapped = .failure(code)
+                }
+                self?.handleAckResult(mapped, commandName: "Unbind Smart Trigger")
             }
-        })
+        }
     }
 
     func bindSmartCmd(smid: Int, devId: String, elm: Int, attrValue: [Int], delay: Int?) {
@@ -848,6 +855,7 @@ class SmartTestViewModel: ObservableObject {
             attrValueConditionExt: nil,
             timeCfg: timeCfg,
             timeJob: timeJob,
+            triggerCondStatus: nil,
             completion: SmartBindTriggerClosureAdapter { [weak self] result in
                 Task { @MainActor in
                     guard let self = self else { return }

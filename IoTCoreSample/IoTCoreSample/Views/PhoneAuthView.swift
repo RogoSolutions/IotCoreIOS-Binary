@@ -61,6 +61,11 @@ struct PhoneAuthView: View {
                 .textInputAutocapitalization(.never)
                 .disabled(viewModel.isLoading)
 
+            TextField("Username (optional)", text: $viewModel.signUpUsername)
+                .textInputAutocapitalization(.never)
+                .disableAutocorrection(true)
+                .disabled(viewModel.isLoading)
+
             SecureField("Password (≥6)", text: $viewModel.signUpPassword)
                 .disabled(viewModel.isLoading)
 

@@ -22,6 +22,7 @@ final class PhoneAuthViewModel: ObservableObject {
 
     // MARK: - Sign-up flow fields
     @Published var signUpPhone: String = "+84"
+    @Published var signUpUsername: String = ""
     @Published var signUpPassword: String = ""
     @Published var signUpOtp: String = ""
 
@@ -67,6 +68,7 @@ final class PhoneAuthViewModel: ObservableObject {
     func requestSignUpCode() {
         begin("otpRequestSignUpCode")
         IoTAppCore.current?.otpRequestSignUpCode(
+            username: signUpUsername.isEmpty ? nil : signUpUsername,
             phoneNumber: signUpPhone,
             password: signUpPassword
         ) { [weak self] result in

@@ -1396,6 +1396,7 @@ struct DeviceControlDetailView: View {
                 attrValueConditionExt: attrValueConditionExt,
                 timeCfg: timeCfg,
                 timeJob: timeJob,
+                triggerCondStatus: nil,
                 completion: SmartBindTriggerClosureAdapter { result in
                     switch result {
                     case .success(let cfm):
@@ -1412,14 +1413,14 @@ struct DeviceControlDetailView: View {
         let smid = Int(parameterValues["smid"] ?? "0") ?? 0
         let devId = parameterValues["devId"] ?? device.id
         return try await withCheckedThrowingContinuation { continuation in
-            handler.unbindDeviceSmartTrigger(smid: smid, devId: devId, completion: AckClosureAdapter { result in
+            handler.unbindDeviceSmartTrigger(smid: smid, devId: devId, conditionStatus: nil) { result in
                 switch result {
-                case .success(let ack):
-                    continuation.resume(returning: "Smart trigger unbound. ACK: \(ack)")
+                case .success:
+                    continuation.resume(returning: "Smart trigger unbound.")
                 case .failure(let errorCode):
                     continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
-            })
+            }
         }
     }
 

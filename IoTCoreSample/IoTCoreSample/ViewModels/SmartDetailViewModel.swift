@@ -681,12 +681,12 @@ final class SmartDetailViewModel: ObservableObject {
         appendOpLog("[DeleteTrigger \(row.uuid.prefix(8))…] MQTT unbind ...")
         do {
             try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-                sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: row.sourceId, completion: AckClosureAdapter { result in
+                sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: row.sourceId, conditionStatus: nil) { result in
                     switch result {
                     case .success: cont.resume()
                     case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
                     }
-                })
+                }
             }
             appendOpLog("[DeleteTrigger] MQTT unbind OK")
             _ = try await restPost(sdk: sdk, path: "smarttrigger/delete", params: ["uuid": row.uuid])
@@ -738,6 +738,7 @@ final class SmartDetailViewModel: ObservableObject {
                     attrValueConditionExt: attrValueConditionExt,
                     timeCfg: timeCfg,
                     timeJob: timeJob,
+                    triggerCondStatus: nil,
                     completion: SmartBindTriggerClosureAdapter { result in
                         switch result {
                         case .success: cont.resume()
@@ -846,12 +847,12 @@ final class SmartDetailViewModel: ObservableObject {
             // 1) MQTT unbind old
             do {
                 try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-                    sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: existingRow.sourceId, completion: AckClosureAdapter { result in
+                    sdk.deviceCmdHandler.unbindDeviceSmartTrigger(smid: smid, devId: existingRow.sourceId, conditionStatus: nil) { result in
                         switch result {
                         case .success: cont.resume()
                         case .failure(let code): cont.resume(throwing: NSError(domain: "SmartDetail", code: code, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(code))"]))
                         }
-                    })
+                    }
                 }
                 appendOpLog("[EditTrigger] MQTT unbind OK")
             } catch {
@@ -879,6 +880,7 @@ final class SmartDetailViewModel: ObservableObject {
                     attrValueConditionExt: attrValueConditionExt,
                     timeCfg: timeCfg,
                     timeJob: timeJob,
+                    triggerCondStatus: nil,
                     completion: SmartBindTriggerClosureAdapter { result in
                         switch result {
                         case .success: cont.resume()
