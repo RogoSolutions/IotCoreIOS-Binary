@@ -2,8 +2,9 @@
 //  PhoneAuthView.swift
 //  IoTCoreSample
 //
-//  Manual test screen for the 6 phone-number auth (OTP) primitives
-//  (Trello 260810-1). Each button invokes exactly one Core function.
+//  Manual test screen for the phone-number auth (OTP) primitives
+//  (Trello 260810-1, phase-26 Y07F4cc0). Each button invokes exactly one Core
+//  function. Uses the reason-driven primitives (Android core 1.0.3.38 parity).
 //
 //  No NavigationView wrapper here — this screen is pushed from AuthView, so it
 //  inherits the existing navigation context.
@@ -17,6 +18,7 @@ struct PhoneAuthView: View {
     var body: some View {
         Form {
             statusSection
+            signInSection
             signUpSection
             loginSection
             forgotSection
@@ -48,6 +50,42 @@ struct PhoneAuthView: View {
             Text("Status")
         } footer: {
             Text("Enter phone in E.164 (+84…). OTP is 6 digits, valid 5 min. Wait 30s between SMS sends. Password ≥ 6 chars. The Core does NOT normalize the number.")
+                .font(.caption)
+        }
+    }
+
+    // MARK: - Passwordless sign-in (phase-26)
+
+    private var signInSection: some View {
+        Section {
+            TextField("Phone (+84…)", text: $viewModel.signInPhone)
+                .keyboardType(.phonePad)
+                .textInputAutocapitalization(.never)
+                .disabled(viewModel.isLoading)
+
+            Picker("Channel", selection: $viewModel.signInChannel) {
+                ForEach(PhoneAuthViewModel.ChannelChoice.allCases) { choice in
+                    Text(choice.rawValue).tag(choice)
+                }
+            }
+            .pickerStyle(.segmented)
+            .disabled(viewModel.isLoading)
+
+            actionButton("Request sign-in code", systemImage: "paperplane",
+                         disabled: viewModel.signInPhone.isEmpty,
+                         action: viewModel.requestSignInCode)
+
+            TextField("OTP", text: $viewModel.signInOtp)
+                .keyboardType(.numberPad)
+                .disabled(viewModel.isLoading)
+
+            actionButton("Verify & sign in", systemImage: "person.badge.key",
+                         disabled: viewModel.signInPhone.isEmpty || viewModel.signInOtp.isEmpty,
+                         action: viewModel.verifySignInCode)
+        } header: {
+            Text("0 · Passwordless sign-in")
+        } footer: {
+            Text("otpRequestSendVerifyCode(.signin[/channel]) → otpRequestSignInByVerifyCode(.signin). Verify returns a token; the Core establishes the session (Auth status turns green). Resend = call request again with the same reason.")
                 .font(.caption)
         }
     }
@@ -87,7 +125,7 @@ struct PhoneAuthView: View {
         } header: {
             Text("1 · Sign-up flow")
         } footer: {
-            Text("otpRequestSignUpCode → (otpRequestResendSignUpCode) → otpVerifySignUpCode. Account is created only after Verify succeeds.")
+            Text("otpRequestSignUpCode → (otpRequestSendVerifyCode(.signup) to resend) → otpRequestSignInByVerifyCode(.signup). Account is created only after Verify succeeds; session only if the backend returns a token.")
                 .font(.caption)
         }
     }
@@ -141,7 +179,7 @@ struct PhoneAuthView: View {
         } header: {
             Text("3 · Forgot password")
         } footer: {
-            Text("otpRequestForgotPwdCode → otpRequestSetNewPwd. The request always reports success even for unregistered numbers. The 'no account' reset case surfaces as error code 400.")
+            Text("otpRequestSendVerifyCode(.forgotPassword) → otpRequestSetNewPwd. The request always reports success even for unregistered numbers. The 'no account' reset case surfaces as error code 400. Session only if the backend returns a token.")
                 .font(.caption)
         }
     }
