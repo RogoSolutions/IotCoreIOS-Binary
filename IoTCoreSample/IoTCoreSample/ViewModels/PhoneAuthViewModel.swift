@@ -91,7 +91,7 @@ final class PhoneAuthViewModel: ObservableObject {
         begin("otpRequestSendVerifyCode(.signin)")
         IoTAppCore.current?.otpRequestSendVerifyCode(
             phoneNumber: signInPhone,
-            reason: .signin,
+            reason: "signin",
             channel: signInChannel.channel
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSendVerifyCode(.signin)",
@@ -104,7 +104,7 @@ final class PhoneAuthViewModel: ObservableObject {
         IoTAppCore.current?.otpRequestSignInByVerifyCode(
             phoneNumber: signInPhone,
             otp: signInOtp,
-            reason: .signin
+            reason: "signin"
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSignInByVerifyCode(.signin)",
                          success: "Verified — session established (check Auth status).") { vm in
@@ -132,7 +132,7 @@ final class PhoneAuthViewModel: ObservableObject {
         begin("otpRequestSendVerifyCode(.signup)")
         IoTAppCore.current?.otpRequestSendVerifyCode(
             phoneNumber: signUpPhone,
-            reason: .signup
+            reason: "signup"
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSendVerifyCode(.signup)",
                          success: "Resend requested (wait 30s between sends).")
@@ -144,7 +144,7 @@ final class PhoneAuthViewModel: ObservableObject {
         IoTAppCore.current?.otpRequestSignInByVerifyCode(
             phoneNumber: signUpPhone,
             otp: signUpOtp,
-            reason: .signup
+            reason: "signup"
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSignInByVerifyCode(.signup)",
                          success: "Verified — account created. Session only if the backend returned a token (see Auth status).") { vm in
@@ -187,7 +187,7 @@ final class PhoneAuthViewModel: ObservableObject {
         begin("otpRequestSendVerifyCode(.forgotPassword)")
         IoTAppCore.current?.otpRequestSendVerifyCode(
             phoneNumber: forgotPhone,
-            reason: .forgotPassword
+            reason: "forgot-password"
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSendVerifyCode(.forgotPassword)",
                          success: "Forgot-password code requested (always succeeds by design).")
