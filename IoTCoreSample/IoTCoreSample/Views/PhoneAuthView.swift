@@ -85,7 +85,7 @@ struct PhoneAuthView: View {
         } header: {
             Text("0 · Passwordless sign-in")
         } footer: {
-            Text("otpRequestSendVerifyCode(.signin[/channel]) → otpRequestSignInByVerifyCode(.signin). Verify returns a token; the Core establishes the session (Auth status turns green). Resend = call request again with the same reason.")
+            Text("otpRequestSendVerifyCode(reason: \"signin\" or \"signin/sms\") → otpRequestSignInByVerifyCode(reason: \"signin\"). The app composes the channel suffix into reason itself — the SDK has no channel param. Verify returns a token; the Core establishes the session (Auth status turns green). Resend = call request again with the same reason.")
                 .font(.caption)
         }
     }

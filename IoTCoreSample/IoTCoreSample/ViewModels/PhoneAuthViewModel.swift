@@ -24,15 +24,19 @@ import Combine
 @MainActor
 final class PhoneAuthViewModel: ObservableObject {
 
-    /// OTP delivery channel picker (`nil` = let the project choose).
+    /// OTP delivery channel picker. The SDK has no `channel` parameter
+    /// (phase-30, Trello Y07F4cc0) — the app composes the `/sms`/`/zalo`
+    /// suffix into `reason` itself before calling `otpRequestSendVerifyCode`.
     enum ChannelChoice: String, CaseIterable, Identifiable {
         case auto, sms, zalo
         var id: String { rawValue }
-        var channel: IoTOtpChannel? {
+        /// Suffix appended to the base `reason` string, empty for `.auto`
+        /// (let the project pick its configured channel order).
+        var reasonSuffix: String {
             switch self {
-            case .auto: return nil
-            case .sms:  return .sms
-            case .zalo: return .zalo
+            case .auto: return ""
+            case .sms:  return "/sms"
+            case .zalo: return "/zalo"
             }
         }
     }
@@ -89,10 +93,12 @@ final class PhoneAuthViewModel: ObservableObject {
 
     func requestSignInCode() {
         begin("otpRequestSendVerifyCode(.signin)")
+        // App composes the channel suffix into `reason` — the SDK has no
+        // `channel` parameter (phase-30, Trello Y07F4cc0).
+        let reason = "signin" + signInChannel.reasonSuffix
         IoTAppCore.current?.otpRequestSendVerifyCode(
             phoneNumber: signInPhone,
-            reason: "signin",
-            channel: signInChannel.channel
+            reason: reason
         ) { [weak self] result in
             self?.finish(result, action: "otpRequestSendVerifyCode(.signin)",
                          success: "Sign-in code requested (2122 = wait for cooldown).")
