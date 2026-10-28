@@ -75,16 +75,38 @@ final class ApiResultClosureAdapter: IoTApiResultCallback {
 /// Adapts `IoTGetDeviceStateCallback` to a closure (State on success;
 /// errorCode Int on failure).
 final class GetDeviceStateClosureAdapter: IoTGetDeviceStateCallback {
+    struct NewestLogBlock {
+        let element: Int
+        let attrType: Int
+        let timeCheckpoint: Int64
+        let prevCheckpoint: Int64
+        let logData: [Int]
+    }
     struct State {
         let deviceId: String
         let elementStates: [Int: [Int: [Int]]]
         let timeOffset: Int64
+        let newestLogBlocks: [NewestLogBlock]
     }
 
     private let handler: (SampleResult<State>) -> Void
+    private var newestBlocks: [NewestLogBlock] = []
 
     init(_ handler: @escaping (SampleResult<State>) -> Void) {
         self.handler = handler
+    }
+
+    func onResponseLogAttrBlockNewest(deviceId: String,
+                                      element: Int,
+                                      attrType: Int,
+                                      timeCheckpoint: Int64,
+                                      prevCheckpoint: Int64,
+                                      logData: [Int]) {
+        newestBlocks.append(NewestLogBlock(element: element,
+                                           attrType: attrType,
+                                           timeCheckpoint: timeCheckpoint,
+                                           prevCheckpoint: prevCheckpoint,
+                                           logData: logData))
     }
 
     func onResponseState(deviceId: String,
@@ -92,8 +114,48 @@ final class GetDeviceStateClosureAdapter: IoTGetDeviceStateCallback {
                          timeOffset: Int64) {
         handler(.success(State(deviceId: deviceId,
                                elementStates: elementStates,
-                               timeOffset: timeOffset)))
+                               timeOffset: timeOffset,
+                               newestLogBlocks: newestBlocks)))
     }
+    func onError(errorCode: Int) { handler(.failure(errorCode)) }
+}
+
+// MARK: - IoTGetLogAttrBlockCallback
+
+/// Adapts `IoTGetLogAttrBlockCallback` to a closure: collects every streamed
+/// block, then delivers the array on `onCompleted` (success) or the errorCode on
+/// `onError` (failure).
+final class GetLogAttrBlockClosureAdapter: IoTGetLogAttrBlockCallback {
+    struct Block {
+        let deviceId: String
+        let element: Int
+        let attrType: Int
+        let timeCheckpoint: Int64
+        let prevCheckpoint: Int64
+        let logData: [Int]
+    }
+
+    private let handler: (SampleResult<[Block]>) -> Void
+    private var blocks: [Block] = []
+
+    init(_ handler: @escaping (SampleResult<[Block]>) -> Void) {
+        self.handler = handler
+    }
+
+    func onResponseLogAttrBlock(deviceId: String,
+                                element: Int,
+                                attrType: Int,
+                                timeCheckpoint: Int64,
+                                prevCheckpoint: Int64,
+                                logData: [Int]) {
+        blocks.append(Block(deviceId: deviceId,
+                            element: element,
+                            attrType: attrType,
+                            timeCheckpoint: timeCheckpoint,
+                            prevCheckpoint: prevCheckpoint,
+                            logData: logData))
+    }
+    func onCompleted() { handler(.success(blocks)) }
     func onError(errorCode: Int) { handler(.failure(errorCode)) }
 }
 

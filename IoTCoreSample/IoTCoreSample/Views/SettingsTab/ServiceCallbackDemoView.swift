@@ -2,7 +2,7 @@
 //  ServiceCallbackDemoView.swift
 //  IoTCoreSample
 //
-//  View for demonstrating SDK service callbacks: onCloudEvent, onDeviceStateReport, onDeviceLogAttrReport
+//  View for demonstrating SDK service callbacks: onCloudEvent, onDeviceStateReport
 //
 
 import SwiftUI

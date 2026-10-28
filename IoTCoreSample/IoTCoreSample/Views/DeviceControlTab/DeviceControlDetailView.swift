@@ -1588,9 +1588,9 @@ struct DeviceControlDetailView: View {
         let devId = parameterValues["devId"] ?? device.id
         let element = Int(parameterValues["element"] ?? "0") ?? 0
         let attr = Int(parameterValues["attr"] ?? "0") ?? 0
-        let timeCheckpoint = Double(parameterValues["timeCheckpoint"] ?? "0") ?? 0
+        let timeCheckpoint = Int64(parameterValues["timeCheckpoint"] ?? "0") ?? 0
         return try await withCheckedThrowingContinuation { continuation in
-            handler.getLogAttrBlocks(devId: devId, element: element, attr: attr, timeCheckpoint: timeCheckpoint) { result in
+            let adapter = GetLogAttrBlockClosureAdapter { result in
                 switch result {
                 case .success(let blocks):
                     continuation.resume(returning: "Retrieved \(blocks.count) log blocks")
@@ -1598,6 +1598,7 @@ struct DeviceControlDetailView: View {
                     continuation.resume(throwing: NSError(domain: "DeviceControl", code: errorCode, userInfo: [NSLocalizedDescriptionKey: "Failed (code \(errorCode))"]))
                 }
             }
+            handler.getLogAttrBlocks(devId: devId, element: element, attr: attr, timeCheckpoint: timeCheckpoint, completion: adapter)
         }
     }
 

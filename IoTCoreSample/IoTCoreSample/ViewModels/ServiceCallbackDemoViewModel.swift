@@ -127,19 +127,9 @@ class ServiceCallbackDemoViewModel: ObservableObject {
                 Task { @MainActor [weak self] in
                     self?.handleDeviceStateReport(devId: devId, element: element, attrValueUpdate: attrValueUpdate)
                 }
-            },
-            onDeviceLogAttrReport: { [weak self] devId, element, attrType, timeCheckpoint, prevCheckpoint, logData in
-                Task { @MainActor [weak self] in
-                    self?.handleDeviceLogAttrReport(
-                        devId: devId,
-                        element: element,
-                        attrType: attrType,
-                        timeCheckpoint: timeCheckpoint,
-                        prevCheckpoint: prevCheckpoint,
-                        logData: logData
-                    )
-                }
             }
+            // Core 1.0.3.44+ removed onDeviceLogAttrReport — read logs via
+            // getDeviceState / getLogAttrBlocks instead.
         )
 
         callbackRegistrationStatus = "Callbacks registered - Listening for events"
