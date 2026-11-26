@@ -8,7 +8,7 @@ import PackageDescription
 let package = Package(
     name: "IotCoreIOS",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(
@@ -19,13 +19,13 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IotCoreIOSBinary",
-            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.36/IotCoreIOS-0.0.36.xcframework.zip",
-            checksum: "af5d5ef7179293911548658cdaba6148c5b2d5618f78fb0d7ebda275f684666f"
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.37/IotCoreIOS-0.0.37.xcframework.zip",
+            checksum: "9cfb491535268525faf76c26e37a83a8c958f91961d91e50dee78ab9f1593c81"
         ),
         .binaryTarget(
             name: "CocoaMQTTBinary",
-            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.36/CocoaMQTT-0.0.36.xcframework.zip",
-            checksum: "51da24e866fefdb902842eba3b14872b6d7a07250437a79307b149a3fd689b08"
+            url: "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/0.0.37/CocoaMQTT-0.0.37.xcframework.zip",
+            checksum: "d9474bcd4b7200a084c112b7f1d0a992cc0fafcf9626ca48713ca874a2c8d471"
         ),
         .target(
             name: "IotCoreIOSWrapper",

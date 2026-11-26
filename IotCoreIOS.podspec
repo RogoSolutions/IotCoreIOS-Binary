@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'IotCoreIOS'
-  s.version          = '0.0.36'
+  s.version          = '0.0.37'
   s.summary          = 'iOS SDK for IoT device management'
   s.description      = <<-DESC
     IotCoreIOS provides BLE discovery, WiFi provisioning, and multi-transport
@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
     :http => "https://github.com/RogoSolutions/IotCoreIOS-Binary/releases/download/#{s.version}/IotCoreIOS-#{s.version}.xcframework.zip"
   }
 
-  s.platform         = :ios, '13.0'
+  s.platform         = :ios, '15.0'
   s.swift_version    = '5.0'
 
   # CRITICAL: Vendored framework only - NO source_files
